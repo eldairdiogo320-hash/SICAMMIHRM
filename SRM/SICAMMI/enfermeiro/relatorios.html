@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios Clínicos - SICAMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css">
+    <style>
+        /* Estilo geral - herdado do histórico */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-image: url('../images/dash-rec.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Tema Claro */
+        body.light-theme::before {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        body.light-theme .page-title,
+        body.light-theme .glass-card .card-title,
+        body.light-theme .glass-card .card-text,
+        body.light-theme .glass-card .info-label,
+        body.light-theme .glass-card .info-value,
+        body.light-theme .glass-card .text-muted,
+        body.light-theme .modal-content,
+        body.light-theme .modal .form-label,
+        body.light-theme .indicator-card .number,
+        body.light-theme .indicator-card .label,
+        body.light-theme .filter-section .form-control,
+        body.light-theme .filter-section .form-select,
+        body.light-theme .filter-section .text-muted,
+        body.light-theme .report-table th,
+        body.light-theme .report-table td,
+        body.light-theme .report-table .table-text,
+        body.light-theme .nav-tabs .nav-link,
+        body.light-theme .chart-container h6,
+        body.light-theme .chart-container .chart-label {
+            color: #1a1a2e !important;
+        }
+
+        body.light-theme .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .indicator-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .filter-section {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .filter-section .form-control,
+        body.light-theme .filter-section .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .filter-section .form-control::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-theme .report-table {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .report-table th {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .report-table td {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .report-table tbody tr:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        body.light-theme .form-control,
+        body.light-theme .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .form-control:focus,
+        body.light-theme .form-select:focus {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+        body.light-theme .form-control::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-theme #currentDateTime {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .dashboard-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .dashboard-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .status-badge {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .status-badge.stable {
+            background: rgba(25, 135, 84, 0.3);
+            color: #198754;
+        }
+
+        body.light-theme .status-badge.attention {
+            background: rgba(255, 193, 7, 0.3);
+            color: #856404;
+        }
+
+        body.light-theme .status-badge.critical {
+            background: rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+
+        body.light-theme .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark {
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .modal .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .chart-container {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .chart-container h6 {
+            color: #1a1a2e !important;
+        }
+
+        body.light-theme .nav-tabs .nav-link {
+            color: #1a1a2e !important;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-theme .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .tab-content {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .glass-card .card-title {
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .glass-card .card-title i {
+            margin-right: 8px;
+        }
+
+        /* Indicadores */
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .indicator-card .number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .indicator-card .label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .indicator-card.reports { border-left: 4px solid rgba(13, 110, 253, 0.6); }
+        .indicator-card.patients { border-left: 4px solid rgba(25, 135, 84, 0.6); }
+        .indicator-card.critical { border-left: 4px solid rgba(220, 53, 69, 0.6); }
+        .indicator-card.attendance { border-left: 4px solid rgba(13, 202, 240, 0.6); }
+
+        .indicator-card.reports .number { color: #6ee7ff; }
+        .indicator-card.patients .number { color: #75f0a0; }
+        .indicator-card.critical .number { color: #ff7a8a; }
+        .indicator-card.attendance .number { color: #6ee7ff; }
+
+        /* Filter Section */
+        .filter-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-section .form-control,
+        .filter-section .form-select {
+            font-family: 'Times New Roman', Times, serif;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .filter-section .form-control:focus,
+        .filter-section .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        /* Tabs */
+        .nav-tabs .nav-link {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-right: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            color: #fff;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: bold;
+            box-shadow: 0 -2px 20px rgba(13, 110, 253, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            border-radius: 0 8px 8px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Report Table */
+        .report-table {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .report-table th {
+            font-family: 'Times New Roman', Times, serif;
+            background: rgba(255, 255, 255, 0.08);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            color: #fff;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+        }
+
+        .report-table td {
+            font-family: 'Times New Roman', Times, serif;
+            vertical-align: middle;
+            color: #fff;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .report-table tbody tr {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .report-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .report-table .table-text {
+            color: #fff;
+        }
+
+        .report-table .expand-icon {
+            transition: all 0.3s ease;
+        }
+
+        .report-table .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+        .report-detail-row {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .report-detail-row.show {
+            display: table-row;
+        }
+
+        .report-detail-row td {
+            padding: 15px 20px;
+        }
+
+        .report-detail-row .detail-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .report-detail-row .detail-item {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        .report-detail-row .detail-item .detail-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+        }
+
+        .report-detail-row .detail-item .detail-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-badge.stable {
+            background: rgba(25, 135, 84, 0.3);
+            color: #75f0a0;
+        }
+
+        .status-badge.attention {
+            background: rgba(255, 193, 7, 0.3);
+            color: #ffd75a;
+        }
+
+        .status-badge.critical {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff7a8a;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-container h6 {
+            color: #fff;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .chart-container canvas {
+            max-height: 200px;
+            width: 100% !important;
+        }
+
+        /* Page Title */
+        .page-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title .bi {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Theme Toggle */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(30deg);
+        }
+
+        /* Dashboard Button */
+        .dashboard-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        #currentDateTime {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:hover {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        .btn-success {
+            background: rgba(25, 135, 84, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-success:hover {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        .btn-warning {
+            background: rgba(255, 193, 7, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #000;
+        }
+
+        .btn-warning:hover {
+            background: rgba(255, 193, 7, 0.8);
+        }
+
+        .btn-danger {
+            background: rgba(220, 53, 69, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-danger:hover {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        /* Quick Actions */
+        .quick-actions .btn {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 3px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.3);
+            color: #fff;
+        }
+
+        .quick-actions .btn-outline-dark {
+            background: rgba(33, 37, 41, 0.3);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn-outline-dark:hover {
+            background: rgba(33, 37, 41, 0.5);
+            color: #fff;
+        }
+
+        /* Modal */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal .btn-close {
+            filter: invert(1);
+        }
+
+        .modal .form-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Scroll */
+        .scroll-area {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .scroll-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scroll-area::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .scroll-area::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .scroll-area::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.3rem;
+            }
+            .header-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .indicator-card .number {
+                font-size: 1.6rem;
+            }
+            .glass-card {
+                padding: 15px;
+            }
+            .filter-section {
+                padding: 15px;
+            }
+            .tab-content {
+                padding: 15px;
+            }
+            .report-table {
+                font-size: 0.85rem;
+            }
+            .report-table th,
+            .report-table td {
+                padding: 8px 10px;
+            }
+            .report-detail-row .detail-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Status do rodapé */
+        .footer-status {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        .footer-status .sync-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .footer-status .sync-status.online {
+            color: #75f0a0;
+        }
+
+        .footer-status .sync-status.offline {
+            color: #ff7a8a;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .sync-dot.online {
+            background: #75f0a0;
+            box-shadow: 0 0 10px rgba(25, 135, 84, 0.3);
+        }
+
+        .sync-dot.offline {
+            background: #ff7a8a;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Cabeçalho -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap header-actions">
+                    <h2 class="page-title">
+                        <i class="bi bi-file-earmark-text text-primary"></i> 
+                        Relatórios Clínicos e de Enfermagem
+                        <span class="badge bg-primary ms-2">ENFERMAGEM</span>
+                    </h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="menuenfermeiro.html" class="dashboard-btn" title="Voltar ao Dashboard Principal">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+                        </a>
+                        <button class="theme-toggle-btn" id="themeToggle" title="Alternar Tema">
+                            <i class="bi bi-moon-stars" id="themeIcon"></i>
+                        </button>
+                        <span class="badge" id="currentDateTime">
+                            <i class="bi bi-clock"></i> 
+                            <span id="dateTimeDisplay">Carregando...</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de Indicadores -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-6">
+                <div class="indicator-card reports fade-in">
+                    <div class="number" id="totalReports">0</div>
+                    <div class="label"><i class="bi bi-file-earmark-text"></i> Relatórios Emitidos</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="indicator-card patients fade-in">
+                    <div class="number" id="totalPatients">0</div>
+                    <div class="label"><i class="bi bi-people"></i> Pacientes Atendidos</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="indicator-card critical fade-in">
+                    <div class="number" id="criticalCases">0</div>
+                    <div class="label"><i class="bi bi-exclamation-triangle"></i> Casos Críticos</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="indicator-card attendance fade-in">
+                    <div class="number" id="attendanceRate">0%</div>
+                    <div class="label"><i class="bi bi-graph-up"></i> Taxa de Atendimento</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros Avançados -->
+        <div class="filter-section fade-in">
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <h6 style="color: #fff;"><i class="bi bi-funnel"></i> Filtros Avançados</h6>
+                </div>
+                <div class="col-md-3">
+                    <input type="date" id="filterStartDate" class="form-control" placeholder="Data Inicial">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" id="filterEndDate" class="form-control" placeholder="Data Final">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" id="filterPatient" class="form-control" placeholder="👤 Nome do paciente / ID">
+                </div>
+                <div class="col-md-3">
+                    <select id="filterUnit" class="form-select">
+                        <option value="">Todas as unidades</option>
+                        <option value="Cardiologia">Cardiologia</option>
+                        <option value="Pediatria">Pediatria</option>
+                        <option value="Materno-Infantil">Materno-Infantil</option>
+                        <option value="UTI">UTI</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <select id="filterReportType" class="form-select">
+                        <option value="">Todos os relatórios</option>
+                        <option value="vitals">Sinais Vitais</option>
+                        <option value="medication">Administração de Medicamentos</option>
+                        <option value="evolution">Evolução de Enfermagem</option>
+                        <option value="admission">Internamentos</option>
+                        <option value="occurrences">Ocorrências Clínicas</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="filterPatientType" class="form-select">
+                        <option value="">Todos os pacientes</option>
+                        <option value="pregnant">Gestantes</option>
+                        <option value="newborn">Recém-Nascidos</option>
+                        <option value="inpatient">Internados</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="filterStatus" class="form-select">
+                        <option value="">Todos os estados</option>
+                        <option value="stable">Estável</option>
+                        <option value="attention">Em Observação</option>
+                        <option value="critical">Crítico</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100" id="btnApplyFilters">
+                        <i class="bi bi-search"></i> Aplicar Filtros
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="lista-tab" data-bs-toggle="tab" data-bs-target="#lista" type="button" role="tab">
+                    <i class="bi bi-list"></i> Relatórios
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analitico-tab" data-bs-toggle="tab" data-bs-target="#analitico" type="button" role="tab">
+                    <i class="bi bi-graph-up"></i> Analítico
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Aba Relatórios -->
+            <div class="tab-pane fade show active" id="lista" role="tabpanel">
+                <div class="glass-card">
+                    <h6 class="card-title">
+                        <i class="bi bi-list-check"></i> Lista de Relatórios
+                        <span class="badge bg-primary ms-2" id="reportCount">0</span>
+                    </h6>
+                    <div class="report-table table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px;"></th>
+                                    <th>Paciente</th>
+                                    <th>Data/Hora</th>
+                                    <th>Enfermeiro(a)</th>
+                                    <th>Resumo Clínico</th>
+                                    <th>Indicadores</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportList">
+                                <!-- Relatórios serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Analítico -->
+            <div class="tab-pane fade" id="analitico" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-graph-up"></i> Evolução de Sinais Vitais (Média)</h6>
+                            <canvas id="vitalsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-bar-chart"></i> Atendimentos por Período</h6>
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-pie-chart"></i> Distribuição de Casos por Estado</h6>
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-graph-up-arrow"></i> Taxa de Internamento e Alta</h6>
+                            <canvas id="admissionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="quick-actions mt-4 d-flex flex-wrap gap-2">
+            <button class="btn btn-success" id="btnGeneratePDF">
+                <i class="bi bi-file-earmark-pdf"></i> Gerar PDF
+            </button>
+            <button class="btn btn-primary" id="btnExportExcel">
+                <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+            </button>
+            <button class="btn btn-warning" id="btnPrintReport">
+                <i class="bi bi-printer"></i> Imprimir
+            </button>
+            <button class="btn btn-info" id="btnSendToDoctor">
+                <i class="bi bi-envelope"></i> Enviar ao Médico
+            </button>
+            <button class="btn btn-outline-secondary" id="btnRefreshReports">
+                <i class="bi bi-arrow-repeat"></i> Atualizar
+            </button>
+            <button class="btn btn-outline-dark">
+                <a href="menu_recepcionista.html" style="color: inherit; text-decoration: none;">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </button>
+        </div>
+
+        <!-- Rodapé Funcional -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="glass-card">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="footer-status">
+                            <i class="bi bi-clock"></i> Última atualização: 
+                            <span id="lastUpdate">15/08/2026 10:30:00</span>
+                        </div>
+                        <div class="footer-status">
+                            <span class="sync-status online">
+                                <span class="sync-dot online"></span> Sincronizado com o sistema clínico
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes do Relatório -->
+    <div class="modal fade" id="reportDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-file-earmark-text text-primary"></i> 
+                        Detalhes do Relatório
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="reportDetailBody">
+                    <!-- Conteúdo dinâmico -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-success" id="btnExportDetailPDF">
+                        <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Dados de exemplo - Relatórios
+            const reports = [
+                {
+                    id: 1,
+                    patient: 'João Silva',
+                    age: 58,
+                    unit: 'Cardiologia',
+                    type: 'vitals',
+                    date: '15/08/2026',
+                    time: '09:30',
+                    nurse: 'Enf. Ana Paula',
+                    summary: 'Avaliação de sinais vitais - Estável',
+                    status: 'stable',
+                    indicators: { temp: '36.5°C', bp: '120/80', hr: '72 bpm', rr: '16 irpm', spo2: '96%' },
+                    details: 'Paciente em recuperação pós-IAM. Sinais vitais estáveis. Sem queixas.',
+                    medications: ['Enalapril 10mg', 'Losartana 50mg']
+                },
+                {
+                    id: 2,
+                    patient: 'Maria Santos',
+                    age: 45,
+                    unit: 'Materno-Infantil',
+                    type: 'evolution',
+                    date: '15/08/2026',
+                    time: '09:15',
+                    nurse: 'Enf. Carlos Silva',
+                    summary: 'Evolução clínica - Atenção',
+                    status: 'attention',
+                    indicators: { temp: '37.2°C', bp: '145/95', hr: '88 bpm', rr: '20 irpm', spo2: '92%' },
+                    details: 'Paciente com pré-eclâmpsia. Pressão arterial elevada. Monitoramento contínuo.',
+                    medications: ['Metildopa 500mg']
+                },
+                {
+                    id: 3,
+                    patient: 'Pedro Costa',
+                    age: 72,
+                    unit: 'UTI',
+                    type: 'medication',
+                    date: '15/08/2026',
+                    time: '09:45',
+                    nurse: 'Enf. Mariana Lima',
+                    summary: 'Administração de medicamentos - Crítico',
+                    status: 'critical',
+                    indicators: { temp: '38.5°C', bp: '110/70', hr: '95 bpm', rr: '24 irpm', spo2: '88%' },
+                    details: 'Paciente em ventilação assistida. Febre persistente. Antibiótico IV administrado.',
+                    medications: ['Oxigênio 3L', 'Antibiótico IV', 'Dobutamina']
+                },
+                {
+                    id: 4,
+                    patient: 'Ana Oliveira',
+                    age: 34,
+                    unit: 'Pediatria',
+                    type: 'admission',
+                    date: '15/08/2026',
+                    time: '09:00',
+                    nurse: 'Enf. Juliana Santos',
+                    summary: 'Internamento - Estável',
+                    status: 'stable',
+                    indicators: { temp: '36.8°C', bp: '115/75', hr: '80 bpm', rr: '18 irpm', spo2: '95%' },
+                    details: 'Paciente internada para tratamento de pneumonia. Evolução satisfatória.',
+                    medications: ['Amoxicilina 250mg']
+                },
+                {
+                    id: 5,
+                    patient: 'Carlos Ferreira',
+                    age: 65,
+                    unit: 'Cardiologia',
+                    type: 'occurrences',
+                    date: '15/08/2026',
+                    time: '08:30',
+                    nurse: 'Enf. Roberto Mendes',
+                    summary: 'Ocorrência Clínica - Crítico',
+                    status: 'critical',
+                    indicators: { temp: '36.2°C', bp: '95/60', hr: '58 bpm', rr: '22 irpm', spo2: '90%' },
+                    details: 'Paciente com bradicardia e hipotensão. Monitorização contínua. Equipe médica acionada.',
+                    medications: ['Dobutamina', 'Nitroglicerina']
+                },
+                {
+                    id: 6,
+                    patient: 'Mariana Lima',
+                    age: 29,
+                    unit: 'Materno-Infantil',
+                    type: 'vitals',
+                    date: '15/08/2026',
+                    time: '09:20',
+                    nurse: 'Enf. Ana Paula',
+                    summary: 'Avaliação de sinais vitais - Estável',
+                    status: 'stable',
+                    indicators: { temp: '36.6°C', bp: '110/70', hr: '75 bpm', rr: '16 irpm', spo2: '98%' },
+                    details: 'Pós-parto imediato. Paciente e recém-nascido em boas condições.',
+                    medications: ['Dipirona 500mg']
+                }
+            ];
+
+            let charts = {};
+
+            // Tema
+            let isDarkTheme = true;
+
+            function toggleTheme() {
+                isDarkTheme = !isDarkTheme;
+                if (isDarkTheme) {
+                    $('body').removeClass('light-theme');
+                    $('#themeIcon').removeClass('bi-sun-fill').addClass('bi-moon-stars');
+                } else {
+                    $('body').addClass('light-theme');
+                    $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+                }
+                localStorage.setItem('sicami-theme-reports', isDarkTheme ? 'dark' : 'light');
+                updateChartColors();
+            }
+
+            const savedTheme = localStorage.getItem('sicami-theme-reports');
+            if (savedTheme === 'light') {
+                isDarkTheme = false;
+                $('body').addClass('light-theme');
+                $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+            }
+
+            $('#themeToggle').click(toggleTheme);
+
+            // Data e Hora
+            function updateDateTime() {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR');
+                const timeStr = now.toLocaleTimeString('pt-BR');
+                $('#dateTimeDisplay').text(`${dateStr} ${timeStr}`);
+                $('#lastUpdate').text(`${dateStr} ${timeStr}`);
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Atualizar Indicadores
+            function updateIndicators(filtered) {
+                const data = filtered || reports;
+                const total = data.length;
+                const patients = [...new Set(data.map(r => r.patient))].length;
+                const critical = data.filter(r => r.status === 'critical').length;
+                const stable = data.filter(r => r.status === 'stable').length;
+                const rate = total > 0 ? Math.round((stable / total) * 100) : 0;
+
+                $('#totalReports').text(total);
+                $('#totalPatients').text(patients);
+                $('#criticalCases').text(critical);
+                $('#attendanceRate').text(rate + '%');
+                $('#reportCount').text(total);
+            }
+
+            // Renderizar Relatórios
+            function renderReports(filtered) {
+                const tbody = $('#reportList');
+                tbody.empty();
+
+                const data = filtered || reports;
+
+                if (data.length === 0) {
+                    tbody.html(`
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.5); padding: 30px;">
+                                <i class="bi bi-inbox" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                                Nenhum relatório encontrado
+                            </td>
+                        </tr>
+                    `);
+                    return;
+                }
+
+                data.forEach((r, index) => {
+                    const statusMap = {
+                        'stable': { class: 'stable', icon: 'bi-check-circle', text: 'Estável' },
+                        'attention': { class: 'attention', icon: 'bi-exclamation-circle', text: 'Atenção' },
+                        'critical': { class: 'critical', icon: 'bi-exclamation-triangle', text: 'Crítico' }
+                    };
+                    const status = statusMap[r.status] || statusMap.stable;
+
+                    const indicators = `${r.indicators.temp} | ${r.indicators.bp} | ${r.indicators.hr}`;
+
+                    tbody.append(`
+                        <tr class="report-row" data-id="${r.id}">
+                            <td>
+                                <i class="bi bi-chevron-right expand-icon" style="color: rgba(255,255,255,0.4); cursor: pointer;"></i>
+                            </td>
+                            <td>
+                                <span class="table-text">${r.patient}</span>
+                                <br><small style="color: rgba(255,255,255,0.4);">${r.age} anos</small>
+                            </td>
+                            <td>
+                                <span class="table-text">${r.date}</span>
+                                <br><small style="color: rgba(255,255,255,0.4);">${r.time}</small>
+                            </td>
+                            <td><span class="table-text">${r.nurse}</span></td>
+                            <td>
+                                <span class="table-text">${r.summary}</span>
+                                <br><small style="color: rgba(255,255,255,0.3);">${r.type}</small>
+                            </td>
+                            <td><span class="table-text" style="font-size: 0.85rem;">${indicators}</span></td>
+                            <td>
+                                <span class="status-badge ${status.class}">
+                                    <i class="bi ${status.icon}"></i> ${status.text}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="report-detail-row" data-parent="${r.id}">
+                            <td colspan="7">
+                                <div class="detail-section">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Detalhes Clínicos</div>
+                                        <div class="detail-value">${r.details}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Medicação em Curso</div>
+                                        <div class="detail-value">${r.medications.join(', ')}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Unidade</div>
+                                        <div class="detail-value">${r.unit}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Tipo de Relatório</div>
+                                        <div class="detail-value">${r.type}</div>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-primary view-detail-btn" data-id="${r.id}">
+                                        <i class="bi bi-eye"></i> Ver Detalhes Completos
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // Expandir/Recolher detalhes
+            $(document).on('click', '.expand-icon', function() {
+                const row = $(this).closest('.report-row');
+                const id = row.data('id');
+                const detailRow = $(`.report-detail-row[data-parent="${id}"]`);
+                const icon = $(this);
+
+                if (detailRow.hasClass('show')) {
+                    detailRow.removeClass('show');
+                    icon.removeClass('expanded');
+                } else {
+                    // Fechar outros
+                    $('.report-detail-row').removeClass('show');
+                    $('.expand-icon').removeClass('expanded');
+                    
+                    detailRow.addClass('show');
+                    icon.addClass('expanded');
+                }
+            });
+
+            // Ver detalhes completos (modal)
+            $(document).on('click', '.view-detail-btn', function() {
+                const id = parseInt($(this).data('id'));
+                const report = reports.find(r => r.id === id);
+                if (report) {
+                    const statusMap = {
+                        'stable': { class: 'stable', text: 'Estável' },
+                        'attention': { class: 'attention', text: 'Atenção' },
+                        'critical': { class: 'critical', text: 'Crítico' }
+                    };
+                    const status = statusMap[report.status] || statusMap.stable;
+
+                    const indicators = Object.entries(report.indicators).map(([key, value]) => 
+                        `<div class="detail-item"><div class="detail-label">${key.toUpperCase()}</div><div class="detail-value">${value}</div></div>`
+                    ).join('');
+
+                    $('#reportDetailBody').html(`
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <h6 style="color: #fff; font-weight: bold;">Paciente</h6>
+                                <p style="color: rgba(255,255,255,0.8);">${report.patient} (${report.age} anos)</p>
+                                <p style="color: rgba(255,255,255,0.5);">Unidade: ${report.unit}</p>
+                                <p style="color: rgba(255,255,255,0.5);">Data: ${report.date} ${report.time}</p>
+                            </div>
+                            <div>
+                                <h6 style="color: #fff; font-weight: bold;">Enfermeiro(a)</h6>
+                                <p style="color: rgba(255,255,255,0.8);">${report.nurse}</p>
+                                <p style="color: rgba(255,255,255,0.5);">Tipo: ${report.type}</p>
+                                <p><span class="status-badge ${status.class}"><i class="bi ${status.icon}"></i> ${status.text}</span></p>
+                            </div>
+                        </div>
+                        <hr style="border-color: rgba(255,255,255,0.1);">
+                        <div>
+                            <h6 style="color: #fff; font-weight: bold;">Resumo Clínico</h6>
+                            <p style="color: rgba(255,255,255,0.8);">${report.summary}</p>
+                        </div>
+                        <div>
+                            <h6 style="color: #fff; font-weight: bold;">Detalhes</h6>
+                            <p style="color: rgba(255,255,255,0.8);">${report.details}</p>
+                        </div>
+                        <hr style="border-color: rgba(255,255,255,0.1);">
+                        <div>
+                            <h6 style="color: #fff; font-weight: bold;">Indicadores</h6>
+                            <div class="detail-section" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                                ${indicators}
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6 style="color: #fff; font-weight: bold;">Medicação</h6>
+                            <p style="color: rgba(255,255,255,0.8);">${report.medications.join(', ') || 'Nenhuma'}</p>
+                        </div>
+                    `);
+
+                    $('#reportDetailModal').modal('show');
+                }
+            });
+
+            // Exportar detalhe em PDF
+            $('#btnExportDetailPDF').click(function() {
+                alert('📄 PDF do relatório exportado com sucesso!\n\n(Em produção, isso geraria um arquivo PDF)');
+                $('#reportDetailModal').modal('hide');
+            });
+
+            // Filtrar Relatórios
+            function filterReports() {
+                const startDate = $('#filterStartDate').val();
+                const endDate = $('#filterEndDate').val();
+                const patient = $('#filterPatient').val().toLowerCase();
+                const unit = $('#filterUnit').val();
+                const reportType = $('#filterReportType').val();
+                const patientType = $('#filterPatientType').val();
+                const status = $('#filterStatus').val();
+
+                let filtered = reports.filter(r => {
+                    const matchPatient = patient === '' || r.patient.toLowerCase().includes(patient);
+                    const matchUnit = unit === '' || r.unit === unit;
+                    const matchType = reportType === '' || r.type === reportType;
+                    const matchStatus = status === '' || r.status === status;
+                    const matchDate = (startDate === '' || r.date >= startDate) && (endDate === '' || r.date <= endDate);
+                    // Simulação de patientType (não temos esse dado, mas mantemos a estrutura)
+                    const matchPatientType = patientType === '' || true;
+
+                    return matchPatient && matchUnit && matchType && matchStatus && matchDate && matchPatientType;
+                });
+
+                renderReports(filtered);
+                updateIndicators(filtered);
+                updateCharts(filtered);
+            }
+
+            $('#btnApplyFilters').click(filterReports);
+
+            // Atualizar
+            $('#btnRefreshReports').click(function() {
+                filterReports();
+                alert('🔄 Relatórios atualizados com sucesso!');
+            });
+
+            // Gerar PDF
+            $('#btnGeneratePDF').click(function() {
+                alert('📄 Relatório em PDF gerado com sucesso!\n\n(Em produção, isso geraria um arquivo PDF com todos os relatórios filtrados)');
+            });
+
+            // Exportar Excel
+            $('#btnExportExcel').click(function() {
+                alert('📊 Dados exportados para Excel com sucesso!\n\n(Em produção, isso geraria um arquivo .xlsx)');
+            });
+
+            // Imprimir
+            $('#btnPrintReport').click(function() {
+                window.print();
+            });
+
+            // Enviar ao Médico
+            $('#btnSendToDoctor').click(function() {
+                const selected = $('.report-row .expand-icon.expanded').closest('.report-row');
+                if (selected.length > 0) {
+                    const id = selected.data('id');
+                    const report = reports.find(r => r.id === id);
+                    if (report) {
+                        alert(`✉️ Relatório de ${report.patient} enviado ao médico responsável!\n\n(Em produção, isso enviaria por e-mail ou sistema)`);
+                    }
+                } else {
+                    alert('✉️ Relatório enviado ao médico responsável!\n\n(Em produção, isso enviaria todos os relatórios selecionados)');
+                }
+            });
+
+            // Botão Dashboard
+            $('#btnDashboard').click(function(e) {
+                e.preventDefault();
+                alert('🔙 Redirecionando para o Dashboard Principal...\n\n(Em produção, isso redirecionaria para a página principal do sistema)');
+            });
+
+            // Gráficos
+            function initCharts() {
+                const ctxVitals = document.getElementById('vitalsChart').getContext('2d');
+                const ctxAttendance = document.getElementById('attendanceChart').getContext('2d');
+                const ctxStatus = document.getElementById('statusChart').getContext('2d');
+                const ctxAdmission = document.getElementById('admissionChart').getContext('2d');
+
+                const isLight = $('body').hasClass('light-theme');
+                const textColor = isLight ? '#1a1a2e' : '#fff';
+                const gridColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
+
+                const commonOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: textColor,
+                                font: { family: 'Times New Roman' }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { color: gridColor }
+                        },
+                        y: {
+                            ticks: { color: textColor },
+                            grid: { color: gridColor }
+                        }
+                    }
+                };
+
+                // Gráfico de Sinais Vitais
+                charts.vitals = new Chart(ctxVitals, {
+                    type: 'line',
+                    data: {
+                        labels: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
+                        datasets: [
+                            {
+                                label: 'FC (bpm)',
+                                data: [72, 75, 78, 80, 76, 82],
+                                borderColor: '#6ee7ff',
+                                backgroundColor: 'rgba(110, 231, 255, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'PA Sistólica (mmHg)',
+                                data: [120, 122, 118, 125, 120, 126],
+                                borderColor: '#75f0a0',
+                                backgroundColor: 'rgba(117, 240, 160, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Temp (°C)',
+                                data: [36.5, 36.7, 36.8, 36.6, 36.9, 37.0],
+                                borderColor: '#ffd75a',
+                                backgroundColor: 'rgba(255, 215, 90, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: commonOptions
+                });
+
+                // Gráfico de Atendimentos
+                charts.attendance = new Chart(ctxAttendance, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+                        datasets: [
+                            {
+                                label: 'Atendimentos',
+                                data: [12, 15, 18, 14, 20, 10, 8],
+                                backgroundColor: 'rgba(110, 231, 255, 0.6)',
+                                borderColor: '#6ee7ff',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        ...commonOptions,
+                        plugins: {
+                            ...commonOptions.plugins,
+                            legend: { display: false }
+                        }
+                    }
+                });
+
+                // Gráfico de Distribuição de Casos
+                charts.status = new Chart(ctxStatus, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Estável', 'Em Observação', 'Crítico'],
+                        datasets: [{
+                            data: [45, 30, 25],
+                            backgroundColor: [
+                                'rgba(117, 240, 160, 0.7)',
+                                'rgba(255, 215, 90, 0.7)',
+                                'rgba(255, 122, 138, 0.7)'
+                            ],
+                            borderColor: [
+                                '#75f0a0',
+                                '#ffd75a',
+                                '#ff7a8a'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: textColor,
+                                    font: { family: 'Times New Roman' }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Gráfico de Internamento
+                charts.admission = new Chart(ctxAdmission, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                        datasets: [
+                            {
+                                label: 'Internamentos',
+                                data: [30, 28, 35, 32, 40, 38],
+                                borderColor: '#6ee7ff',
+                                backgroundColor: 'rgba(110, 231, 255, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Altas',
+                                data: [25, 22, 30, 28, 35, 32],
+                                borderColor: '#75f0a0',
+                                backgroundColor: 'rgba(117, 240, 160, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: commonOptions
+                });
+            }
+
+            function updateChartColors() {
+                const isLight = $('body').hasClass('light-theme');
+                const textColor = isLight ? '#1a1a2e' : '#fff';
+                const gridColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
+
+                Object.values(charts).forEach(chart => {
+                    if (chart.options) {
+                        if (chart.options.plugins && chart.options.plugins.legend) {
+                            chart.options.plugins.legend.labels.color = textColor;
+                        }
+                        if (chart.options.scales) {
+                            if (chart.options.scales.x) {
+                                chart.options.scales.x.ticks.color = textColor;
+                                chart.options.scales.x.grid.color = gridColor;
+                            }
+                            if (chart.options.scales.y) {
+                                chart.options.scales.y.ticks.color = textColor;
+                                chart.options.scales.y.grid.color = gridColor;
+                            }
+                        }
+                        chart.update();
+                    }
+                });
+            }
+
+            function updateCharts(filtered) {
+                // Atualizar gráficos com dados filtrados (simulação)
+                const data = filtered || reports;
+                const stable = data.filter(r => r.status === 'stable').length;
+                const attention = data.filter(r => r.status === 'attention').length;
+                const critical = data.filter(r => r.status === 'critical').length;
+                const total = data.length || 1;
+
+                if (charts.status) {
+                    charts.status.data.datasets[0].data = [
+                        Math.round((stable / total) * 100),
+                        Math.round((attention / total) * 100),
+                        Math.round((critical / total) * 100)
+                    ];
+                    charts.status.update();
+                }
+
+                // Atualizar outros gráficos com dados aleatórios (simulação)
+                if (charts.attendance) {
+                    charts.attendance.data.datasets[0].data = Array.from({length: 7}, () => Math.floor(5 + Math.random() * 20));
+                    charts.attendance.update();
+                }
+
+                if (charts.vitals) {
+                    charts.vitals.data.datasets[0].data = Array.from({length: 6}, () => Math.floor(65 + Math.random() * 20));
+                    charts.vitals.data.datasets[1].data = Array.from({length: 6}, () => Math.floor(110 + Math.random() * 20));
+                    charts.vitals.data.datasets[2].data = Array.from({length: 6}, () => Math.round((36 + Math.random() * 2) * 10) / 10);
+                    charts.vitals.update();
+                }
+            }
+
+            // Inicializar
+            renderReports();
+            updateIndicators();
+            initCharts();
+
+            console.log('✅ Tela de Relatórios - SICAMI carregada com sucesso!');
+        });
+    </script>
+</body>
+</html>

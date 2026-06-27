@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SICAMI - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #f8f9fc;
+            --text-color: #5a5c69;
+            --card-bg: #ffffff;
+            --body-bg: #f8f9fc;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #d1d3e2;
+            --sidebar-active: #e6f2fa;
+            --alert-color: #e74a3b;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --occupied-color: #e74a3b;
+            --available-color: #2ecc71;
+            --shadow-color: rgba(58, 59, 69, 0.15);
+        }
+
+        .dark-mode {
+            --primary-color: #4d9aff;
+            --secondary-color: #2c2c3a;
+            --text-color: #d1d3e2;
+            --card-bg: #3a3b45;
+            --body-bg: #2c2c3a;
+            --sidebar-bg: #2c2c3a;
+            --sidebar-text: #858796;
+            --sidebar-active: #4d9aff;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+       body {
+    font-family: 'Segoe UI', 'Nunito', system-ui, -apple-system, sans-serif;
+    background: var(--body-bg) url('../images/dash-rec.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--text-color);
+    transition: all 0.3s;
+}
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--sidebar-bg);
+            min-height: 100vh;
+            transition: all 0.3s;
+            box-shadow: 0 0.15rem 1.75rem 0 var(--shadow-color);
+        }
+
+        .sidebar .nav-link {
+            color: var(--sidebar-text);
+            padding: 1rem;
+            margin: 0.2rem 0;
+            border-radius: 0.35rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar .nav-link:hover {
+            color: var(--primary-color);
+            background: var(--sidebar-active);
+        }
+
+        .sidebar .nav-link.active {
+            color: var(--primary-color);
+            background: var(--sidebar-active);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 1.5rem;
+            text-align: center;
+        }
+
+        .sidebar.toggled {
+            width: 6.5rem !important;
+            overflow: hidden;
+        }
+
+        .sidebar.toggled .nav-link {
+            text-align: center;
+            padding: 0.75rem 1rem;
+            width: 6.5rem;
+        }
+
+        .sidebar.toggled .nav-link span {
+            display: none;
+        }
+
+        .sidebar.toggled .nav-link i {
+            margin-right: 0;
+            font-size: 1.2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.15rem 1.75rem 0 var(--shadow-color);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 2rem 0 var(--shadow-color);
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 1rem 1.35rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            border-left: 4px solid var(--primary-color);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            background: var(--card-bg);
+            transition: all 0.3s;
+            cursor: default;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1.5rem var(--shadow-color);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 2rem;
+            opacity: 0.7;
+        }
+
+        .stat-card .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        /* Queue Table */
+        .queue-table {
+            font-size: 0.95rem;
+        }
+
+        .queue-table .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-espera { background: #fff3cd; color: #856404; }
+        .status-atendimento { background: #cce5ff; color: #004085; }
+        .status-finalizado { background: #d4edda; color: #155724; }
+        .status-cancelado { background: #f8d7da; color: #721c24; }
+
+        /* Quick Actions */
+        .quick-action-btn {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: none;
+            background: var(--card-bg);
+            box-shadow: 0 0.15rem 1rem 0 var(--shadow-color);
+            transition: all 0.3s;
+            text-align: center;
+            cursor: pointer;
+            color: var(--text-color);
+            text-decoration: none;
+            display: block;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1.5rem var(--shadow-color);
+            color: var(--primary-color);
+        }
+
+        .quick-action-btn i {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Profile */
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid var(--primary-color);
+        }
+
+        .profile-pic-lg {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+        }
+
+        /* Timer */
+        .timer-display {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-variant-numeric: tabular-nums;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        /* Notifications */
+        .notification-badge {
+            position: relative;
+        }
+
+        .notification-badge .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 0.65rem;
+        }
+
+        /* QR Code Reader */
+        .qr-reader-box {
+            border: 2px dashed var(--primary-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--body-bg);
+        }
+
+        .qr-reader-box:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .qr-reader-box i {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Chatbot */
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            z-index: 1000;
+            box-shadow: 0 0.5rem 1.5rem rgba(13, 110, 253, 0.3);
+            transition: all 0.3s;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-window {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            max-height: 500px;
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            box-shadow: 0 0.5rem 2rem var(--shadow-color);
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+            overflow: hidden;
+        }
+
+        .chatbot-window.active {
+            display: flex;
+        }
+
+        .chatbot-header {
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: 350px;
+        }
+
+        .chatbot-message {
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.5rem;
+            max-width: 85%;
+        }
+
+        .chatbot-message.bot {
+            background: var(--secondary-color);
+            align-self: flex-start;
+        }
+
+        .chatbot-message.user {
+            background: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .chatbot-input {
+            padding: 0.75rem;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--body-bg);
+            color: var(--text-color);
+        }
+
+        /* Footer */
+        .footer-stats {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 0.15rem 1.75rem 0 var(--shadow-color);
+        }
+
+        .footer-stats .stat-item {
+            text-align: center;
+            padding: 0.5rem 1rem;
+        }
+
+        .footer-stats .stat-item .label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .footer-stats .stat-item .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        /* FullCalendar */
+        .fc {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+        }
+
+        .fc .fc-toolbar-title {
+            color: var(--text-color);
+        }
+
+        .fc .fc-button-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .fc .fc-button-primary:hover {
+            background-color: var(--primary-color);
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar.toggled {
+                width: 0 !important;
+                padding: 0;
+                overflow: hidden;
+            }
+            
+            .chatbot-window {
+                width: calc(100% - 40px);
+                right: 20px;
+                bottom: 80px;
+            }
+
+            .footer-stats .stat-item {
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .animate-in:nth-child(1) { animation-delay: 0.05s; }
+        .animate-in:nth-child(2) { animation-delay: 0.10s; }
+        .animate-in:nth-child(3) { animation-delay: 0.15s; }
+        .animate-in:nth-child(4) { animation-delay: 0.20s; }
+        .animate-in:nth-child(5) { animation-delay: 0.25s; }
+        .animate-in:nth-child(6) { animation-delay: 0.30s; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--body-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+            opacity: 0.7;
+        }
+
+        /* Language Selector Dropdown */
+        .lang-dropdown {
+            cursor: pointer;
+        }
+
+        /* Greeting */
+        .greeting-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .greeting-text span {
+            color: var(--primary-color);
+        }
+
+        /* Calendar Modal */
+        .fc-daygrid-day {
+            cursor: pointer;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: none;
+            box-shadow: 0 0.5rem 1rem var(--shadow-color);
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            min-width: 300px;
+        }
+
+        .toast-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .toast-body {
+            padding: 0.75rem 1rem;
+        }
+
+        /* Status indicators */
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .status-dot.online { background: var(--success-color); }
+        .status-dot.offline { background: var(--alert-color); }
+
+        /* Botão de salvar com animação de carregamento */
+        .btn-saving {
+            pointer-events: none;
+            opacity: 0.7;
+            position: relative;
+        }
+
+        .btn-saving::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-top: -8px;
+            margin-left: -8px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal-footer .btn-primary {
+            min-width: 120px;
+        }
+
+        /* Modal de alterar senha */
+        .password-strength {
+            height: 4px;
+            margin-top: 5px;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        
+        .h2{
+            color: blue
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar border-end" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4">
+                <h5 class="text-primary fw-bold">SICAMI</h5>
+                <small class="text-muted" data-i18n="reception">Recepção</small>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span data-i18n="dashboard">Dashboard</span>
+                </a>
+                <a href="agendar-consultas.html" class="nav-link">
+                    <i class="fas fa-calendar-check"></i>
+                    <span data-i18n="appointments">Agendamentos</span>
+                </a>
+                <a href="gestao_fila.html" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span data-i18n="queue">Fila de Espera</span>
+                </a>
+                <a href="historico.html" class="nav-link">
+                    <i class="fas fa-clock"></i>
+                    <span data-i18n="history">Histórico</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-door-open"></i>
+                    <span data-i18n="rooms">Mapa de Salas</span>
+                </a>
+                <a href="comprovativos.html" class="nav-link">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span data-i18n="tickets">Painel de Senhas</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg bg-light border-bottom" style="background: var(--card-bg) !important;">
+                <div class="container-fluid">
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-primary me-3" id="sidebarToggle">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="greeting-text">
+                            <i class="fas fa-user-circle me-1"></i>
+                            <span data-i18n="greeting">Bom dia, Maria. Bem-vinda ao SICAMI.</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center ms-auto">
+                        <!-- Timer -->
+                        <div class="timer-display mx-3" id="timer">30:00</div>
+                        <button class="btn btn-sm btn-outline-primary me-1" id="startTimer" title="Iniciar/Pausar">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary me-3" id="resetTimer" title="Reiniciar">
+                            <i class="fas fa-undo"></i>
+                        </button>
+
+                        <!-- Unidade -->
+                        <div class="mx-2 d-none d-md-block">
+                            <span class="badge bg-primary" data-i18n="unit">Unidade: Centro</span>
+                        </div>
+
+                        <!-- Language Selector -->
+                        <div class="dropdown me-2">
+                            <a class="lang-dropdown" id="languageDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-globe fs-5"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-lang="pt">🇧🇷 Português</a></li>
+                                <li><a class="dropdown-item" href="#" data-lang="en">🇺🇸 English</a></li>
+                                <li><a class="dropdown-item" href="#" data-lang="es">🇪🇸 Español</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Dark Mode Toggle -->
+                        <button class="btn btn-sm me-2" id="darkModeToggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+
+                        <!-- Notifications -->
+                        <div class="notification-badge me-2">
+                            <button class="btn btn-sm" id="notificationToggle">
+                                <i class="fas fa-bell fs-5"></i>
+                                <span class="badge bg-danger">3</span>
+                            </button>
+                        </div>
+
+                        <!-- Profile -->
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown">
+                                <img src="https://ui-avatars.com/api/?name=Maria+Silva&background=0d6efd&color=fff" alt="Profile" class="profile-pic me-2">
+                                <span class="d-none d-sm-inline" data-i18n="receptionist">Maria Silva</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user me-2"></i><span data-i18n="profile">Perfil</span></a></li>
+                                <li>
+                                    <a class="dropdown-item" href="../alterar-senha.html">
+                                        <i class="fas fa-key me-2"></i><span data-i18n="change_password">Alterar Senha</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="../logout.html"><i class="fas fa-sign-out-alt me-2"></i><span data-i18n="logout">Sair</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid px-4 py-4">
+                <!-- Greeting Row -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div>
+                                <h2 class="mb-0" data-i18n="dashboard_title" 
+                                    >Dashboard da Recepção</h2>
+                                <p class="text-muted" data-i18n="dashboard_subtitle">Controle de agendamentos e atendimentos</p>
+                            </div>
+                            <div id="clockDisplay" class="text-muted fs-5">
+                                <i class="fas fa-clock me-2"></i>
+                                <span id="currentDateTime"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3 animate-in">
+                        <div class="stat-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small" data-i18n="new_patients">Pacientes Registados</div>
+                                    <div class="stat-number" id="statNewPatients">18</div>
+                                </div>
+                                <div class="stat-icon text-primary"><i class="fas fa-user-plus"></i></div>
+                            </div>
+                            <div class="mt-2"><small class="text-success"><i class="fas fa-arrow-up"></i> 12%</small> <span class="text-muted small" data-i18n="vs_yesterday">vs ontem</span></div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3 animate-in">
+                        <div class="stat-card" style="border-left-color: #2ecc71;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small" data-i18n="appointments_today">Consultas Agendadas</div>
+                                    <div class="stat-number" id="statAppointments">24</div>
+                                </div>
+                                <div class="stat-icon text-success"><i class="fas fa-calendar-check"></i></div>
+                            </div>
+                            <div class="mt-2"><small class="text-success"><i class="fas fa-arrow-up"></i> 8%</small> <span class="text-muted small" data-i18n="vs_yesterday">vs ontem</span></div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3 animate-in">
+                        <div class="stat-card" style="border-left-color: #f39c12;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small" data-i18n="waiting_patients">Pacientes em Espera</div>
+                                    <div class="stat-number" id="statWaiting">7</div>
+                                </div>
+                                <div class="stat-icon text-warning"><i class="fas fa-clock"></i></div>
+                            </div>
+                            <div class="mt-2"><small class="text-danger"><i class="fas fa-arrow-up"></i> 3</small> <span class="text-muted small" data-i18n="from_last_hour">desde última hora</span></div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3 animate-in">
+                        <div class="stat-card" style="border-left-color: #3498db;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small" data-i18n="confirmed_appointments">Consultas Confirmadas</div>
+                                    <div class="stat-number" id="statConfirmed">18</div>
+                                </div>
+                                <div class="stat-icon text-info"><i class="fas fa-check-circle"></i></div>
+                            </div>
+                            <div class="mt-2"><small class="text-success"><i class="fas fa-arrow-up"></i> 75%</small> <span class="text-muted small" data-i18n="confirmation_rate">taxa de confirmação</span></div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3 animate-in">
+                        <div class="stat-card" style="border-left-color: #e74a3b;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small" data-i18n="pending_appointments">Consultas Pendentes</div>
+                                    <div class="stat-number" id="statPending">6</div>
+                                </div>
+                                <div class="stat-icon text-danger"><i class="fas fa-exclamation-triangle"></i></div>
+                            </div>
+                            <div class="mt-2"><small class="text-warning"><i class="fas fa-clock"></i> 4</small> <span class="text-muted small" data-i18n="awaiting_confirmation">aguardam confirmação</span></div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3 animate-in">
+                        <div class="stat-card" style="border-left-color: #6f42c1;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small" data-i18n="avg_wait_time">Tempo Médio Espera</div>
+                                    <div class="stat-number" id="statAvgWait">22 min</div>
+                                </div>
+                                <div class="stat-icon text-purple"><i class="fas fa-hourglass-half"></i></div>
+                            </div>
+                            <div class="mt-2"><small class="text-success"><i class="fas fa-arrow-down"></i> 5 min</small> <span class="text-muted small" data-i18n="improvement">melhoria</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Row -->
+                <div class="row">
+                    <!-- Calendar -->
+                    <div class="col-xl-5 col-lg-12 mb-4">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold" data-i18n="calendar"><i class="fas fa-calendar-alt me-2"></i>Calendário Inteligente</h6>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary me-1" id="calendarToday"><i class="fas fa-calendar-day"></i></button>
+                                    <button class="btn btn-sm btn-outline-secondary" id="calendarRefresh"><i class="fas fa-sync"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="calendar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-xl-7 col-lg-12">
+                        <!-- Queue Management -->
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold" data-i18n="queue_management"><i class="fas fa-users me-2"></i>Gestão da Fila de Atendimento</h6>
+                                <div>
+                                    <button class="btn btn-sm btn-primary me-1" id="callNextQueue">
+                                        <i class="fas fa-bullhorn me-1"></i> <span data-i18n="call_next">Chamar Próximo</span>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning" id="prioritizeQueue">
+                                        <i class="fas fa-star me-1"></i> <span data-i18n="prioritize">Priorizar</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover queue-table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th data-i18n="ticket">Senha</th>
+                                                <th data-i18n="patient">Paciente</th>
+                                                <th data-i18n="time">Hora</th>
+                                                <th data-i18n="status">Estado</th>
+                                                <th data-i18n="wait_time">Espera</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="queueTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="row mt-4">
+                            <div class="col-md-12 mb-3">
+                                <h6 class="fw-bold mb-3" data-i18n="quick_actions"><i class="fas fa-bolt me-2"></i>Ações Rápidas</h6>
+                                <div class="row g-2">
+                                    <div class="col-md-3 col-6">
+                                        <a href="#" class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#newPatientModal">
+                                            <i class="fas fa-user-plus text-primary"></i>
+                                            <span data-i18n="new_patient">Novo Paciente</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <a href="#" class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                                            <i class="fas fa-calendar-plus text-success"></i>
+                                            <span data-i18n="schedule">Agendar Consulta</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <a href="#" class="quick-action-btn" id="qrReaderBtn">
+                                            <i class="fas fa-qrcode text-warning"></i>
+                                            <span data-i18n="read_qr">Ler QR Code</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <a href="#" class="quick-action-btn" id="printReceiptBtn">
+                                            <i class="fas fa-file-pdf text-danger"></i>
+                                            <span data-i18n="receipt">Emitir Comprovativo</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts -->
+                        <div class="row mt-3">
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="m-0 font-weight-bold" data-i18n="appointments_by_hour">Consultas por Hora</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="hourlyChart" height="150"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="m-0 font-weight-bold" data-i18n="appointment_status">Estado das Consultas</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="statusChart" height="150"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Stats -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="footer-stats">
+                            <div class="row align-items-center">
+                                <div class="col-md-3 col-6 stat-item">
+                                    <div class="label" data-i18n="total_attended">Total Atendidos Hoje</div>
+                                    <div class="value" id="footerTotalAttended">42</div>
+                                </div>
+                                <div class="col-md-3 col-6 stat-item">
+                                    <div class="label" data-i18n="avg_wait_time">Tempo Médio Espera</div>
+                                    <div class="value" id="footerAvgWait">18 min</div>
+                                </div>
+                                <div class="col-md-3 col-6 stat-item">
+                                    <div class="label" data-i18n="confirmation_rate">Taxa de Confirmação</div>
+                                    <div class="value text-success" id="footerConfirmationRate">75%</div>
+                                </div>
+                                <div class="col-md-3 col-6 stat-item">
+                                    <div class="label" data-i18n="system_status">Estado do Sistema</div>
+                                    <div class="value">
+                                        <span class="status-dot online"></span>
+                                        <span data-i18n="online">Online</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot -->
+    <button class="btn btn-primary chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-robot"></i>
+    </button>
+
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-robot me-2"></i> Assistente SICAMI</span>
+            <button class="btn btn-sm btn-light" id="chatbotClose"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="chatbot-message bot">
+                Olá! Sou o assistente SICAMI. Como posso ajudá-lo hoje?
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbotInput" placeholder="Digite sua mensagem...">
+            <button class="btn btn-primary btn-sm" id="chatbotSend"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Modals -->
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-i18n="edit_profile"><i class="fas fa-user-edit me-2"></i>Editar Perfil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <img src="https://ui-avatars.com/api/?name=Maria+Silva&background=0d6efd&color=fff&size=128" id="profileImage" class="profile-pic-lg mb-3" alt="Profile">
+                        <input type="file" id="profileUpload" accept="image/*" class="d-none">
+                        <button class="btn btn-sm btn-outline-primary" onclick="document.getElementById('profileUpload').click()">
+                            <i class="fas fa-camera me-1"></i> <span data-i18n="change_photo">Alterar Foto</span>
+                        </button>
+                    </div>
+                    <form id="profileForm">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="name">Nome</label>
+                            <input type="text" class="form-control" id="profileName" value="Maria Silva">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="id">ID</label>
+                            <input type="text" class="form-control" id="profileId" value="REC-12345">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="unit">Unidade</label>
+                            <input type="text" class="form-control" id="profileUnit" value="UBS Centro">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" data-i18n="cancel">Cancelar</button>
+                    <button type="button" class="btn btn-outline-success" id="saveProfileBtn" data-i18n="save">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-i18n="change_password"><i class="fas fa-key me-2"></i>Alterar Senha</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="passwordForm">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="current_password">Senha Atual</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="currentPassword" placeholder="Digite sua senha atual">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('currentPassword', this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="new_password">Nova Senha</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="newPassword" placeholder="Digite a nova senha">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('newPassword', this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength" id="passwordStrength"></div>
+                            <small class="text-muted" id="passwordStrengthText">A senha deve ter pelo menos 6 caracteres</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="confirm_password">Confirmar Nova Senha</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirme a nova senha">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('confirmPassword', this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted" id="confirmPasswordFeedback"></small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" data-i18n="cancel">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="savePasswordBtn" data-i18n="save">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Patient Modal -->
+    <div class="modal fade" id="newPatientModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-i18n="new_patient"><i class="fas fa-user-plus me-2"></i>Novo Paciente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newPatientForm">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="full_name">Nome Completo</label>
+                            <input type="text" class="form-control" id="patientName" placeholder="Nome do paciente">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" data-i18n="birth_date">Data de Nascimento</label>
+                                <input type="date" class="form-control" id="patientBirth">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" data-i18n="phone">Telefone</label>
+                                <input type="tel" class="form-control" id="patientPhone" placeholder="(00) 00000-0000">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="document">Documento</label>
+                            <input type="text" class="form-control" id="patientDocument" placeholder="CPF ou RG">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="cancel">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="registerPatientBtn" data-i18n="register">Registrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Modal -->
+    <div class="modal fade" id="scheduleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-i18n="schedule_appointment"><i class="fas fa-calendar-plus me-2"></i>Agendar Consulta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="scheduleForm">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="patient">Paciente</label>
+                            <select class="form-select" id="schedulePatient">
+                                <option value="Ana Silva">Ana Silva</option>
+                                <option value="Maria João">Maria João</option>
+                                <option value="Carla Gomes">Carla Gomes</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="professional">Profissional</label>
+                            <select class="form-select" id="scheduleProfessional">
+                                <option value="Dr. Carlos Andrade">Dr. Carlos Andrade</option>
+                                <option value="Dra. Juliana Mendes">Dra. Juliana Mendes</option>
+                                <option value="Enf. Roberta Silva">Enf. Roberta Silva</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="date_time">Data e Hora</label>
+                            <input type="datetime-local" class="form-control" id="scheduleDateTime">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="type">Tipo de Atendimento</label>
+                            <select class="form-select" id="scheduleType">
+                                <option value="Consulta clínica">Consulta clínica</option>
+                                <option value="Retorno médico">Retorno médico</option>
+                                <option value="Exame laboratorial">Exame laboratorial</option>
+                                <option value="Vacinação">Vacinação</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="cancel">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveScheduleBtn" data-i18n="schedule">Agendar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ============================================================
+        // BANCO DE MEMÓRIA (localStorage)
+        // ============================================================
+        const Storage = {
+            get(key, defaultValue = null) {
+                try {
+                    const value = localStorage.getItem(key);
+                    return value ? JSON.parse(value) : defaultValue;
+                } catch {
+                    return defaultValue;
+                }
+            },
+            set(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                    return true;
+                } catch {
+                    return false;
+                }
+            },
+            remove(key) {
+                localStorage.removeItem(key);
+            },
+            clear() {
+                localStorage.clear();
+            }
+        };
+
+        // Inicializar dados padrão se não existirem
+        function initStorage() {
+            if (!Storage.get('sicami_queue')) {
+                Storage.set('sicami_queue', [
+                    { ticket: 'A001', patient: 'Ana Silva', time: '08:00', status: 'Em espera', wait: '12 min' },
+                    { ticket: 'A002', patient: 'Maria João', time: '08:10', status: 'Em atendimento', wait: '5 min' },
+                    { ticket: 'A003', patient: 'Carla Gomes', time: '08:20', status: 'Finalizado', wait: '—' },
+                    { ticket: 'A004', patient: 'Pedro Santos', time: '08:30', status: 'Em espera', wait: '8 min' },
+                    { ticket: 'A005', patient: 'Joana Costa', time: '08:40', status: 'Cancelado', wait: '—' }
+                ]);
+            }
+            if (!Storage.get('sicami_profile')) {
+                Storage.set('sicami_profile', {
+                    name: 'Maria Silva',
+                    id: 'REC-12345',
+                    unit: 'UBS Centro',
+                    avatar: 'https://ui-avatars.com/api/?name=Maria+Silva&background=0d6efd&color=fff&size=128'
+                });
+            }
+            if (!Storage.get('sicami_stats')) {
+                Storage.set('sicami_stats', {
+                    newPatients: 18,
+                    appointments: 24,
+                    waiting: 7,
+                    confirmed: 18,
+                    pending: 6,
+                    avgWait: '22 min',
+                    totalAttended: 42,
+                    confirmationRate: '75%'
+                });
+            }
+            if (!Storage.get('sicami_appointments')) {
+                const today = new Date().toISOString().slice(0,10);
+                Storage.set('sicami_appointments', [
+                    { title: 'Ana Silva - Consulta', start: today + 'T09:00:00', color: '#3498db' },
+                    { title: 'Maria João - Retorno', start: today + 'T09:30:00', color: '#2ecc71' },
+                    { title: 'Carla Gomes - Exame', start: today + 'T10:00:00', color: '#f39c12' },
+                    { title: 'Pedro Santos - Vacina', start: today + 'T10:30:00', color: '#9b59b6' },
+                    { title: 'Joana Costa - Consulta', start: today + 'T11:00:00', color: '#e74a3b' }
+                ]);
+            }
+            if (!Storage.get('sicami_password')) {
+                Storage.set('sicami_password', { hash: 'senha123' });
+            }
+        }
+
+        initStorage();
+
+        // ============================================================
+        // MULTILINGUAL SYSTEM
+        // ============================================================
+        const translations = {
+            pt: {
+                reception: "Recepção",
+                dashboard: "Dashboard",
+                appointments: "Agendamentos",
+                queue: "Fila de Espera",
+                history: "Histórico",
+                rooms: "Mapa de Salas",
+                tickets: "Painel de Senhas",
+                greeting: "Bom dia, Maria. Bem-vinda ao SICAMI.",
+                unit: "Unidade: Centro",
+                receptionist: "Maria Silva",
+                profile: "Perfil",
+                change_password: "Alterar Senha",
+                logout: "Sair",
+                cancel: "Cancelar",
+                save: "Salvar Alterações",
+                edit_profile: "Editar Perfil",
+                change_photo: "Alterar Foto",
+                name: "Nome",
+                id: "ID",
+                dashboard_title: "Dashboard da Recepção",
+                dashboard_subtitle: "Controle de agendamentos e atendimentos",
+                new_patients: "Pacientes Registados",
+                appointments_today: "Consultas Agendadas",
+                waiting_patients: "Pacientes em Espera",
+                confirmed_appointments: "Consultas Confirmadas",
+                pending_appointments: "Consultas Pendentes",
+                avg_wait_time: "Tempo Médio Espera",
+                vs_yesterday: "vs ontem",
+                from_last_hour: "desde última hora",
+                confirmation_rate: "taxa de confirmação",
+                awaiting_confirmation: "aguardam confirmação",
+                improvement: "melhoria",
+                calendar: "Calendário Inteligente",
+                queue_management: "Gestão da Fila de Atendimento",
+                call_next: "Chamar Próximo",
+                prioritize: "Priorizar",
+                ticket: "Senha",
+                patient: "Paciente",
+                time: "Hora",
+                status: "Estado",
+                wait_time: "Espera",
+                quick_actions: "Ações Rápidas",
+                new_patient: "Novo Paciente",
+                schedule: "Agendar Consulta",
+                read_qr: "Ler QR Code",
+                receipt: "Emitir Comprovativo",
+                appointments_by_hour: "Consultas por Hora",
+                appointment_status: "Estado das Consultas",
+                total_attended: "Total Atendidos Hoje",
+                system_status: "Estado do Sistema",
+                online: "Online",
+                full_name: "Nome Completo",
+                birth_date: "Data de Nascimento",
+                phone: "Telefone",
+                document: "Documento",
+                register: "Registrar",
+                schedule_appointment: "Agendar Consulta",
+                professional: "Profissional",
+                date_time: "Data e Hora",
+                type: "Tipo de Atendimento",
+                new_notification: "Nova Notificação",
+                appointment_reminder: "Lembrete: Consulta de Ana Silva em 15 minutos",
+                patient_arrived: "Paciente Maria João chegou para atendimento",
+                data_incomplete: "Dados incompletos para Carla Gomes",
+                chatbot_title: "Assistente SICAMI",
+                chatbot_placeholder: "Digite sua mensagem...",
+                chatbot_welcome: "Olá! Sou o assistente SICAMI. Como posso ajudá-lo hoje?",
+                chatbot_error: "Desculpe, não entendi. Pode reformular?",
+                waiting: "Em espera",
+                in_progress: "Em atendimento",
+                completed: "Finalizado",
+                canceled: "Cancelado",
+                current_password: "Senha Atual",
+                new_password: "Nova Senha",
+                confirm_password: "Confirmar Nova Senha",
+                password_updated: "Senha alterada com sucesso!",
+                password_mismatch: "As senhas não coincidem.",
+                password_short: "A senha deve ter pelo menos 6 caracteres.",
+                profile_updated: "Perfil atualizado com sucesso!",
+                patient_registered: "Paciente registrado com sucesso!",
+                appointment_scheduled: "Consulta agendada com sucesso!"
+            },
+            en: {
+                reception: "Reception",
+                dashboard: "Dashboard",
+                appointments: "Appointments",
+                queue: "Queue",
+                history: "History",
+                rooms: "Room Map",
+                tickets: "Ticket Panel",
+                greeting: "Good morning, Maria. Welcome to SICAMI.",
+                unit: "Unit: Center",
+                receptionist: "Maria Silva",
+                profile: "Profile",
+                change_password: "Change Password",
+                logout: "Logout",
+                cancel: "Cancel",
+                save: "Save Changes",
+                edit_profile: "Edit Profile",
+                change_photo: "Change Photo",
+                name: "Name",
+                id: "ID",
+                dashboard_title: "Reception Dashboard",
+                dashboard_subtitle: "Appointment and service control",
+                new_patients: "New Patients",
+                appointments_today: "Today's Appointments",
+                waiting_patients: "Patients Waiting",
+                confirmed_appointments: "Confirmed Appointments",
+                pending_appointments: "Pending Appointments",
+                avg_wait_time: "Avg Wait Time",
+                vs_yesterday: "vs yesterday",
+                from_last_hour: "from last hour",
+                confirmation_rate: "confirmation rate",
+                awaiting_confirmation: "awaiting confirmation",
+                improvement: "improvement",
+                calendar: "Smart Calendar",
+                queue_management: "Queue Management",
+                call_next: "Call Next",
+                prioritize: "Prioritize",
+                ticket: "Ticket",
+                patient: "Patient",
+                time: "Time",
+                status: "Status",
+                wait_time: "Wait Time",
+                quick_actions: "Quick Actions",
+                new_patient: "New Patient",
+                schedule: "Schedule Appointment",
+                read_qr: "Read QR Code",
+                receipt: "Print Receipt",
+                appointments_by_hour: "Appointments by Hour",
+                appointment_status: "Appointment Status",
+                total_attended: "Total Attended Today",
+                system_status: "System Status",
+                online: "Online",
+                full_name: "Full Name",
+                birth_date: "Birth Date",
+                phone: "Phone",
+                document: "Document",
+                register: "Register",
+                schedule_appointment: "Schedule Appointment",
+                professional: "Professional",
+                date_time: "Date & Time",
+                type: "Service Type",
+                new_notification: "New Notification",
+                appointment_reminder: "Reminder: Ana Silva's appointment in 15 minutes",
+                patient_arrived: "Patient Maria João arrived for service",
+                data_incomplete: "Incomplete data for Carla Gomes",
+                chatbot_title: "SICAMI Assistant",
+                chatbot_placeholder: "Type your message...",
+                chatbot_welcome: "Hello! I'm SICAMI assistant. How can I help you today?",
+                chatbot_error: "Sorry, I didn't understand. Can you rephrase?",
+                waiting: "Waiting",
+                in_progress: "In progress",
+                completed: "Completed",
+                canceled: "Canceled",
+                current_password: "Current Password",
+                new_password: "New Password",
+                confirm_password: "Confirm New Password",
+                password_updated: "Password updated successfully!",
+                password_mismatch: "Passwords do not match.",
+                password_short: "Password must be at least 6 characters.",
+                profile_updated: "Profile updated successfully!",
+                patient_registered: "Patient registered successfully!",
+                appointment_scheduled: "Appointment scheduled successfully!"
+            },
+            es: {
+                reception: "Recepción",
+                dashboard: "Panel",
+                appointments: "Citas",
+                queue: "Cola",
+                history: "Historial",
+                rooms: "Mapa de Salas",
+                tickets: "Panel de Turnos",
+                greeting: "Buenos días, María. Bienvenida a SICAMI.",
+                unit: "Unidad: Centro",
+                receptionist: "María Silva",
+                profile: "Perfil",
+                change_password: "Cambiar Contraseña",
+                logout: "Salir",
+                cancel: "Cancelar",
+                save: "Guardar Cambios",
+                edit_profile: "Editar Perfil",
+                change_photo: "Cambiar Foto",
+                name: "Nombre",
+                id: "ID",
+                dashboard_title: "Panel de Recepción",
+                dashboard_subtitle: "Control de citas y atenciones",
+                new_patients: "Pacientes Registrados",
+                appointments_today: "Citas Agendadas",
+                waiting_patients: "Pacientes en Espera",
+                confirmed_appointments: "Citas Confirmadas",
+                pending_appointments: "Citas Pendientes",
+                avg_wait_time: "Tiempo Medio Espera",
+                vs_yesterday: "vs ayer",
+                from_last_hour: "desde última hora",
+                confirmation_rate: "tasa de confirmación",
+                awaiting_confirmation: "esperando confirmación",
+                improvement: "mejora",
+                calendar: "Calendario Inteligente",
+                queue_management: "Gestión de Cola",
+                call_next: "Llamar Siguiente",
+                prioritize: "Priorizar",
+                ticket: "Turno",
+                patient: "Paciente",
+                time: "Hora",
+                status: "Estado",
+                wait_time: "Espera",
+                quick_actions: "Acciones Rápidas",
+                new_patient: "Nuevo Paciente",
+                schedule: "Agendar Cita",
+                read_qr: "Leer QR Code",
+                receipt: "Emitir Comprobante",
+                appointments_by_hour: "Citas por Hora",
+                appointment_status: "Estado de Citas",
+                total_attended: "Total Atendidos Hoy",
+                system_status: "Estado del Sistema",
+                online: "En línea",
+                full_name: "Nombre Completo",
+                birth_date: "Fecha Nacimiento",
+                phone: "Teléfono",
+                document: "Documento",
+                register: "Registrar",
+                schedule_appointment: "Agendar Cita",
+                professional: "Profesional",
+                date_time: "Fecha y Hora",
+                type: "Tipo de Atención",
+                new_notification: "Nueva Notificación",
+                appointment_reminder: "Recordatorio: Cita de Ana Silva en 15 minutos",
+                patient_arrived: "Paciente María João llegó para atención",
+                data_incomplete: "Datos incompletos para Carla Gomes",
+                chatbot_title: "Asistente SICAMI",
+                chatbot_placeholder: "Escribe tu mensaje...",
+                chatbot_welcome: "¡Hola! Soy el asistente SICAMI. ¿Cómo puedo ayudarte hoy?",
+                chatbot_error: "Lo siento, no entendí. ¿Puedes reformular?",
+                waiting: "En espera",
+                in_progress: "En atención",
+                completed: "Finalizado",
+                canceled: "Cancelado",
+                current_password: "Contraseña Actual",
+                new_password: "Nueva Contraseña",
+                confirm_password: "Confirmar Nueva Contraseña",
+                password_updated: "¡Contraseña actualizada con éxito!",
+                password_mismatch: "Las contraseñas no coinciden.",
+                password_short: "La contraseña debe tener al menos 6 caracteres.",
+                profile_updated: "¡Perfil actualizado con éxito!",
+                patient_registered: "¡Paciente registrado con éxito!",
+                appointment_scheduled: "¡Cita agendada con éxito!"
+            }
+        };
+
+        let currentLanguage = 'pt';
+
+        function translatePage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            const chatInput = document.getElementById('chatbotInput');
+            if (chatInput) {
+                chatInput.placeholder = translations[lang].chatbot_placeholder || 'Digite sua mensagem...';
+            }
+            const messages = document.getElementById('chatbotMessages');
+            if (messages) {
+                const firstMsg = messages.querySelector('.chatbot-message.bot');
+                if (firstMsg) {
+                    firstMsg.textContent = translations[lang].chatbot_welcome || 'Olá! Sou o assistente SICAMI. Como posso ajudá-lo hoje?';
+                }
+            }
+            const greetingEl = document.querySelector('.greeting-text span');
+            if (greetingEl) {
+                greetingEl.textContent = translations[lang].greeting || 'Bom dia, Maria. Bem-vinda ao SICAMI.';
+            }
+            Storage.set('preferredLanguage', lang);
+        }
+
+        document.querySelectorAll('[data-lang]').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                translatePage(lang);
+                showToast('Idioma alterado', `Idioma alterado para ${lang === 'pt' ? 'Português' : lang === 'en' ? 'Inglês' : 'Espanhol'}`, 'info');
+            });
+        });
+
+        const savedLang = Storage.get('preferredLanguage');
+        if (savedLang && translations[savedLang]) {
+            translatePage(savedLang);
+        }
+
+        // ============================================================
+        // TOAST SYSTEM
+        // ============================================================
+        function showToast(title, message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.setAttribute('role', 'alert');
+            const iconMap = {
+                info: 'fa-info-circle',
+                success: 'fa-check-circle',
+                warning: 'fa-exclamation-triangle',
+                danger: 'fa-times-circle'
+            };
+            toast.innerHTML = `
+                <div class="toast-header">
+                    <i class="fas ${iconMap[type] || 'fa-info-circle'} me-2 text-${type}"></i>
+                    <strong class="me-auto">${title}</strong>
+                    <small>agora</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">${message}</div>
+            `;
+            container.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: 5000 });
+            bsToast.show();
+            toast.addEventListener('hidden.bs.toast', () => toast.remove());
+        }
+
+        // ============================================================
+        // CLOCK
+        // ============================================================
+        function updateClock() {
+            const now = new Date();
+            const options = { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('pt-BR', options);
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // ============================================================
+        // SIDEBAR TOGGLE
+        // ============================================================
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar-wrapper').classList.toggle('toggled');
+        });
+
+        // ============================================================
+        // DARK MODE
+        // ============================================================
+        document.getElementById('darkModeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            Storage.set('darkMode', document.body.classList.contains('dark-mode'));
+            
+            const icon = this.querySelector('i');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+
+        if (Storage.get('darkMode') === true) {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeToggle').querySelector('i').classList.remove('fa-moon');
+            document.getElementById('darkModeToggle').querySelector('i').classList.add('fa-sun');
+        }
+
+        // ============================================================
+        // TIMER - INICIA AUTOMATICAMENTE
+        // ============================================================
+        let timerInterval;
+        let timeLeft = Storage.get('timerTime', 30 * 60);
+        const timerDisplay = document.getElementById('timer');
+        const startButton = document.getElementById('startTimer');
+        const resetButton = document.getElementById('resetTimer');
+        let timerRunning = Storage.get('timerRunning', false);
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            Storage.set('timerTime', timeLeft);
+        }
+
+        function iniciarTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(function() {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    timerRunning = false;
+                    Storage.set('timerRunning', false);
+                    startButton.innerHTML = '<i class="fas fa-play"></i>';
+                    showToast('Tempo esgotado!', 'O tempo do cronômetro terminou.', 'warning');
+                }
+            }, 1000);
+            timerRunning = true;
+            Storage.set('timerRunning', true);
+            startButton.innerHTML = '<i class="fas fa-pause"></i>';
+        }
+
+        if (timerRunning) {
+            iniciarTimer();
+        }
+
+        startButton.addEventListener('click', function() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                timerRunning = false;
+                Storage.set('timerRunning', false);
+                startButton.innerHTML = '<i class="fas fa-play"></i>';
+            } else {
+                iniciarTimer();
+            }
+        });
+
+        resetButton.addEventListener('click', function() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timerRunning = false;
+            Storage.set('timerRunning', false);
+            timeLeft = 30 * 60;
+            updateTimerDisplay();
+            startButton.innerHTML = '<i class="fas fa-play"></i>';
+            // Reinicia automaticamente após reset
+            iniciarTimer();
+        });
+
+        updateTimerDisplay();
+
+        // ============================================================
+        // NOTIFICATIONS
+        // ============================================================
+        let notificationCount = parseInt(Storage.get('notificationCount', 3));
+
+        document.getElementById('notificationToggle').addEventListener('click', function() {
+            const msgs = [
+                translations[currentLanguage].appointment_reminder || 'Lembrete: Consulta de Ana Silva em 15 minutos',
+                translations[currentLanguage].patient_arrived || 'Paciente Maria João chegou para atendimento',
+                translations[currentLanguage].data_incomplete || 'Dados incompletos para Carla Gomes'
+            ];
+            msgs.forEach((msg, i) => {
+                setTimeout(() => {
+                    showToast(
+                        translations[currentLanguage].new_notification || 'Nova Notificação',
+                        msg,
+                        i === 0 ? 'info' : i === 1 ? 'success' : 'warning'
+                    );
+                }, i * 1000);
+            });
+            notificationCount += 3;
+            Storage.set('notificationCount', notificationCount);
+            this.querySelector('.badge').textContent = notificationCount;
+        });
+
+        // ============================================================
+        // CALENDAR (FullCalendar)
+        // ============================================================
+        let calendar;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            const savedEvents = Storage.get('sicami_appointments', []);
+            
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: savedEvents,
+                eventClick: function(info) {
+                    showToast(
+                        'Detalhes da Consulta',
+                        `${info.event.title} - ${info.event.start.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}`,
+                        'info'
+                    );
+                },
+                dateClick: function(info) {
+                    showToast(
+                        'Nova Consulta',
+                        `Clique para agendar em ${info.dateStr}`,
+                        'info'
+                    );
+                    // Preencher data no modal de agendamento
+                    const dateTimeInput = document.getElementById('scheduleDateTime');
+                    if (dateTimeInput) {
+                        const date = new Date(info.dateStr);
+                        date.setHours(9, 0, 0);
+                        dateTimeInput.value = date.toISOString().slice(0, 16);
+                    }
+                    // Abrir modal de agendamento
+                    const modal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+                    modal.show();
+                },
+                locale: currentLanguage === 'pt' ? 'pt-br' : currentLanguage === 'es' ? 'es' : 'en'
+            });
+            calendar.render();
+
+            document.getElementById('calendarToday').addEventListener('click', function() {
+                calendar.today();
+            });
+
+            document.getElementById('calendarRefresh').addEventListener('click', function() {
+                const events = Storage.get('sicami_appointments', []);
+                calendar.removeAllEvents();
+                calendar.addEventSource(events);
+                showToast('Calendário', 'Calendário atualizado!', 'success');
+            });
+        });
+
+        // ============================================================
+        // QUEUE MANAGEMENT
+        // ============================================================
+        function getQueue() {
+            return Storage.get('sicami_queue', []);
+        }
+
+        function saveQueue(queue) {
+            Storage.set('sicami_queue', queue);
+        }
+
+        function renderQueue() {
+            const queueData = getQueue();
+            const tbody = document.getElementById('queueTableBody');
+            tbody.innerHTML = '';
+            queueData.forEach(item => {
+                const statusClass = item.status === 'Em espera' ? 'status-espera' :
+                                  item.status === 'Em atendimento' ? 'status-atendimento' :
+                                  item.status === 'Finalizado' ? 'status-finalizado' : 'status-cancelado';
+                const waitClass = item.wait !== '—' ? 'text-warning' : 'text-muted';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${item.ticket}</strong></td>
+                    <td>${item.patient}</td>
+                    <td>${item.time}</td>
+                    <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+                    <td><span class="${waitClass}">${item.wait}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateStatsFromQueue(queueData);
+        }
+
+        function updateStatsFromQueue(queueData) {
+            const waiting = queueData.filter(item => item.status === 'Em espera').length;
+            const inProgress = queueData.filter(item => item.status === 'Em atendimento').length;
+            const completed = queueData.filter(item => item.status === 'Finalizado').length;
+            
+            document.getElementById('statWaiting').textContent = waiting;
+            document.getElementById('statNewPatients').textContent = queueData.length;
+            
+            const stats = Storage.get('sicami_stats', {});
+            stats.waiting = waiting;
+            stats.totalAttended = completed;
+            Storage.set('sicami_stats', stats);
+            
+            document.getElementById('footerTotalAttended').textContent = completed;
+        }
+
+        renderQueue();
+
+        document.getElementById('callNextQueue').addEventListener('click', function() {
+            const queue = getQueue();
+            const waitingIdx = queue.findIndex(item => item.status === 'Em espera');
+            if (waitingIdx !== -1) {
+                queue[waitingIdx].status = 'Em atendimento';
+                queue[waitingIdx].wait = '0 min';
+                saveQueue(queue);
+                renderQueue();
+                showToast(
+                    'Chamando paciente',
+                    `${queue[waitingIdx].patient} - ${queue[waitingIdx].ticket} para atendimento!`,
+                    'success'
+                );
+            } else {
+                showToast('Fila vazia', 'Não há pacientes aguardando atendimento.', 'warning');
+            }
+        });
+
+        document.getElementById('prioritizeQueue').addEventListener('click', function() {
+            const queue = getQueue();
+            const waitingItems = queue.filter(item => item.status === 'Em espera');
+            if (waitingItems.length > 0) {
+                const patient = waitingItems[0];
+                // Mover para o topo da fila
+                const idx = queue.indexOf(patient);
+                if (idx > 0) {
+                    queue.splice(idx, 1);
+                    queue.unshift(patient);
+                    saveQueue(queue);
+                    renderQueue();
+                }
+                showToast(
+                    'Priorizar paciente',
+                    `${patient.patient} foi priorizado na fila!`,
+                    'info'
+                );
+            } else {
+                showToast('Fila vazia', 'Não há pacientes para priorizar.', 'warning');
+            }
+        });
+
+        // ============================================================
+        // CHARTS
+        // ============================================================
+        let hourlyChartInstance, statusChartInstance;
+
+        function initCharts() {
+            const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+            hourlyChartInstance = new Chart(hourlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
+                    datasets: [{
+                        label: 'Consultas',
+                        data: [4, 6, 5, 3, 2, 4, 5, 3, 1],
+                        backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                        borderColor: 'rgba(13, 110, 253, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            statusChartInstance = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Confirmadas', 'Pendentes', 'Canceladas'],
+                    datasets: [{
+                        data: [18, 6, 2],
+                        backgroundColor: ['#2ecc71', '#f39c12', '#e74a3b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        initCharts();
+
+        // ============================================================
+        // TOGGLE PASSWORD VISIBILITY
+        // ============================================================
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // ============================================================
+        // PASSWORD STRENGTH
+        // ============================================================
+        document.getElementById('newPassword').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('passwordStrength');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            if (password.length === 0) {
+                strengthBar.style.width = '0%';
+                strengthBar.style.backgroundColor = 'transparent';
+                strengthText.textContent = 'A senha deve ter pelo menos 6 caracteres';
+                return;
+            }
+            
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (password.length >= 10) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            const colors = ['#ff4444', '#ff8800', '#ffcc00', '#88cc00', '#44cc44'];
+            const texts = ['Muito fraca', 'Fraca', 'Média', 'Forte', 'Muito forte'];
+            
+            const index = Math.min(strength, 4);
+            strengthBar.style.width = `${(index + 1) * 20}%`;
+            strengthBar.style.backgroundColor = colors[index];
+            strengthText.textContent = `Força: ${texts[index]}`;
+        });
+
+        // ============================================================
+        // PASSWORD CONFIRMATION
+        // ============================================================
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = this.value;
+            const feedback = document.getElementById('confirmPasswordFeedback');
+            
+            if (confirmPass.length === 0) {
+                feedback.textContent = '';
+                return;
+            }
+            
+            if (newPass === confirmPass) {
+                feedback.textContent = '✅ Senhas coincidem';
+                feedback.style.color = '#2ecc71';
+            } else {
+                feedback.textContent = '❌ Senhas não coincidem';
+                feedback.style.color = '#e74a3b';
+            }
+        });
+
+        // ============================================================
+        // SAVE PROFILE - RÁPIDO E SEM DELAY
+        // ============================================================
+        document.getElementById('saveProfileBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Mostrar estado de carregamento
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Salvando...';
+            
+            // Salvar dados do perfil
+            const profile = {
+                name: document.getElementById('profileName').value,
+                id: document.getElementById('profileId').value,
+                unit: document.getElementById('profileUnit').value
+            };
+            
+            // Salvar avatar se houver upload
+            const avatarImg = document.getElementById('profileImage');
+            if (avatarImg.src && !avatarImg.src.includes('ui-avatars.com')) {
+                profile.avatar = avatarImg.src;
+            }
+            
+            Storage.set('sicami_profile', profile);
+            
+            // Atualizar UI
+            document.querySelector('.greeting-text span').textContent = 
+                `${translations[currentLanguage].greeting || 'Bom dia,'} ${profile.name}. ${translations[currentLanguage].greeting ? translations[currentLanguage].greeting.split(',')[1] || 'Bem-vinda ao SICAMI.' : 'Bem-vinda ao SICAMI.'}`;
+            document.querySelector('.profile-pic').src = avatarImg.src;
+            
+            // Restaurar botão
+            setTimeout(() => {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-save me-1"></i> Salvar Alterações';
+                showToast(
+                    translations[currentLanguage].profile_updated || 'Perfil atualizado!',
+                    'Dados do perfil salvos com sucesso.',
+                    'success'
+                );
+                const modal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
+                if (modal) modal.hide();
+            }, 300);
+        });
+
+        // ============================================================
+        // CHANGE PASSWORD - RÁPIDO E SEM DELAY
+        // ============================================================
+        document.getElementById('savePasswordBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const currentPass = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            
+            // Validar
+            if (currentPass.length === 0) {
+                showToast('Erro', 'Digite a senha atual.', 'warning');
+                return;
+            }
+            
+            const savedPassword = Storage.get('sicami_password', { hash: 'senha123' });
+            if (currentPass !== savedPassword.hash) {
+                showToast('Erro', 'Senha atual incorreta.', 'danger');
+                return;
+            }
+            
+            if (newPass.length < 6) {
+                showToast('Erro', translations[currentLanguage].password_short || 'A senha deve ter pelo menos 6 caracteres.', 'warning');
+                return;
+            }
+            
+            if (newPass !== confirmPass) {
+                showToast('Erro', translations[currentLanguage].password_mismatch || 'As senhas não coincidem.', 'danger');
+                return;
+            }
+            
+            // Mostrar estado de carregamento
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Salvando...';
+            
+            // Salvar nova senha
+            Storage.set('sicami_password', { hash: newPass });
+            
+            // Limpar campos
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('passwordStrength').style.width = '0%';
+            document.getElementById('passwordStrength').style.backgroundColor = 'transparent';
+            document.getElementById('passwordStrengthText').textContent = 'A senha deve ter pelo menos 6 caracteres';
+            document.getElementById('confirmPasswordFeedback').textContent = '';
+            
+            // Restaurar botão
+            setTimeout(() => {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-save me-1"></i> Salvar Alterações';
+                showToast(
+                    translations[currentLanguage].password_updated || 'Senha alterada!',
+                    'Sua senha foi alterada com sucesso.',
+                    'success'
+                );
+                const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                if (modal) modal.hide();
+            }, 300);
+        });
+
+        // ============================================================
+        // REGISTER PATIENT
+        // ============================================================
+        document.getElementById('registerPatientBtn').addEventListener('click', function() {
+            const name = document.getElementById('patientName').value.trim();
+            const birth = document.getElementById('patientBirth').value;
+            const phone = document.getElementById('patientPhone').value.trim();
+            const doc = document.getElementById('patientDocument').value.trim();
+            
+            if (!name) {
+                showToast('Erro', 'Digite o nome do paciente.', 'warning');
+                return;
+            }
+            
+            const queue = getQueue();
+            const nextTicket = String.fromCharCode(65 + queue.length % 26) + 
+                              String(queue.length + 1).padStart(3, '0');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+            
+            queue.push({
+                ticket: nextTicket,
+                patient: name,
+                time: timeStr,
+                status: 'Em espera',
+                wait: '0 min'
+            });
+            
+            saveQueue(queue);
+            renderQueue();
+            
+            document.getElementById('patientName').value = '';
+            document.getElementById('patientBirth').value = '';
+            document.getElementById('patientPhone').value = '';
+            document.getElementById('patientDocument').value = '';
+            
+            showToast(
+                translations[currentLanguage].patient_registered || 'Paciente registrado!',
+                `${name} foi adicionado à fila com senha ${nextTicket}.`,
+                'success'
+            );
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newPatientModal'));
+            if (modal) modal.hide();
+        });
+
+        // ============================================================
+        // SCHEDULE APPOINTMENT
+        // ============================================================
+        document.getElementById('saveScheduleBtn').addEventListener('click', function() {
+            const patient = document.getElementById('schedulePatient').value;
+            const professional = document.getElementById('scheduleProfessional').value;
+            const dateTime = document.getElementById('scheduleDateTime').value;
+            const type = document.getElementById('scheduleType').value;
+            
+            if (!dateTime) {
+                showToast('Erro', 'Selecione data e hora.', 'warning');
+                return;
+            }
+            
+            const appointments = Storage.get('sicami_appointments', []);
+            const dateObj = new Date(dateTime);
+            const title = `${patient} - ${type}`;
+            
+            appointments.push({
+                title: title,
+                start: dateObj.toISOString(),
+                color: '#3498db'
+            });
+            
+            Storage.set('sicami_appointments', appointments);
+            
+            if (calendar) {
+                calendar.addEvent({ title, start: dateObj.toISOString(), color: '#3498db' });
+            }
+            
+            document.getElementById('scheduleDateTime').value = '';
+            
+            showToast(
+                translations[currentLanguage].appointment_scheduled || 'Consulta agendada!',
+                `${patient} - ${type} para ${dateObj.toLocaleString('pt-BR')}`,
+                'success'
+            );
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('scheduleModal'));
+            if (modal) modal.hide();
+        });
+
+        // ============================================================
+        // QR CODE READER
+        // ============================================================
+        document.getElementById('qrReaderBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showToast(
+                'Leitor QR Code',
+                'Câmera integrada ativada. Aponte para o QR Code do paciente.',
+                'info'
+            );
+            setTimeout(() => {
+                showToast(
+                    'Paciente Identificado',
+                    'Ana Silva - Registro: 123456789 - Processo encontrado!',
+                    'success'
+                );
+            }, 3000);
+        });
+
+        // ============================================================
+        // PRINT RECEIPT
+        // ============================================================
+        document.getElementById('printReceiptBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showToast(
+                'Comprovativo',
+                'Gerando comprovativo em PDF...',
+                'info'
+            );
+            setTimeout(() => {
+                showToast(
+                    'Comprovativo',
+                    'Comprovativo emitido com sucesso!',
+                    'success'
+                );
+            }, 1500);
+        });
+
+        // ============================================================
+        // CHATBOT
+        // ============================================================
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbotWindow = document.getElementById('chatbotWindow');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const chatbotSend = document.getElementById('chatbotSend');
+        const chatbotMessages = document.getElementById('chatbotMessages');
+
+        chatbotToggle.addEventListener('click', function() {
+            chatbotWindow.classList.toggle('active');
+        });
+
+        chatbotClose.addEventListener('click', function() {
+            chatbotWindow.classList.remove('active');
+        });
+
+        function sendMessage() {
+            const message = chatbotInput.value.trim();
+            if (!message) return;
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chatbot-message user';
+            userMsg.textContent = message;
+            chatbotMessages.appendChild(userMsg);
+
+            chatbotInput.value = '';
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'chatbot-message bot';
+                
+                const lowerMsg = message.toLowerCase();
+                let response = translations[currentLanguage].chatbot_error || 'Desculpe, não entendi. Pode reformular?';
+                
+                if (lowerMsg.includes('paciente') || lowerMsg.includes('patient')) {
+                    const queue = getQueue();
+                    const waiting = queue.filter(item => item.status === 'Em espera').length;
+                    const inProgress = queue.filter(item => item.status === 'Em atendimento').length;
+                    response = `📊 Atualmente temos ${queue.length} pacientes registrados. ${waiting} aguardando, ${inProgress} em atendimento.`;
+                } else if (lowerMsg.includes('consulta') || lowerMsg.includes('appointment')) {
+                    const stats = Storage.get('sicami_stats', {});
+                    response = `📅 Hoje temos ${stats.appointments || 24} consultas agendadas. ${stats.confirmed || 18} confirmadas, ${stats.pending || 6} pendentes.`;
+                } else if (lowerMsg.includes('fila') || lowerMsg.includes('queue')) {
+                    const queue = getQueue();
+                    const waiting = queue.filter(item => item.status === 'Em espera').length;
+                    response = `👥 Atualmente há ${waiting} pacientes em espera. Tempo médio de espera: ${document.getElementById('footerAvgWait').textContent || '18 minutos'}.`;
+                } else if (lowerMsg.includes('olá') || lowerMsg.includes('oi') || lowerMsg.includes('hello') || lowerMsg.includes('ola')) {
+                    response = translations[currentLanguage].chatbot_welcome || 'Olá! Como posso ajudá-lo?';
+                } else if (lowerMsg.includes('stat') || lowerMsg.includes('estat')) {
+                    const stats = Storage.get('sicami_stats', {});
+                    response = `📊 Hoje: ${stats.totalAttended || 42} pacientes atendidos, ${stats.confirmationRate || '75%'} de confirmação, média de ${stats.avgWait || '18 min'} de espera.`;
+                } else if (lowerMsg.includes('senha') || lowerMsg.includes('password')) {
+                    response = '🔑 Para alterar sua senha, clique no ícone do perfil no canto superior direito e selecione "Alterar Senha".';
+                } else if (lowerMsg.includes('ajuda') || lowerMsg.includes('help')) {
+                    response = '💡 Posso ajudar com: pacientes, consultas, fila, estatísticas e senhas. O que deseja saber?';
+                } else {
+                    response = translations[currentLanguage].chatbot_error || 'Desculpe, não entendi. Pode reformular?';
+                }
+                
+                botMsg.textContent = response;
+                chatbotMessages.appendChild(botMsg);
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }, 500);
+        }
+
+        chatbotSend.addEventListener('click', sendMessage);
+        chatbotInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // ============================================================
+        // PROFILE IMAGE UPLOAD
+        // ============================================================
+        document.getElementById('profileUpload').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('profileImage').src = event.target.result;
+                    document.querySelector('.profile-pic').src = event.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showToast('Sair', 'Você foi desconectado do sistema.', 'info');
+        });
+
+        // ============================================================
+        // AUTO-REFRESH QUEUE
+        // ============================================================
+        setInterval(() => {
+            const queue = getQueue();
+            let updated = false;
+            queue.forEach(item => {
+                if (item.status === 'Em espera' && item.wait !== '—') {
+                    const mins = parseInt(item.wait);
+                    if (!isNaN(mins)) {
+                        item.wait = `${mins + 1} min`;
+                        updated = true;
+                    }
+                }
+                if (item.status === 'Em atendimento' && item.wait !== '0 min' && item.wait !== '—') {
+                    const mins = parseInt(item.wait);
+                    if (!isNaN(mins) && mins < 15) {
+                        item.wait = `${mins + 1} min`;
+                        updated = true;
+                    }
+                }
+            });
+            if (updated) {
+                saveQueue(queue);
+                renderQueue();
+            }
+        }, 30000);
+
+        // ============================================================
+        // TOAST ON LOAD
+        // ============================================================
+        setTimeout(() => {
+            showToast(
+                'Sistema Iniciado',
+                'Bem-vindo ao SICAMI. Todas as funcionalidades estão disponíveis.',
+                'success'
+            );
+        }, 1000);
+
+        // ============================================================
+        // CARREGAR DADOS DO PERFIL
+        // ============================================================
+        const profile = Storage.get('sicami_profile', {});
+        if (profile.name) {
+            document.getElementById('profileName').value = profile.name;
+            document.getElementById('profileId').value = profile.id || 'REC-12345';
+            document.getElementById('profileUnit').value = profile.unit || 'UBS Centro';
+            if (profile.avatar) {
+                document.getElementById('profileImage').src = profile.avatar;
+                document.querySelector('.profile-pic').src = profile.avatar;
+            }
+        }
+
+        // ============================================================
+        // CARREGAR ESTATÍSTICAS
+        // ============================================================
+        const stats = Storage.get('sicami_stats', {});
+        if (stats.newPatients) document.getElementById('statNewPatients').textContent = stats.newPatients;
+        if (stats.appointments) document.getElementById('statAppointments').textContent = stats.appointments;
+        if (stats.waiting) document.getElementById('statWaiting').textContent = stats.waiting;
+        if (stats.confirmed) document.getElementById('statConfirmed').textContent = stats.confirmed;
+        if (stats.pending) document.getElementById('statPending').textContent = stats.pending;
+        if (stats.avgWait) document.getElementById('statAvgWait').textContent = stats.avgWait;
+        if (stats.totalAttended) document.getElementById('footerTotalAttended').textContent = stats.totalAttended;
+        if (stats.confirmationRate) document.getElementById('footerConfirmationRate').textContent = stats.confirmationRate;
+    </script>
+</body>
+</html>

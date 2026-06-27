@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoramento de Desempenho</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #f8f9fc;
+            --success-color: #1cc88a;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+        }
+        
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-color) 0%, #224abe 100%);
+            min-height: 100vh;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+        
+        .sidebar .nav-link.active {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link:hover {
+            color: #fff;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+            font-weight: 700;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .metric-card {
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-icon {
+            font-size: 2rem;
+        }
+        
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        
+        .metric-title {
+            font-size: 0.9rem;
+            color: #6e707e;
+        }
+        
+        .metric-change {
+            font-size: 0.8rem;
+        }
+        
+        .change-up {
+            color: var(--success-color);
+        }
+        
+        .change-down {
+            color: var(--danger-color);
+        }
+        
+        .nav-tabs .nav-link.active {
+            font-weight: bold;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .alert-card {
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .alert-critical {
+            background-color: rgba(231, 74, 59, 0.1);
+        }
+        
+        .alert-warning {
+            background-color: rgba(246, 194, 62, 0.1);
+        }
+        
+        .alert-info {
+            background-color: rgba(78, 115, 223, 0.1);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-up {
+            background-color: var(--success-color);
+        }
+        
+        .status-down {
+            background-color: var(--danger-color);
+        }
+        
+        .status-warning {
+            background-color: var(--warning-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-primary">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-users me-2"></i> Usuários
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-user-shield me-2"></i> Permissões
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-database me-2"></i> Banco de Dados
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                <i class="fas fa-tachometer-alt me-2"></i> Desempenho
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Monitoramento de Desempenho</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary">Hoje</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">7 dias</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">30 dias</button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                            <i class="fas fa-download me-1"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Métricas Principais -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card metric-card border-left-primary h-100">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="metric-title text-primary text-uppercase mb-1">
+                                            Tempo de Resposta
+                                        </div>
+                                        <div class="metric-value mb-1">342ms</div>
+                                        <div class="metric-change">
+                                            <span class="change-down"><i class="fas fa-arrow-down me-1"></i> 12%</span>
+                                            <span class="text-muted">desde ontem</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-stopwatch metric-icon text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card metric-card border-left-success h-100">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="metric-title text-success text-uppercase mb-1">
+                                            Uptime
+                                        </div>
+                                        <div class="metric-value mb-1">99.97%</div>
+                                        <div class="metric-change">
+                                            <span class="change-up"><i class="fas fa-arrow-up me-1"></i> 0.02%</span>
+                                            <span class="text-muted">desde ontem</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-chart-line metric-icon text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card metric-card border-left-info h-100">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="metric-title text-info text-uppercase mb-1">
+                                            Requisições
+                                        </div>
+                                        <div class="metric-value mb-1">1,248</div>
+                                        <div class="metric-change">
+                                            <span class="change-up"><i class="fas fa-arrow-up me-1"></i> 8.5%</span>
+                                            <span class="text-muted">desde ontem</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-exchange-alt metric-icon text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card metric-card border-left-warning h-100">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="metric-title text-warning text-uppercase mb-1">
+                                            Usuários Ativos
+                                        </div>
+                                        <div class="metric-value mb-1">48</div>
+                                        <div class="metric-change">
+                                            <span class="change-down"><i class="fas fa-arrow-down me-1"></i> 3.2%</span>
+                                            <span class="text-muted">desde ontem</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-users metric-icon text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Abas -->
+                <ul class="nav nav-tabs mb-4" id="performanceTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Visão Geral</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts" type="button" role="tab">Alertas</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="services-tab" data-bs-toggle="tab" data-bs-target="#services" type="button" role="tab">Serviços</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">Logs</button>
+                    </li>
+                </ul>
+
+                <!-- Conteúdo das Abas -->
+                <div class="tab-content" id="performanceTabsContent">
+                    <!-- Tab Visão Geral -->
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-line me-1"></i> Desempenho do Sistema (Últimas 24 horas)
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="performanceChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-microchip me-1"></i> Uso de Recursos
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <h6 class="text-uppercase">CPU</h6>
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar bg-danger" role="progressbar" style="width: 65%"></div>
+                                            </div>
+                                            <small class="text-muted">65% utilizado (4 núcleos)</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <h6 class="text-uppercase">Memória</h6>
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar bg-warning" role="progressbar" style="width: 45%"></div>
+                                            </div>
+                                            <small class="text-muted">7.2 GB de 16 GB</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <h6 class="text-uppercase">Disco</h6>
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 30%"></div>
+                                            </div>
+                                            <small class="text-muted">150 GB de 500 GB</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <h6 class="text-uppercase">Rede</h6>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-info" role="progressbar" style="width: 25%"></div>
+                                            </div>
+                                            <small class="text-muted">25 Mbps de 100 Mbps</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-pie me-1"></i> Requisições por Tipo
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="requestsChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-table me-1"></i> Endpoints Mais Acessados
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Endpoint</th>
+                                                        <th>Requisições</th>
+                                                        <th>Tempo Médio</th>
+                                                        <th>Erros</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>/api/users</td>
+                                                        <td>1,245</td>
+                                                        <td>142ms</td>
+                                                        <td>12</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>/api/auth/login</td>
+                                                        <td>987</td>
+                                                        <td>210ms</td>
+                                                        <td>45</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>/api/reports</td>
+                                                        <td>756</td>
+                                                        <td>345ms</td>
+                                                        <td>23</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>/api/settings</td>
+                                                        <td>432</td>
+                                                        <td>87ms</td>
+                                                        <td>5</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>/api/database</td>
+                                                        <td>321</td>
+                                                        <td>512ms</td>
+                                                        <td>18</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Alertas -->
+                    <div class="tab-pane fade" id="alerts" role="tabpanel">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <select class="form-select" id="alertSeverityFilter">
+                                        <option value="">Todas as Severidades</option>
+                                        <option value="critical">Crítico</option>
+                                        <option value="warning">Aviso</option>
+                                        <option value="info">Informativo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <select class="form-select" id="alertStatusFilter">
+                                        <option value="">Todos os Status</option>
+                                        <option value="open">Aberto</option>
+                                        <option value="acknowledged">Reconhecido</option>
+                                        <option value="resolved">Resolvido</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Pesquisar alertas...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card alert-card alert-critical">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title mb-0">Alta Utilização de CPU</h5>
+                                            <span class="badge bg-danger">Crítico</span>
+                                        </div>
+                                        <p class="card-text">A utilização da CPU excedeu 90% por mais de 5 minutos.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">12/07/2023 14:30 - Servidor Principal</small>
+                                            <button class="btn btn-sm btn-outline-secondary">Detalhes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card alert-card alert-warning">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title mb-0">Tempo de Resposta Lento</h5>
+                                            <span class="badge bg-warning">Aviso</span>
+                                        </div>
+                                        <p class="card-text">O tempo médio de resposta excedeu 500ms para o endpoint /api/reports.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">12/07/2023 10:15 - API</small>
+                                            <button class="btn btn-sm btn-outline-secondary">Detalhes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card alert-card alert-warning">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title mb-0">Espaço em Disco Baixo</h5>
+                                            <span class="badge bg-warning">Aviso</span>
+                                        </div>
+                                        <p class="card-text">Apenas 15% de espaço livre no volume /var.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">11/07/2023 18:45 - Servidor de Backup</small>
+                                            <button class="btn btn-sm btn-outline-secondary">Detalhes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card alert-card alert-info">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title mb-0">Backup Completo Concluído</h5>
+                                            <span class="badge bg-info">Informativo</span>
+                                        </div>
+                                        <p class="card-text">Backup completo do banco de dados concluído com sucesso.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">12/07/2023 02:00 - Banco de Dados</small>
+                                            <button class="btn btn-sm btn-outline-secondary">Detalhes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-outline-primary">Carregar Mais Alertas</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab Serviços -->
+                    <div class="tab-pane fade" id="services" role="tabpanel">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Pesquisar serviços...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">Servidor Web</h5>
+                                            <span class="status-indicator status-up"></span>
+                                        </div>
+                                        <p class="card-text text-muted">Apache/2.4.41 (Ubuntu)</p>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Uptime</small>
+                                            <p>7 dias 12:34:21</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Requisições</small>
+                                            <p>1,245/min</p>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-sm btn-outline-primary">Reiniciar</button>
+                                            <button class="btn btn-sm btn-outline-secondary">Detalhes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">Banco de Dados</h5>
+                                            <span class="status-indicator status-up"></span>
+                                        </div>
+                                        <p class="card-text text-muted">MySQL 8.0.32</p>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Uptime</small>
+                                            <p>7 dias 12:34:21</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Consultas</small>
+                                            <p>345/min</p>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-sm btn-outline-primary">Otimizar</button>
+                                            <button class="btn btn-sm btn-outline-secondary">Detalhes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">Servidor de Aplicação</h5>
+                                            <span class="status-indicator status-warning"></span>
+                                        </div>
+                                        <p class="card-text text-muted">Node.js 14.17.0</p>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Uptime</small>
+                                            <p>1 dia 04:12:45</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Processos</small>
+                                            <p>8/12</p>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-sm btn-outline-primary">Reiniciar</button>
+                                            <button class="btn btn-sm btn-outline-secondary">Detalhes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">Redis</h5>
+                                            <span class="status-indicator status-up"></span>
+                                        </div>
+                                        <p class="card-text text-muted">Redis 6.2.4</p>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Uptime</small>
+                                            <p>7 dias 12:34:21</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Chaves</small>
+                                            <p>1,245</p>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-sm btn-outline-primary">Limpar Cache</button>
+                                            <button class="btn btn-sm btn-outline-secondary">Detalhes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">Servidor SMTP</h5>
+                                            <span class="status-indicator status-down"></span>
+                                        </div>
+                                        <p class="card-text text-muted">Postfix 3.4.13</p>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Uptime</small>
+                                            <p>-</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Fila</small>
+                                            <p>124 mensagens</p>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-sm btn-outline-danger">Iniciar</button>
+                                            <button class="btn btn-sm btn-outline-secondary">Detalhes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">Monitoramento</h5>
+                                            <span class="status-indicator status-up"></span>
+                                        </div>
+                                        <p class="card-text text-muted">Prometheus 2.28.1</p>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Uptime</small>
+                                            <p>7 dias 12:34:21</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Métricas</small>
+                                            <p>1,245 coletadas</p>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-sm btn-outline-primary">Exportar</button>
+                                            <button class="btn btn-sm btn-outline-secondary">Detalhes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Logs -->
+                    <div class="tab-pane fade" id="logs" role="tabpanel">
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <label for="logTypeFilter" class="form-label">Tipo</label>
+                                <select id="logTypeFilter" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="error">Erros</option>
+                                    <option value="warning">Avisos</option>
+                                    <option value="info">Informações</option>
+                                    <option value="debug">Debug</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="logSourceFilter" class="form-label">Fonte</label>
+                                <select id="logSourceFilter" class="form-select">
+                                    <option value="">Todas</option>
+                                    <option value="web">Servidor Web</option>
+                                    <option value="app">Aplicação</option>
+                                    <option value="db">Banco de Dados</option>
+                                    <option value="auth">Autenticação</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="logDateFrom" class="form-label">De</label>
+                                <input type="datetime-local" class="form-control" id="logDateFrom">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="logDateTo" class="form-label">Até</label>
+                                <input type="datetime-local" class="form-control" id="logDateTo">
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm" id="logsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Data/Hora</th>
+                                                <th>Tipo</th>
+                                                <th>Fonte</th>
+                                                <th>Mensagem</th>
+                                                <th>Detalhes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="table-danger">
+                                                <td>12/07/2023 14:30:45</td>
+                                                <td>ERROR</td>
+                                                <td>app</td>
+                                                <td>Falha ao conectar ao banco de dados</td>
+                                                <td><button class="btn btn-sm btn-outline-secondary">Ver</button></td>
+                                            </tr>
+                                            <tr class="table-warning">
+                                                <td>12/07/2023 14:30:12</td>
+                                                <td>WARNING</td>
+                                                <td>auth</td>
+                                                <td>Tentativa de login falhou para usuário admin</td>
+                                                <td><button class="btn btn-sm btn-outline-secondary">Ver</button></td>
+                                            </tr>
+                                            <tr class="table-info">
+                                                <td>12/07/2023 14:29:56</td>
+                                                <td>INFO</td>
+                                                <td>web</td>
+                                                <td>Requisição GET /api/users concluída em 142ms</td>
+                                                <td><button class="btn btn-sm btn-outline-secondary">Ver</button></td>
+                                            </tr>
+                                            <tr class="table-info">
+                                                <td>12/07/2023 14:29:34</td>
+                                                <td>INFO</td>
+                                                <td>db</td>
+                                                <td>Consulta executada: SELECT * FROM users LIMIT 50</td>
+                                                <td><button class="btn btn-sm btn-outline-secondary">Ver</button></td>
+                                            </tr>
+                                            <tr class="table-warning">
+                                                <td>12/07/2023 14:28:12</td>
+                                                <td>WARNING</td>
+                                                <td>app</td>
+                                                <td>Tempo de resposta lento para /api/reports (512ms)</td>
+                                                <td><button class="btn btn-sm btn-outline-secondary">Ver</button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <div>
+                                <span class="text-muted">Mostrando 1-5 de 124 entradas</span>
+                            </div>
+                            <div>
+                                <nav>
+                                    <ul class="pagination pagination-sm">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#">Anterior</a>
+                                        </li>
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#">1</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">2</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">3</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">Próximo</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            // Inicializar DataTable para logs
+            $('#logsTable').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
+                },
+                order: [[0, 'desc']],
+                searching: false,
+                lengthChange: false,
+                info: false,
+                paging: false
+            });
+            
+            // Gráfico de desempenho
+            var ctx = document.getElementById('performanceChart').getContext('2d');
+            var performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+                    datasets: [
+                        {
+                            label: 'Tempo de Resposta (ms)',
+                            data: [320, 310, 290, 280, 300, 320, 340, 360, 350, 330, 310, 300],
+                            borderColor: '#4e73df',
+                            backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                            tension: 0.1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Requisições por Minuto',
+                            data: [120, 110, 90, 80, 150, 220, 240, 260, 230, 200, 180, 160],
+                            borderColor: '#1cc88a',
+                            backgroundColor: 'rgba(28, 200, 138, 0.05)',
+                            tension: 0.1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Tempo (ms)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Requisições'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de requisições por tipo
+            var ctx2 = document.getElementById('requestsChart').getContext('2d');
+            var requestsChart = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+                    datasets: [{
+                        data: [65, 15, 10, 5, 5],
+                        backgroundColor: [
+                            '#4e73df',
+                            '#1cc88a',
+                            '#36b9cc',
+                            '#f6c23e',
+                            '#e74a3b'
+                        ],
+                        hoverBackgroundColor: [
+                            '#2e59d9',
+                            '#17a673',
+                            '#2c9faf',
+                            '#dda20a',
+                            '#be2617'
+                        ],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                    },
+                },
+            });
+            
+            // Filtros de alertas
+            $('#alertSeverityFilter, #alertStatusFilter').change(function() {
+                var severity = $('#alertSeverityFilter').val();
+                var status = $('#alertStatusFilter').val();
+                
+                $('.alert-card').each(function() {
+                    var cardSeverity = $(this).hasClass('alert-critical') ? 'critical' : 
+                                      $(this).hasClass('alert-warning') ? 'warning' : 'info';
+                    var cardStatus = $(this).find('.badge').text().toLowerCase();
+                    
+                    var showCard = true;
+                    
+                    if (severity && cardSeverity !== severity) {
+                        showCard = false;
+                    }
+                    
+                    if (status && cardStatus !== status) {
+                        showCard = false;
+                    }
+                    
+                    $(this).toggle(showCard);
+                });
+            });
+            
+            // Exemplo de função para ver detalhes do log
+            $(document).on('click', '.btn-outline-secondary', function() {
+                if ($(this).text() === 'Detalhes' || $(this).text() === 'Ver') {
+                    var row = $(this).closest('tr');
+                    var message = row.find('td:eq(3)').text();
+                    alert('Detalhes do log:\n\n' + message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

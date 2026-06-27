@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emissão de Comprovativos de Marcação - SICAMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Estilo geral */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-image: url('../images/dash-rec.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Overlay mais suave para melhor legibilidade */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Tema Claro */
+        body.light-theme {
+            background-image: url('../images/dash-rec.jpg');
+        }
+
+        body.light-theme::before {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        body.light-theme .page-title,
+        body.light-theme .indicator-card .number,
+        body.light-theme .indicator-card .label,
+        body.light-theme .info-card .card-title,
+        body.light-theme .info-card .info-label,
+        body.light-theme .info-card .info-value,
+        body.light-theme .comprovativo-preview .header .logo,
+        body.light-theme .comprovativo-preview .header .subtitle,
+        body.light-theme .comprovativo-preview .content,
+        body.light-theme .history-table th,
+        body.light-theme .history-table td,
+        body.light-theme .search-section h6,
+        body.light-theme .search-section .text-muted,
+        body.light-theme .nav-tabs .nav-link,
+        body.light-theme .report-card .card-body,
+        body.light-theme .report-card .card-title,
+        body.light-theme .report-card .card-text {
+            color: #1a1a2e !important;
+        }
+
+        body.light-theme .nav-tabs .nav-link {
+            color: #1a1a2e !important;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-theme .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .tab-content,
+        body.light-theme .indicator-card,
+        body.light-theme .info-card,
+        body.light-theme .comprovativo-preview,
+        body.light-theme .search-section,
+        body.light-theme .history-table,
+        body.light-theme .report-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .indicator-card .label i {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        body.light-theme .search-section .form-control,
+        body.light-theme .search-section .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .search-section .form-control::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-theme .patient-avatar {
+            background: rgba(13, 110, 253, 0.15);
+            border-color: rgba(13, 110, 253, 0.3);
+            color: #0d6efd;
+        }
+
+        body.light-theme .comprovativo-preview .qr-code .qr-placeholder {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: rgba(0, 0, 0, 0.3);
+        }
+
+        body.light-theme .status-badge.confirmed {
+            background: rgba(25, 135, 84, 0.8);
+            color: #fff;
+        }
+
+        body.light-theme .status-badge.pending {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .status-badge.rescheduled {
+            background: rgba(13, 202, 240, 0.8);
+            color: #000;
+        }
+
+        body.light-theme #currentDateTime {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .modal .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .modal .form-label {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        body.light-theme .suggestion-item {
+            color: #1a1a2e;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        body.light-theme .suggestion-item:hover {
+            background: rgba(13, 110, 253, 0.1);
+        }
+
+        body.light-theme .btn-outline-secondary {
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .btn-outline-secondary:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        body.light-theme .page-title .badge {
+            background: rgba(13, 110, 253, 0.2) !important;
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .comprovativo-preview .footer {
+            border-top-color: rgba(0, 0, 0, 0.1);
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        body.light-theme .comprovativo-preview .header {
+            border-bottom-color: rgba(13, 110, 253, 0.3);
+        }
+
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Estilo tabs - Glassmorphism */
+        .nav-tabs .nav-link {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 18px;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            margin-right: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: #fff;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: bold;
+            box-shadow: 0 -2px 20px rgba(13, 110, 253, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 0 8px 8px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Cards de indicadores - Glassmorphism Cristalino */
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .indicator-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .indicator-card .label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .indicator-card .label i {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .indicator-card.success {
+            border-left-color: rgba(25, 135, 84, 0.6);
+            border-left: 4px solid rgba(25, 135, 84, 0.6);
+        }
+        .indicator-card.success .number { color: #75f0a0; }
+
+        .indicator-card.warning {
+            border-left-color: rgba(255, 193, 7, 0.6);
+            border-left: 4px solid rgba(255, 193, 7, 0.6);
+        }
+        .indicator-card.warning .number { color: #ffd75a; }
+
+        .indicator-card.danger {
+            border-left-color: rgba(220, 53, 69, 0.6);
+            border-left: 4px solid rgba(220, 53, 69, 0.6);
+        }
+        .indicator-card.danger .number { color: #ff7a8a; }
+
+        .indicator-card.info {
+            border-left-color: rgba(13, 202, 240, 0.6);
+            border-left: 4px solid rgba(13, 202, 240, 0.6);
+        }
+        .indicator-card.info .number { color: #6ee7ff; }
+
+        /* Cards de paciente e consulta - Glassmorphism */
+        .info-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .info-card .card-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-card .info-label {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .info-card .info-value {
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        /* Pré-visualização do comprovativo - Glassmorphism */
+        .comprovativo-preview {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .comprovativo-preview .header {
+            text-align: center;
+            border-bottom: 2px solid rgba(13, 110, 253, 0.4);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .comprovativo-preview .header .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .comprovativo-preview .header .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .comprovativo-preview .content {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+        }
+
+        .comprovativo-preview .content .label {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .comprovativo-preview .footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .comprovativo-preview .qr-code .qr-placeholder {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .status-badge.confirmed {
+            background: rgba(25, 135, 84, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 193, 7, 0.7);
+            backdrop-filter: blur(5px);
+            color: #000;
+        }
+
+        .status-badge.rescheduled {
+            background: rgba(13, 202, 240, 0.7);
+            backdrop-filter: blur(5px);
+            color: #000;
+        }
+
+        /* Tabela de histórico - Glassmorphism */
+        .history-table {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .history-table th {
+            font-family: 'Times New Roman', Times, serif;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .history-table td {
+            font-family: 'Times New Roman', Times, serif;
+            vertical-align: middle;
+            color: #fff;
+        }
+
+        .history-table .table-hover tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Ações rápidas */
+        .quick-actions .btn {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 3px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+        }
+
+        .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.6);
+        }
+
+        .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.6);
+        }
+
+        .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.3);
+            color: #fff;
+        }
+
+        .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.6);
+        }
+
+        .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.6);
+        }
+
+        /* Notificações */
+        .notification-badge {
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* Animação de entrada */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilo do título */
+        .page-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title .bi {
+            animation: bounce 2s infinite;
+        }
+
+        .page-title .badge {
+            background: rgba(13, 110, 253, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Pesquisa - Glassmorphism */
+        .search-section {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .search-section h6 {
+            color: #fff;
+        }
+
+        .search-section .form-control,
+        .search-section .form-select {
+            font-family: 'Times New Roman', Times, serif;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .search-section .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-section .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+        .search-section .btn-outline-secondary {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .search-section .btn-outline-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-section .btn-outline-primary {
+            color: #fff;
+            border-color: rgba(13, 110, 253, 0.4);
+        }
+
+        .search-section .btn-outline-primary:hover {
+            background: rgba(13, 110, 253, 0.2);
+        }
+
+        .search-section .text-muted {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        .search-section .badge.bg-light {
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(5px);
+            color: #fff !important;
+        }
+
+        .suggestion-item {
+            cursor: pointer;
+            padding: 8px 15px;
+            transition: all 0.2s ease;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Avatar do paciente - Glassmorphism */
+        .patient-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #fff;
+            font-weight: bold;
+            margin: 0 auto 10px auto;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* Cards de relatório - Glassmorphism */
+        .report-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .report-card .card-body {
+            color: #fff;
+        }
+
+        .report-card .card-title {
+            color: #fff;
+        }
+
+        .report-card .card-text {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .report-card .bi {
+            opacity: 0.8;
+        }
+
+        /* Modal Glassmorphism */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal .btn-close {
+            filter: invert(1);
+        }
+
+        .modal .form-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .modal .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .modal .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+        }
+
+        .modal .form-check-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .modal .form-check-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal .form-check-input:checked {
+            background-color: #0d6efd;
+        }
+
+        #currentDateTime {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:hover {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        .bg-primary {
+            background: rgba(13, 110, 253, 0.4) !important;
+            backdrop-filter: blur(5px);
+        }
+
+        .bg-info {
+            background: rgba(13, 202, 240, 0.3) !important;
+        }
+
+        /* Botão de tema */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(30deg);
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Botão Dashboard */
+        .dashboard-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        body.light-theme .dashboard-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .dashboard-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .indicator-card .number {
+                font-size: 1.5rem;
+            }
+            .comprovativo-preview {
+                padding: 15px;
+            }
+            .tab-content {
+                padding: 15px;
+            }
+            .page-title {
+                font-size: 1.5rem;
+            }
+            .header-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Cabeçalho -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap header-actions">
+                    <h2 class="page-title">
+                        <i class="bi bi-file-earmark-text text-primary"></i> 
+                        Emissão de Comprovativos de Marcação
+                        <span class="badge bg-primary ms-2 notification-badge">ATIVO</span>
+                    </h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- Botão Dashboard -->
+                        <a href="menu_recepcionista.html" class="dashboard-btn" title="Voltar ao Dashboard Principal">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+                        </a>
+
+                        <!-- Alternador de Tema -->
+                        <button class="theme-toggle-btn" id="themeToggle" title="Alternar Tema">
+                            <i class="bi bi-moon-stars" id="themeIcon"></i>
+                        </button>
+
+                        <span class="badge bg-info text-dark" id="currentDateTime">
+                            <i class="bi bi-clock"></i> 
+                            <span id="dateTimeDisplay">Carregando...</span>
+                        </span>
+                        <button class="btn btn-primary" id="btnNewComprovativo">
+                            <i class="bi bi-plus-circle"></i> Novo Comprovativo
+                        </button>
+                        <div class="input-group" style="width: 250px;">
+                            <input type="text" id="quickSearch" class="form-control" placeholder="🔍 Pesquisar...">
+                            <button class="btn btn-outline-primary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de Estatísticas -->
+        <div class="row mb-4">
+            <div class="col-md-2 col-6">
+                <div class="indicator-card fade-in">
+                    <div class="number" id="emittedToday">0</div>
+                    <div class="label"><i class="bi bi-file-earmark"></i> Emitidos Hoje</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card success fade-in">
+                    <div class="number" id="sentCount">0</div>
+                    <div class="label"><i class="bi bi-envelope"></i> Enviados</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card info fade-in">
+                    <div class="number" id="printedCount">0</div>
+                    <div class="label"><i class="bi bi-printer"></i> Impressos</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card warning fade-in">
+                    <div class="number" id="pendingCount">0</div>
+                    <div class="label"><i class="bi bi-clock"></i> Pendentes</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card success fade-in">
+                    <div class="number" id="confirmedCount">0</div>
+                    <div class="label"><i class="bi bi-check-circle"></i> Confirmadas</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card danger fade-in">
+                    <div class="number" id="canceledCount">0</div>
+                    <div class="label"><i class="bi bi-x-circle"></i> Canceladas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="emissao-tab" data-bs-toggle="tab" data-bs-target="#emissao" type="button" role="tab">
+                    <i class="bi bi-pencil-square"></i> Emissão
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab">
+                    <i class="bi bi-clock-history"></i> Histórico
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="relatorios-tab" data-bs-toggle="tab" data-bs-target="#relatorios" type="button" role="tab">
+                    <i class="bi bi-file-earmark-bar-graph"></i> Relatórios
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Aba Emissão -->
+            <div class="tab-pane fade show active" id="emissao" role="tabpanel">
+                <div class="row">
+                    <!-- Coluna Esquerda - Pesquisa e Dados -->
+                    <div class="col-md-5">
+                        <!-- Pesquisa -->
+                        <div class="search-section">
+                            <h6><i class="bi bi-search"></i> Localizar Marcação</h6>
+                            <div class="input-group mb-3">
+                                <input type="text" id="searchAppointment" class="form-control" placeholder="Nome, processo, telefone...">
+                                <button class="btn btn-outline-secondary" type="button" id="btnSearch">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                                <button class="btn btn-outline-primary" type="button" id="btnQRCode">
+                                    <i class="bi bi-qr-code"></i>
+                                </button>
+                            </div>
+                            <div id="suggestions" class="list-group" style="display: none;">
+                                <!-- Sugestões serão inseridas via JavaScript -->
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted"><i class="bi bi-clock-history"></i> Pesquisas recentes: </small>
+                                <span class="badge bg-light text-dark">Maria Silva</span>
+                                <span class="badge bg-light text-dark">A025</span>
+                                <span class="badge bg-light text-dark">987654321</span>
+                            </div>
+                        </div>
+
+                        <!-- Informações do Paciente -->
+                        <div class="info-card" id="patientInfo" style="display: none;">
+                            <div class="text-center">
+                                <div class="patient-avatar" id="patientAvatar">MS</div>
+                                <h5 id="patientName" class="mb-0">Maria Silva</h5>
+                                <small class="text-muted" id="patientId">Processo: P-2026-0158</small>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="info-label">Idade</div>
+                                    <div class="info-value" id="patientAge">28 anos</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-label">Sexo</div>
+                                    <div class="info-value" id="patientGender">Feminino</div>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <div class="info-label">Contacto</div>
+                                    <div class="info-value" id="patientPhone">+244 923 456 789</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dados da Consulta -->
+                        <div class="info-card" id="appointmentInfo" style="display: none;">
+                            <h6 class="card-title"><i class="bi bi-calendar-check"></i> Dados da Consulta</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="info-label">Especialidade</div>
+                                    <div class="info-value" id="appointmentSpecialty">Pediatria</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-label">Médico</div>
+                                    <div class="info-value" id="appointmentDoctor">Dra. Ana Manuel</div>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <div class="info-label">Data</div>
+                                    <div class="info-value" id="appointmentDate">15/08/2026</div>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <div class="info-label">Hora</div>
+                                    <div class="info-value" id="appointmentTime">09:30</div>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <div class="info-label">Sala</div>
+                                    <div class="info-value" id="appointmentRoom">Consultório 03</div>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <div class="info-label">Tipo</div>
+                                    <div class="info-value" id="appointmentType">Consulta de Rotina</div>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <div class="info-label">Estado</div>
+                                    <div class="info-value">
+                                        <span class="status-badge confirmed" id="appointmentStatus">Confirmada</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="quick-actions d-flex flex-wrap gap-2">
+                            <button class="btn btn-primary" id="btnGerarComprovativo" disabled>
+                                <i class="bi bi-file-earmark"></i> Gerar Comprovativo
+                            </button>
+                            <button class="btn btn-success" id="btnImprimir" disabled>
+                                <i class="bi bi-printer"></i> Imprimir
+                            </button>
+                            <button class="btn btn-info" id="btnEnviar" disabled>
+                                <i class="bi bi-envelope"></i> Enviar
+                            </button>
+                            <button class="btn btn-outline-secondary" id="btnVisualizar" disabled>
+                                <i class="bi bi-eye"></i> Visualizar
+                            </button>
+                            <button class="btn btn-warning" id="btnReemitir" disabled>
+                                <i class="bi bi-arrow-repeat"></i> Reemitir
+                            </button>
+                            <button class="btn btn-danger" id="btnCancelar" disabled>
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Coluna Direita - Pré-visualização -->
+                    <div class="col-md-7">
+                        <div class="comprovativo-preview" id="comprovativoPreview">
+                            <div class="header">
+                                <div class="logo">🏥 SICAMI</div>
+                                <div class="subtitle">Sistema Integrado de Cuidados Materno-Infantis</div>
+                                <div class="subtitle">Unidade de Saúde da Criança</div>
+                            </div>
+                            <div class="content" id="previewContent">
+                                <div class="text-center">
+                                    <h5>COMPROVATIVO DE MARCAÇÃO</h5>
+                                    <p><strong>Nº:</strong> <span id="previewNumber">CMP-2026-0001</span></p>
+                                    <p><strong>Data de Emissão:</strong> <span id="previewEmissionDate">15/08/2026 09:30</span></p>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p><span class="label">Paciente:</span> <span id="previewPatient">Maria Silva</span></p>
+                                        <p><span class="label">Processo:</span> <span id="previewProcess">P-2026-0158</span></p>
+                                        <p><span class="label">Idade:</span> <span id="previewAge">28 anos</span></p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p><span class="label">Especialidade:</span> <span id="previewSpecialty">Pediatria</span></p>
+                                        <p><span class="label">Médico:</span> <span id="previewDoctor">Dra. Ana Manuel</span></p>
+                                        <p><span class="label">Sala:</span> <span id="previewRoom">Consultório 03</span></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p><span class="label">Data:</span> <span id="previewDate">15/08/2026</span></p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p><span class="label">Hora:</span> <span id="previewTime">09:30</span></p>
+                                    </div>
+                                </div>
+                                <div class="qr-code">
+                                    <div class="qr-placeholder">
+                                        <i class="bi bi-qr-code"></i>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <small>Código de Validação: <strong id="previewCode">V2026-08-15-A001</strong></small>
+                                </div>
+                            </div>
+                            <div class="footer">
+                                <p>Este comprovativo é válido e garante a marcação da consulta.</p>
+                                <p>Assinatura Digital: SICAMI-2026-08-15T09:30:00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Histórico -->
+            <div class="tab-pane fade" id="historico" role="tabpanel">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="history-table table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Nº</th>
+                                        <th>Paciente</th>
+                                        <th>Data da Consulta</th>
+                                        <th>Estado</th>
+                                        <th>Data Emissão</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyBody">
+                                    <!-- Dados serão inseridos via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Relatórios -->
+            <div class="tab-pane fade" id="relatorios" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card report-card h-100" id="relatorioEmitidos">
+                            <div class="card-body text-center">
+                                <i class="bi bi-file-earmark text-primary fs-1"></i>
+                                <h5 class="card-title mt-3">Comprovativos Emitidos</h5>
+                                <p class="card-text">Relatório de comprovativos por período</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card report-card h-100" id="relatorioEnviados">
+                            <div class="card-body text-center">
+                                <i class="bi bi-envelope text-success fs-1"></i>
+                                <h5 class="card-title mt-3">Comprovativos Enviados</h5>
+                                <p class="card-text">Relatório de envios por período</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card report-card h-100" id="relatorioImpressos">
+                            <div class="card-body text-center">
+                                <i class="bi bi-printer text-info fs-1"></i>
+                                <h5 class="card-title mt-3">Comprovativos Impressos</h5>
+                                <p class="card-text">Relatório de impressões por período</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Envio -->
+    <div class="modal fade" id="sendModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Enviar Comprovativo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="sendForm">
+                        <div class="mb-3">
+                            <label class="form-label">Método de Envio</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sendEmail" checked>
+                                <label class="form-check-label" for="sendEmail">E-mail</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sendSMS">
+                                <label class="form-check-label" for="sendSMS">SMS</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sendWhatsApp">
+                                <label class="form-check-label" for="sendWhatsApp">WhatsApp</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sendDestination" class="form-label">Destinatário</label>
+                            <input type="text" class="form-control" id="sendDestination" value="maria.silva@email.com">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnSendConfirm">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Relatórios -->
+    <div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reportModalTitle">Filtros do Relatório</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reportForm">
+                        <div class="mb-3">
+                            <label for="reportStartDate" class="form-label">Data Inicial</label>
+                            <input type="date" class="form-control" id="reportStartDate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="reportEndDate" class="form-label">Data Final</label>
+                            <input type="date" class="form-control" id="reportEndDate">
+                        </div>
+                        <div class="mb-3" id="additionalFilters">
+                            <label for="reportStatus" class="form-label">Estado</label>
+                            <select class="form-select" id="reportStatus">
+                                <option value="">Todos</option>
+                                <option value="Emitido">Emitido</option>
+                                <option value="Enviado">Enviado</option>
+                                <option value="Impresso">Impresso</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnGenerateReport">Gerar Relatório</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Dados de exemplo
+            const appointments = [
+                { 
+                    id: 1, 
+                    nome: 'Maria Silva', 
+                    processo: 'P-2026-0158', 
+                    idade: '28 anos', 
+                    sexo: 'Feminino',
+                    telefone: '+244 923 456 789',
+                    especialidade: 'Pediatria',
+                    medico: 'Dra. Ana Manuel',
+                    data: '15/08/2026',
+                    hora: '09:30',
+                    sala: 'Consultório 03',
+                    tipo: 'Consulta de Rotina',
+                    estado: 'Confirmada'
+                },
+                { 
+                    id: 2, 
+                    nome: 'João Pedro', 
+                    processo: 'P-2026-0159', 
+                    idade: '35 anos', 
+                    sexo: 'Masculino',
+                    telefone: '+244 923 456 790',
+                    especialidade: 'Cardiologia',
+                    medico: 'Dr. Carlos Santos',
+                    data: '16/08/2026',
+                    hora: '14:00',
+                    sala: 'Consultório 05',
+                    tipo: 'Consulta de Acompanhamento',
+                    estado: 'Pendente'
+                },
+                { 
+                    id: 3, 
+                    nome: 'Ana Oliveira', 
+                    processo: 'P-2026-0160', 
+                    idade: '42 anos', 
+                    sexo: 'Feminino',
+                    telefone: '+244 923 456 791',
+                    especialidade: 'Ginecologia',
+                    medico: 'Dra. Maria Santos',
+                    data: '17/08/2026',
+                    hora: '11:00',
+                    sala: 'Consultório 02',
+                    tipo: 'Consulta de Rotina',
+                    estado: 'Reagendada'
+                }
+            ];
+
+            const historyData = [
+                { id: 'CMP001', paciente: 'Maria Silva', data: '15/08/2026', estado: 'Emitido', emissao: '15/08/2026 09:30' },
+                { id: 'CMP002', paciente: 'Ana Gomes', data: '15/08/2026', estado: 'Enviado', emissao: '15/08/2026 10:15' },
+                { id: 'CMP003', paciente: 'João Pedro', data: '16/08/2026', estado: 'Impresso', emissao: '15/08/2026 11:00' },
+                { id: 'CMP004', paciente: 'Carlos Silva', data: '16/08/2026', estado: 'Emitido', emissao: '15/08/2026 11:45' },
+                { id: 'CMP005', paciente: 'Maria Santos', data: '17/08/2026', estado: 'Pendente', emissao: '15/08/2026 12:30' }
+            ];
+
+            let currentAppointment = null;
+            let comprovativoCounter = 6;
+
+            // Tema
+            let isDarkTheme = true;
+
+            function toggleTheme() {
+                isDarkTheme = !isDarkTheme;
+                if (isDarkTheme) {
+                    $('body').removeClass('light-theme');
+                    $('#themeIcon').removeClass('bi-sun-fill').addClass('bi-moon-stars');
+                } else {
+                    $('body').addClass('light-theme');
+                    $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+                }
+                // Salvar preferência
+                localStorage.setItem('sicami-theme', isDarkTheme ? 'dark' : 'light');
+            }
+
+            // Carregar tema salvo
+            const savedTheme = localStorage.getItem('sicami-theme');
+            if (savedTheme === 'light') {
+                isDarkTheme = false;
+                $('body').addClass('light-theme');
+                $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+            }
+
+            $('#themeToggle').click(toggleTheme);
+
+            // Botão Dashboard
+            $('#btnDashboard').click(function(e) {
+                e.preventDefault();
+                alert('🔙 Redirecionando para o Dashboard Principal...\n\n(Em produção, isso redirecionaria para a página principal do sistema)');
+                // window.location.href = 'dashboard.html';
+            });
+
+            // Data e hora em tempo real
+            function updateDateTime() {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR');
+                const timeStr = now.toLocaleTimeString('pt-BR');
+                $('#dateTimeDisplay').text(`${dateStr} ${timeStr}`);
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Atualizar estatísticas
+            function updateStats() {
+                $('#emittedToday').text(historyData.length);
+                $('#sentCount').text(historyData.filter(h => h.estado === 'Enviado').length);
+                $('#printedCount').text(historyData.filter(h => h.estado === 'Impresso').length);
+                $('#pendingCount').text(historyData.filter(h => h.estado === 'Pendente').length);
+                $('#confirmedCount').text(appointments.filter(a => a.estado === 'Confirmada').length);
+                $('#canceledCount').text(appointments.filter(a => a.estado === 'Cancelada').length);
+            }
+            updateStats();
+
+            // Renderizar histórico
+            function renderHistory() {
+                const tbody = $('#historyBody');
+                tbody.empty();
+
+                historyData.forEach((item, index) => {
+                    const statusClass = {
+                        'Emitido': 'info',
+                        'Enviado': 'success',
+                        'Impresso': 'primary',
+                        'Pendente': 'warning'
+                    }[item.estado] || 'secondary';
+
+                    tbody.append(`
+                        <tr>
+                            <td><strong>${item.id}</strong></td>
+                            <td>${item.paciente}</td>
+                            <td>${item.data}</td>
+                            <td><span class="badge bg-${statusClass}">${item.estado}</span></td>
+                            <td>${item.emissao}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary action-btn" onclick="alert('Visualizando comprovativo ${item.id}')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success action-btn" onclick="alert('Reemitindo comprovativo ${item.id}')">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger action-btn" onclick="alert('Cancelando comprovativo ${item.id}')">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+            renderHistory();
+
+            // Pesquisa com sugestões
+            $('#searchAppointment').on('input', function() {
+                const term = $(this).val().toLowerCase();
+                if (term.length < 2) {
+                    $('#suggestions').hide();
+                    return;
+                }
+
+                const results = appointments.filter(a => 
+                    a.nome.toLowerCase().includes(term) ||
+                    a.processo.toLowerCase().includes(term) ||
+                    a.telefone.includes(term)
+                );
+
+                if (results.length === 0) {
+                    $('#suggestions').hide();
+                    return;
+                }
+
+                let html = '';
+                results.forEach(a => {
+                    html += `
+                        <div class="list-group-item suggestion-item" data-id="${a.id}">
+                            <strong>${a.nome}</strong> - ${a.processo}
+                            <br><small>${a.especialidade} - ${a.data} ${a.hora}</small>
+                        </div>
+                    `;
+                });
+                $('#suggestions').html(html).show();
+            });
+
+            // Selecionar sugestão
+            $(document).on('click', '.suggestion-item', function() {
+                const id = parseInt($(this).data('id'));
+                const appointment = appointments.find(a => a.id === id);
+                if (appointment) {
+                    selectAppointment(appointment);
+                    $('#suggestions').hide();
+                    $('#searchAppointment').val(appointment.nome);
+                }
+            });
+
+            // Botão de pesquisa
+            $('#btnSearch').click(function() {
+                const term = $('#searchAppointment').val().toLowerCase();
+                if (term === '') {
+                    alert('Digite um termo para pesquisar.');
+                    return;
+                }
+
+                const result = appointments.find(a => 
+                    a.nome.toLowerCase().includes(term) ||
+                    a.processo.toLowerCase().includes(term) ||
+                    a.telefone.includes(term)
+                );
+
+                if (result) {
+                    selectAppointment(result);
+                } else {
+                    alert('Nenhum paciente encontrado.');
+                }
+            });
+
+            // QR Code
+            $('#btnQRCode').click(function() {
+                alert('📷 Leitor de QR Code ativado.\n\nAponte a câmera para o código QR do paciente.');
+            });
+
+            // Selecionar agendamento
+            function selectAppointment(appointment) {
+                currentAppointment = appointment;
+                
+                // Mostrar informações do paciente
+                $('#patientInfo').show();
+                $('#patientAvatar').text(appointment.nome.split(' ').map(n => n[0]).join(''));
+                $('#patientName').text(appointment.nome);
+                $('#patientId').text(`Processo: ${appointment.processo}`);
+                $('#patientAge').text(appointment.idade);
+                $('#patientGender').text(appointment.sexo);
+                $('#patientPhone').text(appointment.telefone);
+
+                // Mostrar dados da consulta
+                $('#appointmentInfo').show();
+                $('#appointmentSpecialty').text(appointment.especialidade);
+                $('#appointmentDoctor').text(appointment.medico);
+                $('#appointmentDate').text(appointment.data);
+                $('#appointmentTime').text(appointment.hora);
+                $('#appointmentRoom').text(appointment.sala);
+                $('#appointmentType').text(appointment.tipo);
+                
+                const statusClass = {
+                    'Confirmada': 'confirmed',
+                    'Pendente': 'pending',
+                    'Reagendada': 'rescheduled'
+                }[appointment.estado] || 'pending';
+                $('#appointmentStatus').removeClass().addClass(`status-badge ${statusClass}`).text(appointment.estado);
+
+                // Atualizar pré-visualização
+                const now = new Date();
+                const emissionDate = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
+                const comprovativoNum = 'CMP-2026-' + String(comprovativoCounter).padStart(4, '0');
+                const codigoValidacao = 'V2026-08-' + comprovativoNum;
+
+                $('#previewNumber').text(comprovativoNum);
+                $('#previewEmissionDate').text(emissionDate);
+                $('#previewPatient').text(appointment.nome);
+                $('#previewProcess').text(appointment.processo);
+                $('#previewAge').text(appointment.idade);
+                $('#previewSpecialty').text(appointment.especialidade);
+                $('#previewDoctor').text(appointment.medico);
+                $('#previewRoom').text(appointment.sala);
+                $('#previewDate').text(appointment.data);
+                $('#previewTime').text(appointment.hora);
+                $('#previewCode').text(codigoValidacao);
+
+                // Habilitar botões
+                $('#btnGerarComprovativo, #btnImprimir, #btnEnviar, #btnVisualizar, #btnReemitir, #btnCancelar').prop('disabled', false);
+            }
+
+            // Gerar Comprovativo
+            $('#btnGerarComprovativo').click(function() {
+                if (!currentAppointment) return;
+                
+                const now = new Date();
+                const comprovativoNum = 'CMP-2026-' + String(comprovativoCounter).padStart(4, '0');
+                comprovativoCounter++;
+
+                // Adicionar ao histórico
+                historyData.unshift({
+                    id: comprovativoNum,
+                    paciente: currentAppointment.nome,
+                    data: currentAppointment.data,
+                    estado: 'Emitido',
+                    emissao: now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR')
+                });
+
+                renderHistory();
+                updateStats();
+                alert(`✅ Comprovativo ${comprovativoNum} gerado com sucesso!`);
+            });
+
+            // Imprimir
+            $('#btnImprimir').click(function() {
+                if (!currentAppointment) return;
+                alert('🖨️ Enviando para impressão...');
+                // Atualizar estado no histórico
+                const lastHistory = historyData[0];
+                if (lastHistory) {
+                    lastHistory.estado = 'Impresso';
+                    renderHistory();
+                    updateStats();
+                }
+            });
+
+            // Enviar
+            $('#btnEnviar').click(function() {
+                if (!currentAppointment) return;
+                $('#sendModal').modal('show');
+            });
+
+            $('#btnSendConfirm').click(function() {
+                const methods = [];
+                if ($('#sendEmail').is(':checked')) methods.push('E-mail');
+                if ($('#sendSMS').is(':checked')) methods.push('SMS');
+                if ($('#sendWhatsApp').is(':checked')) methods.push('WhatsApp');
+
+                if (methods.length === 0) {
+                    alert('Selecione pelo menos um método de envio.');
+                    return;
+                }
+
+                $('#sendModal').modal('hide');
+                alert(`📧 Comprovativo enviado por ${methods.join(', ')} para ${$('#sendDestination').val()}`);
+
+                // Atualizar estado no histórico
+                const lastHistory = historyData[0];
+                if (lastHistory) {
+                    lastHistory.estado = 'Enviado';
+                    renderHistory();
+                    updateStats();
+                }
+            });
+
+            // Visualizar
+            $('#btnVisualizar').click(function() {
+                if (!currentAppointment) return;
+                $('#comprovativoPreview').addClass('border border-primary');
+                setTimeout(() => {
+                    $('#comprovativoPreview').removeClass('border border-primary');
+                }, 3000);
+                alert('👁️ Visualizando comprovativo completo');
+            });
+
+            // Reemitir
+            $('#btnReemitir').click(function() {
+                if (!currentAppointment) return;
+                if (confirm('Deseja reemitir este comprovativo?')) {
+                    alert('🔄 Comprovativo reemitido com sucesso!');
+                }
+            });
+
+            // Cancelar
+            $('#btnCancelar').click(function() {
+                if (!currentAppointment) return;
+                if (confirm('Tem certeza que deseja cancelar esta marcação?')) {
+                    currentAppointment.estado = 'Cancelada';
+                    $('#appointmentStatus').removeClass().addClass('status-badge').text('Cancelada');
+                    alert('❌ Marcação cancelada com sucesso!');
+                }
+            });
+
+            // Novo Comprovativo
+            $('#btnNewComprovativo').click(function() {
+                $('#searchAppointment').val('').focus();
+                $('#patientInfo, #appointmentInfo').hide();
+                $('#btnGerarComprovativo, #btnImprimir, #btnEnviar, #btnVisualizar, #btnReemitir, #btnCancelar').prop('disabled', true);
+                
+                // Limpar pré-visualização
+                $('#previewNumber').text('CMP-2026-XXXX');
+                $('#previewEmissionDate').text('--/--/---- --:--');
+                $('#previewPatient').text('---');
+                $('#previewProcess').text('---');
+                $('#previewAge').text('---');
+                $('#previewSpecialty').text('---');
+                $('#previewDoctor').text('---');
+                $('#previewRoom').text('---');
+                $('#previewDate').text('--/--/----');
+                $('#previewTime').text('--:--');
+                $('#previewCode').text('---');
+
+                alert('📄 Selecione uma marcação para gerar um novo comprovativo.');
+            });
+
+            // Relatórios
+            $('.report-card').click(function() {
+                const reportType = $(this).attr('id').replace('relatorio', '').toLowerCase();
+                let title = '';
+
+                switch(reportType) {
+                    case 'emitidos': title = 'Relatório de Comprovativos Emitidos'; break;
+                    case 'enviados': title = 'Relatório de Comprovativos Enviados'; break;
+                    case 'impressos': title = 'Relatório de Comprovativos Impressos'; break;
+                    default: title = 'Relatório';
+                }
+
+                $('#reportModalTitle').text(title);
+                $('#reportModal').modal('show');
+            });
+
+            $('#btnGenerateReport').click(function() {
+                const startDate = $('#reportStartDate').val();
+                const endDate = $('#reportEndDate').val();
+                
+                if (!startDate || !endDate) {
+                    alert('Por favor, preencha as datas inicial e final.');
+                    return;
+                }
+                
+                $('#reportModal').modal('hide');
+                alert(`📊 Relatório gerado para o período de ${startDate} a ${endDate}\n\n(Em produção, isso geraria o relatório em PDF)`);
+            });
+
+            // Simular atualização em tempo real
+            setInterval(() => {
+                $('.indicator-card').addClass('fade-in');
+                setTimeout(() => {
+                    $('.indicator-card').removeClass('fade-in');
+                }, 500);
+            }, 10000);
+
+            // Fechar sugestões ao clicar fora
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.search-section').length) {
+                    $('#suggestions').hide();
+                }
+            });
+
+            console.log('✅ Tela de Emissão de Comprovativos de Marcação - SICAMI carregada com sucesso!');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Regional de Malanje - Mapa Metrô</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        body {
+            background: #0a0e1a;
+            min-height: 100vh;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        body.light {
+            background: #e8ecf4;
+        }
+
+        /* CARD PRINCIPAL - ESTRUTURA DE TÚNEIS */
+        .main-tunnel-card {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, rgba(10, 14, 30, 0.95), rgba(15, 20, 40, 0.98));
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 25px 30px 35px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* EFEITO DE TÚNEL - FUNDO */
+        .main-tunnel-card::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            left: -60%;
+            width: 220%;
+            height: 220%;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(0, 212, 255, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(123, 47, 252, 0.04) 0%, transparent 50%),
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 40px,
+                    rgba(255, 255, 255, 0.01) 40px,
+                    rgba(255, 255, 255, 0.01) 41px
+                );
+            pointer-events: none;
+            z-index: 0;
+            animation: tunnelMove 60s linear infinite;
+        }
+
+        @keyframes tunnelMove {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(360deg) scale(1.1); }
+        }
+
+        body.light .main-tunnel-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.06);
+        }
+
+        body.light .main-tunnel-card::before {
+            opacity: 0.15;
+        }
+
+        /* ===== CABEÇALHO ===== */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-header .metro-icon {
+            font-size: 2.5rem;
+            color: #00d4ff;
+            filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.2));
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.2)); }
+            50% { filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.5)); }
+        }
+
+        .logo-header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #7b2ffc, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-header h1 small {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 400;
+            -webkit-text-fill-color: rgba(255,255,255,0.3);
+            letter-spacing: 2px;
+        }
+
+        body.light .logo-header h1 small {
+            -webkit-text-fill-color: rgba(0,0,0,0.3);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-input-group {
+            background: rgba(255,255,255,0.04);
+            border-radius: 50px;
+            padding: 5px 15px;
+            border: 1px solid rgba(255,255,255,0.04);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .search-input-group:focus-within {
+            border-color: #00d4ff;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.05);
+        }
+
+        body.light .search-input-group {
+            background: rgba(0,0,0,0.03);
+            border-color: rgba(0,0,0,0.06);
+        }
+
+        .search-input-group input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            padding: 6px 0;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        body.light .search-input-group input {
+            color: #1a1a2e;
+        }
+
+        .search-input-group input::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+
+        body.light .search-input-group input::placeholder {
+            color: rgba(0,0,0,0.2);
+        }
+
+        .search-input-group i {
+            color: rgba(255,255,255,0.2);
+        }
+
+        body.light .search-input-group i {
+            color: rgba(0,0,0,0.2);
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.03);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .theme-btn:hover {
+            background: rgba(255,255,255,0.08);
+            transform: rotate(30deg);
+        }
+
+        body.light .theme-btn {
+            background: rgba(0,0,0,0.03);
+            border-color: rgba(0,0,0,0.06);
+            color: #1a1a2e;
+        }
+
+        .status-badge {
+            background: rgba(255,255,255,0.03);
+            padding: 6px 16px;
+            border-radius: 50px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.04);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.light .status-badge {
+            background: rgba(0,0,0,0.03);
+            color: rgba(0,0,0,0.5);
+            border-color: rgba(0,0,0,0.04);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        /* ===== CARDS DE INDICADORES ===== */
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .indicator-card {
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255,255,255,0.03);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* EFEITO DE TÚNEL NOS CARDS INDICADORES */
+        .indicator-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.02) 100%);
+            pointer-events: none;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.04);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+
+        body.light .indicator-card {
+            background: rgba(0,0,0,0.02);
+            border-color: rgba(0,0,0,0.04);
+        }
+
+        body.light .indicator-card:hover {
+            background: rgba(0,0,0,0.04);
+        }
+
+        .indicator-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        body.light .indicator-card .value {
+            color: #1a1a2e;
+        }
+
+        .indicator-card .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        body.light .indicator-card .label {
+            color: rgba(0,0,0,0.3);
+        }
+
+        .indicator-card.total .value { color: #00d4ff; }
+        .indicator-card.available .value { color: #00ff88; }
+        .indicator-card.occupied .value { color: #ff6b6b; }
+        .indicator-card.reserved .value { color: #ffd93d; }
+        .indicator-card.maintenance .value { color: #a8b2c1; }
+
+        /* ===== MAPA DE TÚNEIS (GRID PRINCIPAL) ===== */
+        .tunnel-map-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        @media (max-width: 1024px) {
+            .tunnel-map-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== LINHAS DE TÚNEIS ===== */
+        .tunnel-lines-area {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .tunnel-line-card {
+            background: rgba(255,255,255,0.02);
+            border-radius: 18px;
+            padding: 16px 20px;
+            border-left: 6px solid;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* EFEITO DE PROFUNDIDADE DE TÚNEL */
+        .tunnel-line-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02));
+            pointer-events: none;
+        }
+
+        .tunnel-line-card:hover {
+            background: rgba(255,255,255,0.04);
+            transform: translateX(6px);
+        }
+
+        body.light .tunnel-line-card {
+            background: rgba(0,0,0,0.02);
+        }
+
+        body.light .tunnel-line-card:hover {
+            background: rgba(0,0,0,0.04);
+        }
+
+        .line-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .line-color-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .line-name-info {
+            font-weight: 600;
+            color: #fff;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.light .line-name-info {
+            color: #1a1a2e;
+        }
+
+        .line-count-badge {
+            margin-left: auto;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.03);
+            padding: 3px 14px;
+            border-radius: 50px;
+        }
+
+        body.light .line-count-badge {
+            color: rgba(0,0,0,0.25);
+            background: rgba(0,0,0,0.03);
+        }
+
+        /* ESTAÇÕES (SALAS) DENTRO DO CARD - TÚNEIS */
+        .stations-tunnel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 10px;
+            padding: 4px 0;
+        }
+
+        .station-tunnel-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px 4px 8px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.03);
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .station-tunnel-item:hover {
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            transform: scale(1.05);
+            border-color: rgba(255,255,255,0.06);
+        }
+
+        body.light .station-tunnel-item {
+            background: rgba(0,0,0,0.02);
+            border-color: rgba(0,0,0,0.04);
+            color: rgba(0,0,0,0.4);
+        }
+
+        body.light .station-tunnel-item:hover {
+            background: rgba(0,0,0,0.05);
+            color: #1a1a2e;
+        }
+
+        .station-dot-mini {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .station-status-tag {
+            font-size: 0.55rem;
+            padding: 1px 10px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.03);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .station-status-tag.available { color: #00ff88; }
+        .station-status-tag.occupied { color: #ff6b6b; }
+        .station-status-tag.reserved { color: #ffd93d; }
+        .station-status-tag.preparing { color: #4fc3f7; }
+        .station-status-tag.maintenance { color: #a8b2c1; }
+
+        /* CORES DAS LINHAS */
+        .line-consultas { border-left-color: #00d4ff; }
+        .line-consultas .line-color-dot { background: #00d4ff; color: #00d4ff; }
+
+        .line-internamento { border-left-color: #00ff88; }
+        .line-internamento .line-color-dot { background: #00ff88; color: #00ff88; }
+
+        .line-emergencia { border-left-color: #ff6b6b; }
+        .line-emergencia .line-color-dot { background: #ff6b6b; color: #ff6b6b; }
+
+        .line-diagnostico { border-left-color: #b388ff; }
+        .line-diagnostico .line-color-dot { background: #b388ff; color: #b388ff; }
+
+        .line-administrativo { border-left-color: #ffd93d; }
+        .line-administrativo .line-color-dot { background: #ffd93d; color: #ffd93d; }
+
+        /* ===== PAINEL LATERAL ===== */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Mapa do Google/OpenStreetMap */
+        .map-card {
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,0.03);
+            overflow: hidden;
+        }
+
+        body.light .map-card {
+            background: rgba(0,0,0,0.02);
+            border-color: rgba(0,0,0,0.04);
+        }
+
+        .map-card .map-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.2);
+            margin-bottom: 10px;
+        }
+
+        body.light .map-card .map-title {
+            color: rgba(0,0,0,0.2);
+        }
+
+        #openstreetmap {
+            width: 100%;
+            height: 220px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+            background: #1a1a2e;
+            position: relative;
+        }
+
+        body.light #openstreetmap {
+            border-color: rgba(0,0,0,0.04);
+            background: #f0f0f0;
+        }
+
+        /* Informações de localização */
+        .location-info-card {
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            padding: 14px 18px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        body.light .location-info-card {
+            background: rgba(0,0,0,0.02);
+            border-color: rgba(0,0,0,0.04);
+        }
+
+        .location-info-card .loc-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.2);
+        }
+
+        body.light .location-info-card .loc-label {
+            color: rgba(0,0,0,0.2);
+        }
+
+        .location-current {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 14px;
+            background: rgba(0, 212, 255, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.06);
+            margin-top: 6px;
+        }
+
+        .location-current i {
+            font-size: 1.8rem;
+            color: #00d4ff;
+        }
+
+        .location-current .loc-text {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        body.light .location-current .loc-text {
+            color: #1a1a2e;
+        }
+
+        .location-current .loc-sub {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.25);
+        }
+
+        body.light .location-current .loc-sub {
+            color: rgba(0,0,0,0.25);
+        }
+
+        /* Rota de navegação */
+        .nav-route-card {
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            padding: 14px 18px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        body.light .nav-route-card {
+            background: rgba(0,0,0,0.02);
+            border-color: rgba(0,0,0,0.04);
+        }
+
+        .nav-route-card .nav-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.2);
+            margin-bottom: 8px;
+        }
+
+        body.light .nav-route-card .nav-title {
+            color: rgba(0,0,0,0.2);
+        }
+
+        .nav-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 0;
+            color: rgba(255,255,255,0.25);
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .nav-step:last-child {
+            border-bottom: none;
+        }
+
+        body.light .nav-step {
+            color: rgba(0,0,0,0.25);
+            border-color: rgba(0,0,0,0.02);
+        }
+
+        .nav-step .step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.03);
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        body.light .nav-step .step-num {
+            background: rgba(0,0,0,0.03);
+        }
+
+        .nav-step.active {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        body.light .nav-step.active {
+            color: #1a1a2e;
+        }
+
+        .nav-step.active .step-num {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+        }
+
+        /* Botões de ação */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 7px 16px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.02);
+            color: rgba(255,255,255,0.4);
+            font-size: 0.75rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        body.light .action-btn {
+            background: rgba(0,0,0,0.02);
+            border-color: rgba(0,0,0,0.04);
+            color: rgba(0,0,0,0.3);
+        }
+
+        body.light .action-btn:hover {
+            background: rgba(0,0,0,0.04);
+            color: #1a1a2e;
+        }
+
+        .action-btn.primary {
+            background: rgba(0, 212, 255, 0.08);
+            border-color: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+        }
+
+        .action-btn.primary:hover {
+            background: rgba(0, 212, 255, 0.15);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-content {
+            background: rgba(10,14,30,0.96);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.04);
+            color: #fff;
+            border-radius: 16px;
+        }
+
+        body.light .modal-content {
+            background: rgba(255,255,255,0.95);
+            border-color: rgba(0,0,0,0.04);
+            color: #1a1a2e;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        body.light .modal-header {
+            border-color: rgba(0,0,0,0.04);
+        }
+
+        .modal .form-control, .modal .form-select {
+            background: rgba(255,255,255,0.03);
+            border-color: rgba(255,255,255,0.04);
+            color: #fff;
+            border-radius: 10px;
+        }
+
+        body.light .modal .form-control,
+        body.light .modal .form-select {
+            background: rgba(0,0,0,0.02);
+            border-color: rgba(0,0,0,0.06);
+            color: #1a1a2e;
+        }
+
+        .modal .form-control:focus, .modal .form-select:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.05);
+        }
+
+        .modal .form-label {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+        }
+
+        body.light .modal .form-label {
+            color: rgba(0,0,0,0.3);
+        }
+
+        /* ===== SCROLL ===== */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.01); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
+
+        /* ===== RESPONSIVO ===== */
+        @media (max-width: 768px) {
+            .main-tunnel-card { padding: 15px; }
+            .logo-header h1 { font-size: 1.2rem; }
+            .search-input-group input { width: 120px; }
+            .indicators-grid { grid-template-columns: repeat(3, 1fr); }
+            .tunnel-map-grid { grid-template-columns: 1fr; }
+            .stations-tunnel { gap: 4px 6px; }
+            .station-tunnel-item { font-size: 0.7rem; padding: 3px 10px 3px 6px; }
+        }
+
+        @media (max-width: 480px) {
+            .indicators-grid { grid-template-columns: repeat(2, 1fr); }
+            .header-section { flex-direction: column; align-items: stretch; }
+            .header-controls { justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-tunnel-card">
+    <!-- CABEÇALHO -->
+    <div class="header-section">
+        <div class="logo-header">
+            <i class="bi bi-subway metro-icon"></i>
+            <h1>
+                Mapa Metrô
+                <small>Hospital Regional de Malanje</small>
+            </h1>
+        </div>
+        <div class="header-controls">
+            <div class="search-input-group">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="Estação, linha...">
+            </div>
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span id="clockDisplay">--:--:--</span>
+            </div>
+            <button class="theme-btn" id="themeToggle">
+                <i class="bi bi-moon-stars" id="themeIcon"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- CARDS INDICADORES -->
+    <div class="indicators-grid">
+        <div class="indicator-card total">
+            <div class="value" id="totalCount">0</div>
+            <div class="label">Total de Salas</div>
+        </div>
+        <div class="indicator-card available">
+            <div class="value" id="availableCount">0</div>
+            <div class="label">Disponíveis</div>
+        </div>
+        <div class="indicator-card occupied">
+            <div class="value" id="occupiedCount">0</div>
+            <div class="label">Ocupadas</div>
+        </div>
+        <div class="indicator-card reserved">
+            <div class="value" id="reservedCount">0</div>
+            <div class="label">Reservadas</div>
+        </div>
+        <div class="indicator-card maintenance">
+            <div class="value" id="maintenanceCount">0</div>
+            <div class="label">Manutenção</div>
+        </div>
+    </div>
+
+    <!-- MAPA DE TÚNEIS -->
+    <div class="tunnel-map-grid">
+        <!-- LINHAS DE TÚNEIS (CARDS) -->
+        <div class="tunnel-lines-area" id="tunnelLinesContainer">
+            <!-- Renderizado via JS -->
+        </div>
+
+        <!-- PAINEL LATERAL -->
+        <div class="side-panel">
+            <!-- MAPA OSM -->
+            <div class="map-card">
+                <div class="map-title">🗺️ Localização do Hospital</div>
+                <div id="openstreetmap"></div>
+            </div>
+
+            <!-- LOCALIZAÇÃO ATUAL -->
+            <div class="location-info-card">
+                <div class="loc-label">📍 Você está aqui</div>
+                <div class="location-current">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <div>
+                        <div class="loc-text" id="currentLocationText">Estação Central</div>
+                        <div class="loc-sub">Linha Verde • Piso 0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROTA -->
+            <div class="nav-route-card">
+                <div class="nav-title">🚇 Rota para destino</div>
+                <div id="navStepsContainer">
+                    <div class="nav-step active">
+                        <span class="step-num">1</span>
+                        <span>Estação Central</span>
+                    </div>
+                    <div class="nav-step">
+                        <span class="step-num">2</span>
+                        <span>Linha Azul → Corredor A</span>
+                    </div>
+                    <div class="nav-step">
+                        <span class="step-num">3</span>
+                        <span>Linha Roxa → Corredor B</span>
+                    </div>
+                    <div class="nav-step">
+                        <span class="step-num">4</span>
+                        <span>Laboratório Central</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AÇÕES -->
+            <div class="action-buttons">
+                <button class="action-btn primary" id="btnReserve"><i class="bi bi-calendar-plus"></i> Reservar</button>
+                <button class="action-btn" id="btnFree"><i class="bi bi-door-open"></i> Liberar</button>
+                <button class="action-btn" id="btnDoctors"><i class="bi bi-person-badge"></i> Médicos</button>
+                <button class="action-btn" id="btnRefresh"><i class="bi bi-arrow-repeat"></i> Atualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL RESERVA -->
+<div class="modal fade" id="reserveModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-calendar-plus text-primary"></i> Reservar Estação</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reserveForm">
+                    <div class="mb-3">
+                        <label class="form-label">Sala / Estação</label>
+                        <select class="form-select" id="reserveRoomSelect">
+                            <option value="1">Sala 01 - Pediatria</option>
+                            <option value="2">Sala 02 - Cardiologia</option>
+                            <option value="3">Sala 03 - Ginecologia</option>
+                            <option value="4">Sala 04 - Ortopedia</option>
+                            <option value="5">Sala 05 - Neurologia</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Médico Responsável</label>
+                        <select class="form-select" id="reserveDoctorSelect">
+                            <option value="1">Dra. Ana Manuel</option>
+                            <option value="2">Dr. Carlos Santos</option>
+                            <option value="3">Dra. Maria Oliveira</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data</label>
+                        <input type="date" class="form-control" id="reserveDate">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hora</label>
+                        <input type="time" class="form-control" id="reserveTime">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background:rgba(255,255,255,0.04);border:none;color:#fff;">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmReserve" style="background:#00d4ff;border:none;color:#0a0e1a;font-weight:600;">Reservar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+$(document).ready(function() {
+
+    // =============================================
+    // DADOS - SALAS/ESTAÇÕES
+    // =============================================
+    const rooms = [
+        { id: 1, number: '01', name: 'Pediatria', specialty: 'Pediatria', status: 'available', doctor: 'Dra. Ana Manuel', line: 'consultas' },
+        { id: 2, number: '02', name: 'Cardiologia', specialty: 'Cardiologia', status: 'occupied', doctor: 'Dr. Carlos Santos', line: 'consultas' },
+        { id: 3, number: '03', name: 'Ginecologia', specialty: 'Ginecologia', status: 'reserved', doctor: 'Dra. Maria Oliveira', line: 'consultas' },
+        { id: 4, number: '04', name: 'Ortopedia', specialty: 'Ortopedia', status: 'preparing', doctor: 'Dr. Pedro Silva', line: 'consultas' },
+        { id: 5, number: '05', name: 'Neurologia', specialty: 'Neurologia', status: 'maintenance', doctor: 'Dr. João Costa', line: 'consultas' },
+        { id: 6, number: '06', name: 'Enfermaria Infantil', specialty: 'Pediatria', status: 'available', doctor: 'Dra. Sofia Lima', line: 'internamento' },
+        { id: 7, number: '07', name: 'Enfermaria Feminina', specialty: 'Ginecologia', status: 'occupied', doctor: 'Dra. Beatriz Santos', line: 'internamento' },
+        { id: 8, number: '08', name: 'Enfermaria Masculina', specialty: 'Ortopedia', status: 'available', doctor: 'Dr. Rui Mendes', line: 'internamento' },
+        { id: 9, number: '09', name: 'Cuidados Intensivos', specialty: 'Cardiologia', status: 'occupied', doctor: 'Dr. Miguel Ferreira', line: 'internamento' },
+        { id: 10, number: '10', name: 'Triagem', specialty: 'Emergência', status: 'available', doctor: 'Dra. Carla Lopes', line: 'emergencia' },
+        { id: 11, number: '11', name: 'Sala de Emergência', specialty: 'Emergência', status: 'occupied', doctor: 'Dr. Bruno Costa', line: 'emergencia' },
+        { id: 12, number: '12', name: 'Sala de Procedimentos', specialty: 'Emergência', status: 'reserved', doctor: 'Dra. Ana Dias', line: 'emergencia' },
+        { id: 13, number: '13', name: 'Reanimação', specialty: 'Emergência', status: 'preparing', doctor: 'Dr. Hugo Silva', line: 'emergencia' },
+        { id: 14, number: '14', name: 'Laboratório', specialty: 'Diagnóstico', status: 'available', doctor: 'Dra. Teresa Martins', line: 'diagnostico' },
+        { id: 15, number: '15', name: 'Raio-X', specialty: 'Diagnóstico', status: 'occupied', doctor: 'Dr. José Ramos', line: 'diagnostico' },
+        { id: 16, number: '16', name: 'Ecografia', specialty: 'Diagnóstico', status: 'available', doctor: 'Dra. Inês Pereira', line: 'diagnostico' },
+        { id: 17, number: '17', name: 'Farmácia', specialty: 'Diagnóstico', status: 'reserved', doctor: 'Dr. Luís Rodrigues', line: 'diagnostico' },
+        { id: 18, number: '18', name: 'Administração', specialty: 'Administrativo', status: 'available', doctor: 'Dra. Marta Santos', line: 'administrativo' },
+        { id: 19, number: '19', name: 'Arquivo', specialty: 'Administrativo', status: 'maintenance', doctor: 'Dr. Ricardo Lima', line: 'administrativo' },
+        { id: 20, number: '20', name: 'Sala de Reuniões', specialty: 'Administrativo', status: 'available', doctor: 'Dra. Filipa Costa', line: 'administrativo' }
+    ];
+
+    // =============================================
+    // CONFIGURAÇÕES DAS LINHAS
+    // =============================================
+    const lineConfigs = {
+        consultas: { label: 'Linha Azul • Consultas', icon: 'bi-heart-pulse', color: '#00d4ff', cssClass: 'line-consultas' },
+        internamento: { label: 'Linha Verde • Internamento', icon: 'bi-hospital', color: '#00ff88', cssClass: 'line-internamento' },
+        emergencia: { label: 'Linha Vermelha • Emergência', icon: 'bi-plus-circle', color: '#ff6b6b', cssClass: 'line-emergencia' },
+        diagnostico: { label: 'Linha Roxa • Diagnóstico', icon: 'bi-microscope', color: '#b388ff', cssClass: 'line-diagnostico' },
+        administrativo: { label: 'Linha Amarela • Administrativo', icon: 'bi-folder', color: '#ffd93d', cssClass: 'line-administrativo' }
+    };
+
+    const statusLabels = {
+        'available': 'Disponível',
+        'occupied': 'Ocupada',
+        'reserved': 'Reservada',
+        'preparing': 'Preparação',
+        'maintenance': 'Manutenção'
+    };
+
+    // =============================================
+    // TEMA (CLARO/ESCURO)
+    // =============================================
+    let darkMode = true;
+    function toggleTheme() {
+        darkMode = !darkMode;
+        $('body').toggleClass('light', !darkMode);
+        $('#themeIcon').toggleClass('bi-moon-stars bi-sun-fill');
+        localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+    }
+
+    if (localStorage.getItem('theme') === 'light') {
+        darkMode = false;
+        $('body').addClass('light');
+        $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+    }
+    $('#themeToggle').click(toggleTheme);
+
+    // =============================================
+    // RELÓGIO
+    // =============================================
+    function updateClock() {
+        const now = new Date();
+        $('#clockDisplay').text(now.toLocaleTimeString('pt-BR'));
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // =============================================
+    // INDICADORES
+    // =============================================
+    function updateIndicators() {
+        const total = rooms.length;
+        const available = rooms.filter(r => r.status === 'available').length;
+        const occupied = rooms.filter(r => r.status === 'occupied').length;
+        const reserved = rooms.filter(r => r.status === 'reserved').length;
+        const maintenance = rooms.filter(r => r.status === 'maintenance').length;
+
+        $('#totalCount').text(total);
+        $('#availableCount').text(available);
+        $('#occupiedCount').text(occupied);
+        $('#reservedCount').text(reserved);
+        $('#maintenanceCount').text(maintenance);
+    }
+    updateIndicators();
+
+    // =============================================
+    // RENDERIZAR LINHAS DE TÚNEIS
+    // =============================================
+    function renderTunnelLines(filtered) {
+        const container = $('#tunnelLinesContainer');
+        container.empty();
+
+        const data = filtered || rooms;
+        const lines = ['consultas', 'internamento', 'emergencia', 'diagnostico', 'administrativo'];
+
+        lines.forEach(lineKey => {
+            const config = lineConfigs[lineKey];
+            const lineRooms = data.filter(r => r.line === lineKey);
+            if (lineRooms.length === 0) return;
+
+            const availCount = lineRooms.filter(r => r.status === 'available').length;
+
+            let stationsHtml = '';
+            lineRooms.forEach(room => {
+                stationsHtml += `
+                    <div class="station-tunnel-item" data-room-id="${room.id}" data-status="${room.status}">
+                        <span class="station-dot-mini" style="background:${config.color};"></span>
+                        <span>Sala ${room.number} - ${room.name}</span>
+                        <span class="station-status-tag ${room.status}">${statusLabels[room.status]}</span>
+                    </div>
+                `;
+            });
+
+            container.append(`
+                <div class="tunnel-line-card ${config.cssClass}">
+                    <div class="line-header-info">
+                        <span class="line-color-dot"></span>
+                        <span class="line-name-info">
+                            <i class="bi ${config.icon}"></i> ${config.label}
+                        </span>
+                        <span class="line-count-badge">${availCount} disponíveis</span>
+                    </div>
+                    <div class="stations-tunnel">
+                        ${stationsHtml}
+                    </div>
+                </div>
+            `);
+        });
+
+        if (container.children().length === 0) {
+            container.html(`
+                <div style="color:rgba(255,255,255,0.15);text-align:center;padding:40px 20px;font-style:italic;">
+                    <i class="bi bi-search" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
+                    Nenhuma estação encontrada.
+                </div>
+            `);
+        }
+    }
+    renderTunnelLines();
+
+    // =============================================
+    // CLICK NA ESTAÇÃO
+    // =============================================
+    $(document).on('click', '.station-tunnel-item', function() {
+        const id = parseInt($(this).data('room-id'));
+        const room = rooms.find(r => r.id === id);
+        if (room) {
+            const lineLabel = lineConfigs[room.line]?.label || 'Geral';
+            alert(
+                `🚇 ESTAÇÃO ${room.number} - ${room.name}\n` +
+                `━━━━━━━━━━━━━━━━━━━━━\n` +
+                `Linha: ${lineLabel}\n` +
+                `Especialidade: ${room.specialty}\n` +
+                `Médico: ${room.doctor}\n` +
+                `Status: ${statusLabels[room.status]}\n` +
+                `━━━━━━━━━━━━━━━━━━━━━\n` +
+                `📍 Corredor ${room.line.charAt(0).toUpperCase()}, Piso 0`
+            );
+        }
+    });
+
+    // =============================================
+    // PESQUISA
+    // =============================================
+    $('#searchInput').on('input', function() {
+        const term = $(this).val().toLowerCase().trim();
+        if (term === '') {
+            renderTunnelLines();
+            return;
+        }
+        const filtered = rooms.filter(r =>
+            r.number.includes(term) ||
+            r.name.toLowerCase().includes(term) ||
+            r.specialty.toLowerCase().includes(term) ||
+            r.doctor.toLowerCase().includes(term) ||
+            lineConfigs[r.line]?.label.toLowerCase().includes(term)
+        );
+        renderTunnelLines(filtered);
+    });
+
+    // =============================================
+    // AÇÕES
+    // =============================================
+
+    // Reservar
+    $('#btnReserve').click(() => $('#reserveModal').modal('show'));
+
+    $('#confirmReserve').click(function() {
+        const room = $('#reserveRoomSelect option:selected').text();
+        const doctor = $('#reserveDoctorSelect option:selected').text();
+        const date = $('#reserveDate').val();
+        const time = $('#reserveTime').val();
+
+        if (!date || !time) {
+            alert('⏰ Por favor, preencha data e hora.');
+            return;
+        }
+
+        $('#reserveModal').modal('hide');
+        alert(
+            `✅ RESERVA CONFIRMADA\n` +
+            `━━━━━━━━━━━━━━━━━━━━━\n` +
+            `Estação: ${room}\n` +
+            `Médico: ${doctor}\n` +
+            `Data: ${date}\n` +
+            `Hora: ${time}\n` +
+            `━━━━━━━━━━━━━━━━━━━━━\n` +
+            `🚇 Reserva realizada com sucesso!`
+        );
+    });
+
+    // Liberar
+    $('#btnFree').click(function() {
+        const roomNumber = prompt('Digite o número da sala que deseja liberar:');
+        if (roomNumber) {
+            const room = rooms.find(r => r.number === roomNumber);
+            if (room && (room.status === 'occupied' || room.status === 'reserved')) {
+                room.status = 'available';
+                renderTunnelLines();
+                updateIndicators();
+                alert(`✅ Sala ${roomNumber} liberada com sucesso!`);
+            } else {
+                alert('❌ Sala não encontrada ou já está disponível.');
+            }
+        }
+    });
+
+    // Médicos
+    $('#btnDoctors').click(function() {
+        const list = rooms.map(r =>
+            `• Sala ${r.number}: ${r.doctor} (${statusLabels[r.status]})`
+        ).join('\n');
+        alert(
+            `👨‍⚕️ MÉDICOS EM SERVIÇO\n` +
+            `━━━━━━━━━━━━━━━━━━━━━\n` +
+            `${list}\n` +
+            `━━━━━━━━━━━━━━━━━━━━━\n` +
+            `Total: ${rooms.length} profissionais`
+        );
+    });
+
+    // Atualizar
+    $('#btnRefresh').click(function() {
+        renderTunnelLines();
+        updateIndicators();
+        alert('🔄 Mapa atualizado com sucesso!');
+    });
+
+    // =============================================
+    // MAPA - OPENSTREETMAP (INTEGRAÇÃO OMS)
+    // =============================================
+    // Coordenadas do Hospital Regional de Malanje (Angola)
+    // Aproximadamente: -9.5363, 16.3439
+    const hospitalLat = -9.5363;
+    const hospitalLng = 16.3439;
+
+    const map = L.map('openstreetmap').setView([hospitalLat, hospitalLng], 16);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Marcador do hospital
+    const marker = L.marker([hospitalLat, hospitalLng], {
+        icon: L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41]
+        })
+    }).addTo(map);
+
+    marker.bindPopup(`
+        <strong>🏥 Hospital Regional de Malanje</strong><br>
+        <small>Mapa Metrô - Sistema de Túneis</small>
+    `).openPopup();
+
+    // Adicionar círculo de destaque
+    L.circle([hospitalLat, hospitalLng], {
+        color: '#00d4ff',
+        fillColor: '#00d4ff',
+        fillOpacity: 0.1,
+        radius: 50
+    }).addTo(map);
+
+    console.log('🗺️ Mapa OpenStreetMap carregado!');
+    console.log('📍 Hospital Regional de Malanje: -9.5363, 16.3439');
+
+    // =============================================
+    // MENSAGEM INICIAL NO CONSOLE
+    // =============================================
+    console.log('🚇 Mapa Metrô - Hospital Regional de Malanje');
+    console.log('📊 Total de estações: ' + rooms.length);
+    console.log('✅ Sistema de túneis ativo!');
+});
+</script>
+</body>
+</html>

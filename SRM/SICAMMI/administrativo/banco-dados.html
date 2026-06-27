@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup e Manutenção de Banco de Dados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #f8f9fc;
+            --success-color: #1cc88a;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+        }
+        
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-color) 0%, #224abe 100%);
+            min-height: 100vh;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+        
+        .sidebar .nav-link.active {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link:hover {
+            color: #fff;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+            font-weight: 700;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .database-card {
+            transition: all 0.3s ease;
+        }
+        
+        .database-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+        }
+        
+        .database-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+        
+        .progress {
+            height: 0.5rem;
+        }
+        
+        .nav-tabs .nav-link.active {
+            font-weight: bold;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .backup-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        
+        .status-success {
+            background-color: rgba(28, 200, 138, 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-warning {
+            background-color: rgba(246, 194, 62, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .status-danger {
+            background-color: rgba(231, 74, 59, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-primary">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-users me-2"></i> Usuários
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-user-shield me-2"></i> Permissões
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                <i class="fas fa-database me-2"></i> Banco de Dados
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-tachometer-alt me-2"></i> Desempenho
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Backup e Manutenção de Banco de Dados</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#backupModal">
+                            <i class="fas fa-database me-1"></i> Novo Backup
+                        </button>
+                        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#maintenanceModal">
+                            <i class="fas fa-tools me-1"></i> Manutenção
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Abas -->
+                <ul class="nav nav-tabs mb-4" id="databaseTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="status-tab" data-bs-toggle="tab" data-bs-target="#status" type="button" role="tab">Status</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="backups-tab" data-bs-toggle="tab" data-bs-target="#backups" type="button" role="tab">Backups</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tables-tab" data-bs-toggle="tab" data-bs-target="#tables" type="button" role="tab">Tabelas</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="queries-tab" data-bs-toggle="tab" data-bs-target="#queries" type="button" role="tab">Consultas</button>
+                    </li>
+                </ul>
+
+                <!-- Conteúdo das Abas -->
+                <div class="tab-content" id="databaseTabsContent">
+                    <!-- Tab Status -->
+                    <div class="tab-pane fade show active" id="status" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card database-card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">Informações do Banco de Dados</h5>
+                                            <i class="fas fa-info-circle database-icon"></i>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Tipo</small>
+                                            <p>MySQL 8.0</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Versão</small>
+                                            <p>8.0.32</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Tamanho</small>
+                                            <p>245.7 MB</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Tempo de atividade</small>
+                                            <p>7 dias 12:34:21</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card database-card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">Uso de Recursos</h5>
+                                            <i class="fas fa-chart-pie database-icon"></i>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">CPU</small>
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 25%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Memória</small>
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar bg-info" role="progressbar" style="width: 45%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Armazenamento</small>
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar bg-warning" role="progressbar" style="width: 65%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">Conexões</small>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-danger" role="progressbar" style="width: 15%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line me-1"></i> Desempenho em Tempo Real
+                            </div>
+                            <div class="card-body">
+                                <canvas id="performanceChart" height="100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Backups -->
+                    <div class="tab-pane fade" id="backups" role="tabpanel">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label for="backupTypeFilter" class="form-label">Tipo</label>
+                                <select id="backupTypeFilter" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="full">Completo</option>
+                                    <option value="partial">Parcial</option>
+                                    <option value="incremental">Incremental</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="backupStatusFilter" class="form-label">Status</label>
+                                <select id="backupStatusFilter" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="success">Sucesso</option>
+                                    <option value="warning">Aviso</option>
+                                    <option value="error">Erro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="backupDateFilter" class="form-label">Período</label>
+                                <select id="backupDateFilter" class="form-select">
+                                    <option value="7">Últimos 7 dias</option>
+                                    <option value="30">Últimos 30 dias</option>
+                                    <option value="90">Últimos 3 meses</option>
+                                    <option value="all">Todos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="backupsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Data/Hora</th>
+                                                <th>Tipo</th>
+                                                <th>Tamanho</th>
+                                                <th>Local</th>
+                                                <th>Status</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>12/07/2023 02:00</td>
+                                                <td>Completo</td>
+                                                <td>245.7 MB</td>
+                                                <td>/backups/full_20230712.sql</td>
+                                                <td><span class="backup-status status-success">Sucesso</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Restaurar"><i class="fas fa-undo"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary me-1" title="Download"><i class="fas fa-download"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>11/07/2023 02:00</td>
+                                                <td>Incremental</td>
+                                                <td>12.3 MB</td>
+                                                <td>/backups/incr_20230711.sql</td>
+                                                <td><span class="backup-status status-success">Sucesso</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Restaurar"><i class="fas fa-undo"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary me-1" title="Download"><i class="fas fa-download"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>10/07/2023 02:00</td>
+                                                <td>Incremental</td>
+                                                <td>8.7 MB</td>
+                                                <td>/backups/incr_20230710.sql</td>
+                                                <td><span class="backup-status status-success">Sucesso</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Restaurar"><i class="fas fa-undo"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary me-1" title="Download"><i class="fas fa-download"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>05/07/2023 02:00</td>
+                                                <td>Completo</td>
+                                                <td>230.1 MB</td>
+                                                <td>/backups/full_20230705.sql</td>
+                                                <td><span class="backup-status status-warning">Aviso</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Restaurar"><i class="fas fa-undo"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary me-1" title="Download"><i class="fas fa-download"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>28/06/2023 02:00</td>
+                                                <td>Completo</td>
+                                                <td>215.5 MB</td>
+                                                <td>/backups/full_20230628.sql</td>
+                                                <td><span class="backup-status status-danger">Erro</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Restaurar"><i class="fas fa-undo"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary me-1" title="Download"><i class="fas fa-download"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Tabelas -->
+                    <div class="tab-pane fade" id="tables" role="tabpanel">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Pesquisar tabelas...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="tablesTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Nome</th>
+                                                <th>Registros</th>
+                                                <th>Tamanho</th>
+                                                <th>Codificação</th>
+                                                <th>Motor</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>users</td>
+                                                <td>1,245</td>
+                                                <td>12.4 MB</td>
+                                                <td>utf8mb4</td>
+                                                <td>InnoDB</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Visualizar"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-warning me-1" title="Otimizar"><i class="fas fa-bolt"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" title="Reparar"><i class="fas fa-wrench"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>permissions</td>
+                                                <td>56</td>
+                                                <td>1.2 MB</td>
+                                                <td>utf8mb4</td>
+                                                <td>InnoDB</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Visualizar"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-warning me-1" title="Otimizar"><i class="fas fa-bolt"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" title="Reparar"><i class="fas fa-wrench"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>logs</td>
+                                                <td>24,587</td>
+                                                <td>45.7 MB</td>
+                                                <td>utf8mb4</td>
+                                                <td>InnoDB</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Visualizar"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-warning me-1" title="Otimizar"><i class="fas fa-bolt"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" title="Reparar"><i class="fas fa-wrench"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>settings</td>
+                                                <td>12</td>
+                                                <td>0.5 MB</td>
+                                                <td>utf8mb4</td>
+                                                <td>InnoDB</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Visualizar"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-warning me-1" title="Otimizar"><i class="fas fa-bolt"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" title="Reparar"><i class="fas fa-wrench"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Consultas -->
+                    <div class="tab-pane fade" id="queries" role="tabpanel">
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Editor SQL</h5>
+                                        <div class="mb-3">
+                                            <textarea class="form-control" id="sqlQuery" rows="5" placeholder="Digite sua consulta SQL aqui..."></textarea>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <button class="btn btn-primary me-2">Executar</button>
+                                                <button class="btn btn-outline-secondary me-2">Limpar</button>
+                                                <button class="btn btn-outline-secondary">Salvar</button>
+                                            </div>
+                                            <div>
+                                                <button class="btn btn-outline-danger">Consulta Perigosa</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Consultas Salvas</h5>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Listar usuários ativos
+                                                <span>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-play"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Backup de tabelas críticas
+                                                <span>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-play"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Otimizar tabelas grandes
+                                                <span>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-play"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-table me-1"></i> Resultados
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    Nenhuma consulta executada ainda. Digite uma consulta SQL e clique em "Executar" para ver os resultados.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Backup -->
+    <div class="modal fade" id="backupModal" tabindex="-1" aria-labelledby="backupModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="backupModalLabel">Criar Novo Backup</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="backupForm">
+                        <div class="mb-3">
+                            <label for="backupType" class="form-label">Tipo de Backup</label>
+                            <select class="form-select" id="backupType" required>
+                                <option value="full">Completo (todo o banco de dados)</option>
+                                <option value="partial">Parcial (apenas tabelas selecionadas)</option>
+                                <option value="incremental">Incremental (apenas alterações desde o último backup)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="tablesSelection" style="display: none;">
+                            <label class="form-label">Tabelas para incluir</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="tableUsers" checked>
+                                <label class="form-check-label" for="tableUsers">users</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="tablePermissions" checked>
+                                <label class="form-check-label" for="tablePermissions">permissions</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="tableLogs">
+                                <label class="form-check-label" for="tableLogs">logs</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="tableSettings" checked>
+                                <label class="form-check-label" for="tableSettings">settings</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="backupLocation" class="form-label">Local de Armazenamento</label>
+                            <select class="form-select" id="backupLocation" required>
+                                <option value="local">Servidor Local</option>
+                                <option value="cloud">Nuvem (AWS S3)</option>
+                                <option value="both">Ambos</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="backupCompression" checked>
+                            <label class="form-check-label" for="backupCompression">Compactar backup</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="backupNotification">
+                            <label class="form-check-label" for="backupNotification">Notificar por e-mail quando concluído</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="startBackup">Iniciar Backup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Manutenção -->
+    <div class="modal fade" id="maintenanceModal" tabindex="-1" aria-labelledby="maintenanceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="maintenanceModalLabel">Ferramentas de Manutenção</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h6>Otimização</h6>
+                        <p class="text-muted">Otimize tabelas para melhorar o desempenho e recuperar espaço não utilizado.</p>
+                        <button class="btn btn-outline-primary w-100 mb-3">Otimizar Todas as Tabelas</button>
+                        <button class="btn btn-outline-secondary w-100">Otimizar Tabelas Selecionadas</button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Reparo</h6>
+                        <p class="text-muted">Repare tabelas corrompidas ou com problemas.</p>
+                        <button class="btn btn-outline-primary w-100 mb-3">Verificar e Reparar Todas as Tabelas</button>
+                        <button class="btn btn-outline-secondary w-100">Verificar Tabelas Selecionadas</button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Limpeza</h6>
+                        <p class="text-muted">Limpe dados antigos ou temporários para liberar espaço.</p>
+                        <button class="btn btn-outline-danger w-100">Limpar Logs Antigos</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            // Inicializar DataTables
+            $('#backupsTable, #tablesTable').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
+                }
+            });
+            
+            // Mostrar/ocultar seleção de tabelas com base no tipo de backup
+            $('#backupType').change(function() {
+                if ($(this).val() === 'partial') {
+                    $('#tablesSelection').show();
+                } else {
+                    $('#tablesSelection').hide();
+                }
+            });
+            
+            // Iniciar backup
+            $('#startBackup').click(function() {
+                if ($('#backupForm')[0].checkValidity()) {
+                    // Simular início do backup
+                    alert('Backup iniciado com sucesso! Você receberá uma notificação quando estiver concluído.');
+                    $('#backupModal').modal('hide');
+                    // Aqui você adicionaria o código para iniciar o backup
+                } else {
+                    $('#backupForm')[0].reportValidity();
+                }
+            });
+            
+            // Gráfico de desempenho
+            var ctx = document.getElementById('performanceChart').getContext('2d');
+            var performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+                    datasets: [
+                        {
+                            label: 'Uso de CPU (%)',
+                            data: [12, 15, 8, 10, 25, 30, 45, 35, 28, 22, 18, 15],
+                            borderColor: '#4e73df',
+                            backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Uso de Memória (%)',
+                            data: [35, 32, 30, 28, 40, 45, 50, 55, 48, 42, 38, 35],
+                            borderColor: '#1cc88a',
+                            backgroundColor: 'rgba(28, 200, 138, 0.05)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Consultas por Segundo',
+                            data: [45, 50, 40, 55, 120, 150, 180, 160, 140, 100, 80, 60],
+                            borderColor: '#f6c23e',
+                            backgroundColor: 'rgba(246, 194, 62, 0.05)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Filtros de backup
+            $('#backupTypeFilter, #backupStatusFilter, #backupDateFilter').change(function() {
+                var table = $('#backupsTable').DataTable();
+                table.draw();
+            });
+            
+            // Exemplo de função para restaurar backup
+            $(document).on('click', '.btn-outline-primary', function() {
+                if ($(this).attr('title') === 'Restaurar') {
+                    var row = $(this).closest('tr');
+                    var backupDate = row.find('td:eq(0)').text();
+                    if (confirm('Restaurar backup de ' + backupDate + '? Esta ação substituirá todos os dados atuais.')) {
+                        alert('Restauração iniciada! O sistema pode ficar indisponível durante o processo.');
+                        // Aqui você adicionaria o código para restaurar o backup
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

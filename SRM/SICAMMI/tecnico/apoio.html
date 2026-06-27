@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suporte Técnico Laboratorial - SICAMMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* ===== ESTILO GERAL ===== */
+        * {
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        body {
+            background-image: url('https://img.freepik.com/fotos-gratis/equipe-medica-em-laboratorio_23-2149031596.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* ===== TEMA CLARO ===== */
+        body.light-theme::before {
+            background: rgba(255, 255, 255, 0.88);
+        }
+
+        body.light-theme .page-title,
+        body.light-theme .page-subtitle,
+        body.light-theme .indicator-card .number,
+        body.light-theme .indicator-card .label,
+        body.light-theme .info-card .card-title,
+        body.light-theme .info-card .info-label,
+        body.light-theme .info-card .info-value,
+        body.light-theme .timeline-item .timeline-content h6,
+        body.light-theme .timeline-item .timeline-content p,
+        body.light-theme .filter-section h6,
+        body.light-theme .filter-section .text-muted,
+        body.light-theme .nav-tabs .nav-link,
+        body.light-theme .report-card .card-body,
+        body.light-theme .report-card .card-title,
+        body.light-theme .report-card .card-text,
+        body.light-theme .chart-container h6,
+        body.light-theme .assistant-card h5,
+        body.light-theme .assistant-card p,
+        body.light-theme .activity-table th,
+        body.light-theme .activity-table td,
+        body.light-theme .patient-detail h5,
+        body.light-theme .patient-detail p,
+        body.light-theme .modal-content,
+        body.light-theme .modal .form-label,
+        body.light-theme .equipment-status .status-text,
+        body.light-theme .faq-item .question,
+        body.light-theme .faq-item .answer,
+        body.light-theme .ticket-item .ticket-title,
+        body.light-theme .ticket-item .ticket-desc {
+            color: #1a1a2e !important;
+        }
+
+        body.light-theme .nav-tabs .nav-link {
+            color: #1a1a2e !important;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-theme .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .tab-content,
+        body.light-theme .indicator-card,
+        body.light-theme .info-card,
+        body.light-theme .filter-section,
+        body.light-theme .chart-container,
+        body.light-theme .report-card,
+        body.light-theme .activity-table,
+        body.light-theme .timeline-item .timeline-content,
+        body.light-theme .patient-detail,
+        body.light-theme .equipment-status,
+        body.light-theme .faq-item,
+        body.light-theme .ticket-item,
+        body.light-theme .chat-message {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .filter-section .form-control,
+        body.light-theme .filter-section .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .filter-section .form-control::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-theme #currentDateTime {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .modal .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .timeline-item .timeline-badge {
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark {
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .page-title .badge {
+            background: rgba(13, 110, 253, 0.2) !important;
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .assistant-card {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.85) 0%, rgba(245, 87, 108, 0.85) 100%);
+        }
+
+        body.light-theme .activity-table th {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .activity-table td {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .chat-input {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .chat-message.bot {
+            background: rgba(13, 110, 253, 0.1);
+        }
+
+        body.light-theme .chat-message.user {
+            background: rgba(25, 135, 84, 0.1);
+        }
+
+        body.light-theme .equipment-status .status-badge {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== GLASSMORPHISM BASE ===== */
+        .glass {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .glass:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== TABS ===== */
+        .nav-tabs .nav-link {
+            font-size: 16px;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-right: 5px;
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(10px);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(255, 255, 255, 0.20);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.20);
+            color: #fff;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: bold;
+            box-shadow: 0 -2px 20px rgba(13, 110, 253, 0.25);
+        }
+
+        .tab-content {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(15px);
+            border-radius: 0 8px 8px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* ===== INDICATOR CARDS ===== */
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 18px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid rgba(13, 110, 253, 0.6);
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .indicator-card .number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .indicator-card .label {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .indicator-card .label i {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .indicator-card.tickets-open { border-left-color: rgba(220, 53, 69, 0.6); }
+        .indicator-card.tickets-resolved { border-left-color: rgba(25, 135, 84, 0.6); }
+        .indicator-card.equipment-maintenance { border-left-color: rgba(255, 193, 7, 0.6); }
+        .indicator-card.faq { border-left-color: rgba(13, 202, 240, 0.6); }
+        .indicator-card.avg-response { border-left-color: rgba(108, 117, 125, 0.6); }
+
+        .indicator-card.tickets-open .number { color: #ff7a8a; }
+        .indicator-card.tickets-resolved .number { color: #75f0a0; }
+        .indicator-card.equipment-maintenance .number { color: #ffd75a; }
+        .indicator-card.faq .number { color: #6ee7ff; }
+        .indicator-card.avg-response .number { color: #b8a9c9; }
+
+        /* ===== PAGE HEADER ===== */
+        .page-title {
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        .page-title .badge {
+            background: rgba(13, 110, 253, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(30deg);
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== DASHBOARD BUTTON ===== */
+        .dashboard-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        body.light-theme .dashboard-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .dashboard-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        /* ===== DATE/TIME ===== */
+        #currentDateTime {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== FILTER SECTION ===== */
+        .filter-section {
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+        }
+
+        .filter-section h6 {
+            color: #fff;
+        }
+
+        .filter-section .form-control,
+        .filter-section .form-select {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .filter-section .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .filter-section .form-control:focus,
+        .filter-section .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        /* ===== INFO CARD ===== */
+        .info-card {
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .info-card .card-title {
+            color: #fff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.10);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-card .info-label {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .info-card .info-value {
+            color: #fff;
+        }
+
+        /* ===== ASSISTANT CARD ===== */
+        .assistant-card {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.30) 0%, rgba(245, 87, 108, 0.30) 100%);
+            backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .assistant-card .bi {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .assistant-card h5 {
+            color: #fff;
+        }
+
+        .assistant-card p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* ===== CHAT ===== */
+        .chat-container {
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .chat-message {
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chat-message.bot {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-message.user {
+            background: rgba(13, 110, 253, 0.25);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            margin-left: auto;
+        }
+
+        .chat-message .time {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 4px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .chat-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+            outline: none;
+        }
+
+        .chat-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .chat-suggestions .btn {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .chat-suggestions .btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+
+        /* ===== EQUIPMENT STATUS ===== */
+        .equipment-status {
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .equipment-status:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .equipment-status .status-badge {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.operational {
+            background: rgba(25, 135, 84, 0.7);
+            color: #fff;
+        }
+
+        .status-badge.maintenance {
+            background: rgba(255, 193, 7, 0.7);
+            color: #000;
+        }
+
+        .status-badge.failure {
+            background: rgba(220, 53, 69, 0.7);
+            color: #fff;
+        }
+
+        /* ===== FAQ ITEM ===== */
+        .faq-item {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border-radius: 10px;
+            padding: 15px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .faq-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .faq-item .question {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .faq-item .answer {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .faq-item.active .answer {
+            display: block;
+        }
+
+        .faq-item .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        /* ===== TICKET ITEM ===== */
+        .ticket-item {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border-radius: 10px;
+            padding: 15px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .ticket-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .ticket-item .ticket-title {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .ticket-item .ticket-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .ticket-item .ticket-meta {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        /* ===== PRIORITY BADGES ===== */
+        .priority-badge {
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .priority-badge.low { background: rgba(108, 117, 125, 0.6); color: #fff; }
+        .priority-badge.medium { background: rgba(255, 193, 7, 0.6); color: #000; }
+        .priority-badge.high { background: rgba(220, 53, 69, 0.6); color: #fff; }
+        .priority-badge.critical { background: rgba(220, 53, 69, 0.9); color: #fff; animation: pulse 1.5s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* ===== ACTIVITY TABLE ===== */
+        .activity-table {
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+        }
+
+        .activity-table th {
+            background: rgba(255, 255, 255, 0.08);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .activity-table td {
+            color: #fff;
+            vertical-align: middle;
+        }
+
+        .activity-table .table-hover tbody tr:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ===== REPORT CARDS ===== */
+        .report-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .report-card .card-body {
+            padding: 25px 15px;
+            color: #fff;
+        }
+
+        .report-card .card-title {
+            color: #fff;
+        }
+
+        .report-card .card-text {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions .btn {
+            margin: 3px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .quick-actions .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-actions .btn-primary { background: rgba(13, 110, 253, 0.6); }
+        .quick-actions .btn-success { background: rgba(25, 135, 84, 0.6); }
+        .quick-actions .btn-info { background: rgba(13, 202, 240, 0.6); }
+        .quick-actions .btn-warning { background: rgba(255, 193, 7, 0.6); }
+        .quick-actions .btn-danger { background: rgba(220, 53, 69, 0.6); }
+        .quick-actions .btn-outline-secondary { background: rgba(108, 117, 125, 0.3); color: #fff; }
+        .quick-actions .btn-outline-dark { background: rgba(33, 37, 41, 0.3); color: #fff; border-color: rgba(255, 255, 255, 0.15); }
+        .quick-actions .btn-outline-dark:hover { background: rgba(33, 37, 41, 0.5); color: #fff; }
+
+        /* ===== MODAL ===== */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .modal .btn-close { filter: invert(1); }
+        .modal .form-label { color: rgba(255, 255, 255, 0.8); }
+        .modal .form-control,
+        .modal .form-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        .modal .form-control:focus,
+        .modal .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+        }
+
+        .modal .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .indicator-card .number { font-size: 1.6rem; }
+            .tab-content { padding: 15px; }
+            .page-title { font-size: 1.3rem; }
+            .header-actions { flex-direction: column; gap: 10px; }
+            .chat-message { max-width: 95%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- ===== CABEÇALHO ===== -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap header-actions">
+                    <div>
+                        <h2 class="page-title">
+                            <i class="bi bi-tools text-primary"></i> 
+                            Suporte Técnico Laboratorial
+                            <span class="badge bg-primary ms-2">SICAMMI</span>
+                        </h2>
+                        <p class="page-subtitle">
+                            <i class="bi bi-info-circle"></i> Centro de assistência, orientação e resolução de problemas do laboratório
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="menutec.html" class="dashboard-btn">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+                        </a>
+                        <button class="theme-toggle-btn" id="themeToggle">
+                            <i class="bi bi-moon-stars" id="themeIcon"></i>
+                        </button>
+                        <span class="badge bg-info text-dark" id="currentDateTime">
+                            <i class="bi bi-clock"></i> <span id="dateTimeDisplay">Carregando...</span>
+                        </span>
+                        <div class="input-group" style="width: 220px;">
+                            <input type="text" id="quickSearch" class="form-control" placeholder="🔍 Pesquisar...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== INDICADORES ===== -->
+        <div class="row mb-4">
+            <div class="col-md-2 col-6">
+                <div class="indicator-card tickets-open fade-in">
+                    <div class="number" id="totalOpenTickets">0</div>
+                    <div class="label"><i class="bi bi-ticket"></i> Chamados Abertos</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card tickets-resolved fade-in">
+                    <div class="number" id="totalResolvedTickets">0</div>
+                    <div class="label"><i class="bi bi-check-circle"></i> Chamados Resolvidos</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card equipment-maintenance fade-in">
+                    <div class="number" id="totalMaintenance">0</div>
+                    <div class="label"><i class="bi bi-wrench"></i> Equipamentos em Manutenção</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card faq fade-in">
+                    <div class="number" id="totalFaq">0</div>
+                    <div class="label"><i class="bi bi-book"></i> Perguntas Frequentes</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card avg-response fade-in">
+                    <div class="number" id="avgResponse">0</div>
+                    <div class="label"><i class="bi bi-clock"></i> Tempo Médio de Resposta</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TABS ===== -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item"><button class="nav-link active" id="chamados-tab" data-bs-toggle="tab" data-bs-target="#chamados" type="button"><i class="bi bi-ticket"></i> Chamados</button></li>
+            <li class="nav-item"><button class="nav-link" id="assistente-tab" data-bs-toggle="tab" data-bs-target="#assistente" type="button"><i class="bi bi-robot"></i> Assistente Virtual</button></li>
+            <li class="nav-item"><button class="nav-link" id="equipamentos-tab" data-bs-toggle="tab" data-bs-target="#equipamentos" type="button"><i class="bi bi-laptop"></i> Equipamentos</button></li>
+            <li class="nav-item"><button class="nav-link" id="faq-tab" data-bs-toggle="tab" data-bs-target="#faq" type="button"><i class="bi bi-question-circle"></i> FAQ</button></li>
+            <li class="nav-item"><button class="nav-link" id="relatorios-tab" data-bs-toggle="tab" data-bs-target="#relatorios" type="button"><i class="bi bi-bar-chart"></i> Relatórios</button></li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- ===== ABA: CHAMADOS ===== -->
+            <div class="tab-pane fade show active" id="chamados" role="tabpanel">
+                <div class="filter-section">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <h6><i class="bi bi-funnel"></i> Filtros de Chamados</h6>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filterCategory" class="form-select">
+                                <option value="">Todas as categorias</option>
+                                <option value="sistema">Sistema</option>
+                                <option value="equipamento">Equipamento</option>
+                                <option value="rede">Rede</option>
+                                <option value="impressora">Impressora</option>
+                                <option value="relatorios">Relatórios</option>
+                                <option value="exames">Exames</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filterPriority" class="form-select">
+                                <option value="">Todas as prioridades</option>
+                                <option value="baixa">🟢 Baixa</option>
+                                <option value="media">🟡 Média</option>
+                                <option value="alta">🔴 Alta</option>
+                                <option value="critica">🚨 Crítica</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filterStatus" class="form-select">
+                                <option value="">Todos os estados</option>
+                                <option value="aberto">Aberto</option>
+                                <option value="em_andamento">Em Andamento</option>
+                                <option value="resolvido">Resolvido</option>
+                                <option value="fechado">Fechado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100" id="btnResetFilters">
+                                <i class="bi bi-arrow-counterclockwise"></i> Limpar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <h6 class="card-title"><i class="bi bi-list-ul"></i> Chamados Ativos</h6>
+                            <div id="ticketList">
+                                <!-- Inserido via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <h6 class="card-title"><i class="bi bi-plus-circle"></i> Abrir Novo Chamado</h6>
+                            <form id="ticketForm">
+                                <div class="mb-3">
+                                    <label class="form-label" style="color: rgba(255,255,255,0.7);">Categoria</label>
+                                    <select class="form-select" id="newTicketCategory" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="sistema">Sistema</option>
+                                        <option value="equipamento">Equipamento</option>
+                                        <option value="rede">Rede</option>
+                                        <option value="impressora">Impressora</option>
+                                        <option value="relatorios">Relatórios</option>
+                                        <option value="exames">Exames</option>
+                                        <option value="outros">Outros</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" style="color: rgba(255,255,255,0.7);">Prioridade</label>
+                                    <select class="form-select" id="newTicketPriority">
+                                        <option value="baixa">🟢 Baixa</option>
+                                        <option value="media" selected>🟡 Média</option>
+                                        <option value="alta">🔴 Alta</option>
+                                        <option value="critica">🚨 Crítica</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" style="color: rgba(255,255,255,0.7);">Título</label>
+                                    <input type="text" class="form-control" id="newTicketTitle" placeholder="Resumo do problema" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" style="color: rgba(255,255,255,0.7);">Descrição</label>
+                                    <textarea class="form-control" id="newTicketDesc" rows="2" placeholder="Detalhe o problema..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-send"></i> Abrir Chamado
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ABA: ASSISTENTE VIRTUAL ===== -->
+            <div class="tab-pane fade" id="assistente" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="info-card" style="min-height: 450px;">
+                            <h6 class="card-title"><i class="bi bi-robot"></i> Assistente Virtual SICAMMI</h6>
+                            <div class="chat-container" id="chatContainer">
+                                <!-- Mensagens inseridas via JavaScript -->
+                            </div>
+                            <div class="chat-suggestions" id="suggestionsContainer">
+                                <button class="btn btn-sm suggestion-btn" data-question="Como registar uma amostra?">🧪 Registrar amostra</button>
+                                <button class="btn btn-sm suggestion-btn" data-question="Como emitir um relatório laboratorial?">📊 Emitir relatório</button>
+                                <button class="btn btn-sm suggestion-btn" data-question="Como imprimir etiquetas?">🏷️ Imprimir etiquetas</button>
+                                <button class="btn btn-sm suggestion-btn" data-question="Como validar resultados?">✅ Validar resultados</button>
+                                <button class="btn btn-sm suggestion-btn" data-question="Como exportar relatórios?">📥 Exportar relatórios</button>
+                            </div>
+                            <div class="chat-input-container">
+                                <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua pergunta...">
+                                <button class="btn btn-primary" id="chatSendBtn"><i class="bi bi-send"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="assistant-card">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-stars me-3"></i>
+                                <div>
+                                    <h5><i class="bi bi-lightbulb"></i> Dicas Rápidas</h5>
+                                    <p id="assistantMessage">💡 O assistente pode ajudar com dúvidas sobre registo de amostras, relatórios, equipamentos e muito mais!</p>
+                                    <div class="mt-2">
+                                        <small class="d-block"><i class="bi bi-check-circle"></i> Base de conhecimento atualizada</small>
+                                        <small class="d-block"><i class="bi bi-graph-up"></i> 85% de resolução automática</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 chart-container">
+                            <h6><i class="bi bi-bar-chart"></i> Estatísticas de Suporte</h6>
+                            <div class="d-flex justify-content-between">
+                                <div><span class="badge bg-primary">Chamados: 12</span></div>
+                                <div><span class="badge bg-success">Resolvidos: 9</span></div>
+                            </div>
+                            <div class="progress mt-2" style="height: 8px;">
+                                <div class="progress-bar bg-success" style="width: 75%">75%</div>
+                            </div>
+                            <div class="mt-2">
+                                <small style="color: rgba(255,255,255,0.7);">Tempo médio de resposta: 8min</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ABA: EQUIPAMENTOS ===== -->
+            <div class="tab-pane fade" id="equipamentos" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="info-card">
+                            <h6 class="card-title"><i class="bi bi-laptop"></i> Monitorização de Equipamentos</h6>
+                            <div id="equipmentList">
+                                <!-- Inserido via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ABA: FAQ ===== -->
+            <div class="tab-pane fade" id="faq" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="info-card">
+                            <h6 class="card-title"><i class="bi bi-question-circle"></i> Perguntas Frequentes</h6>
+                            <div id="faqList">
+                                <!-- Inserido via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ABA: RELATÓRIOS ===== -->
+            <div class="tab-pane fade" id="relatorios" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-3 mb-4">
+                        <div class="card report-card h-100" data-report="chamados">
+                            <div class="card-body text-center">
+                                <i class="bi bi-ticket text-primary fs-1"></i>
+                                <h6 class="card-title mt-2">Chamados</h6>
+                                <p class="card-text small">Relatório de chamados abertos e resolvidos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card report-card h-100" data-report="equipamentos">
+                            <div class="card-body text-center">
+                                <i class="bi bi-laptop text-success fs-1"></i>
+                                <h6 class="card-title mt-2">Equipamentos</h6>
+                                <p class="card-text small">Status e manutenção de equipamentos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card report-card h-100" data-report="atendimentos">
+                            <div class="card-body text-center">
+                                <i class="bi bi-clock-history text-info fs-1"></i>
+                                <h6 class="card-title mt-2">Atendimentos</h6>
+                                <p class="card-text small">Histórico de atendimentos do suporte</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card report-card h-100" data-report="satisfacao">
+                            <div class="card-body text-center">
+                                <i class="bi bi-emoji-smile text-warning fs-1"></i>
+                                <h6 class="card-title mt-2">Satisfação</h6>
+                                <p class="card-text small">Nível de satisfação dos utilizadores</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== AÇÕES RÁPIDAS ===== -->
+        <div class="quick-actions mt-4 d-flex flex-wrap gap-2">
+            <button class="btn btn-primary" id="btnOpenTicket"><i class="bi bi-plus-circle"></i> Abrir Chamado</button>
+            <button class="btn btn-success" id="btnStartChat"><i class="bi bi-chat"></i> Iniciar Conversa</button>
+            <button class="btn btn-info" id="btnViewFaq"><i class="bi bi-question-circle"></i> Consultar FAQ</button>
+            <button class="btn btn-warning" id="btnViewTutorials"><i class="bi bi-play-circle"></i> Ver Tutoriais</button>
+            <button class="btn btn-secondary" id="btnDownloadManual"><i class="bi bi-download"></i> Baixar Manual</button>
+            <button class="btn btn-outline-primary" id="btnRefresh"><i class="bi bi-arrow-repeat"></i> Atualizar</button>
+            <button class="btn btn-outline-dark">
+                <a href="#" style="color: inherit; text-decoration: none;"><i class="bi bi-arrow-left"></i> Voltar</a>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE CHAMADO ===== -->
+    <div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-ticket"></i> Abrir Chamado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="modalTicketForm">
+                        <div class="mb-3">
+                            <label class="form-label">Categoria</label>
+                            <select class="form-select" id="modalTicketCategory" required>
+                                <option value="sistema">Sistema</option>
+                                <option value="equipamento">Equipamento</option>
+                                <option value="rede">Rede</option>
+                                <option value="impressora">Impressora</option>
+                                <option value="relatorios">Relatórios</option>
+                                <option value="exames">Exames</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Prioridade</label>
+                            <select class="form-select" id="modalTicketPriority">
+                                <option value="baixa">🟢 Baixa</option>
+                                <option value="media" selected>🟡 Média</option>
+                                <option value="alta">🔴 Alta</option>
+                                <option value="critica">🚨 Crítica</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Título</label>
+                            <input type="text" class="form-control" id="modalTicketTitle" placeholder="Resumo do problema" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" id="modalTicketDesc" rows="3" placeholder="Detalhe o problema..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Anexos</label>
+                            <input type="file" class="form-control" multiple>
+                            <small style="color: rgba(255,255,255,0.5);">Permitido: imagens, PDF, documentos</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnSubmitTicket"><i class="bi bi-send"></i> Enviar Chamado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // ===== DADOS DE EXEMPLO =====
+            const tickets = [
+                { id: 1, category: 'equipamento', priority: 'alta', title: 'Hematologia com erro crítico', desc: 'O equipamento de hematologia está apresentando erros na calibração.', status: 'aberto', date: '15/08/2026 08:30' },
+                { id: 2, category: 'sistema', priority: 'media', title: 'Lentidão no SICAMMI', desc: 'O sistema está lento ao carregar os resultados dos exames.', status: 'em_andamento', date: '14/08/2026 14:20' },
+                { id: 3, category: 'impressora', priority: 'baixa', title: 'Etiquetas saindo desalinhadas', desc: 'A impressora de etiquetas está desalinhando as impressões.', status: 'aberto', date: '13/08/2026 10:15' },
+                { id: 4, category: 'relatorios', priority: 'media', title: 'Erro ao exportar relatório', desc: 'O relatório de exames não está sendo exportado corretamente.', status: 'resolvido', date: '12/08/2026 09:00' }
+            ];
+
+            const equipment = [
+                { name: 'Hematologia', status: 'operational', icon: 'bi-heart-pulse', details: 'Última calibração: 10/08/2026' },
+                { name: 'Bioquímica', status: 'operational', icon: 'bi-flask', details: 'Funcionando normalmente' },
+                { name: 'Centrífuga', status: 'maintenance', icon: 'bi-arrow-repeat', details: 'Em manutenção preventiva' },
+                { name: 'Microscópio Digital', status: 'operational', icon: 'bi-eye', details: 'Firmware atualizado' },
+                { name: 'Impressora de Etiquetas', status: 'failure', icon: 'bi-printer', details: 'Falha no cabeçote de impressão' }
+            ];
+
+            const faqData = [
+                { question: '❓ Como corrigir uma amostra registada incorretamente?', answer: 'Acesse o módulo de Amostras, localize a amostra, clique em "Editar" e corrija os dados. Caso já tenha sido processada, é necessário criar uma solicitação de correção.' },
+                { question: '❓ Como emitir um relatório em PDF?', answer: 'No módulo de Relatórios, selecione o exame desejado, clique em "Exportar" e escolha a opção PDF. O arquivo será baixado automaticamente.' },
+                { question: '❓ Como recuperar uma solicitação de exame?', answer: 'Acesse o histórico de solicitações, utilize os filtros de data ou nome do paciente e localize a solicitação desejada.' },
+                { question: '❓ Como imprimir uma etiqueta com QR Code?', answer: 'No módulo de Amostras, selecione a amostra, clique em "Imprimir Etiqueta" e escolha o modelo com QR Code.' },
+                { question: '❓ Como validar resultados laboratoriais?', answer: 'No módulo de Exames, após a conclusão da análise, clique em "Validar" e insira suas credenciais. O resultado ficará disponível para os médicos.' }
+            ];
+
+            const chatResponses = {
+                'como registar uma amostra': 'Para registar uma amostra, acesse o módulo "Gestão de Amostras" > "Novo Registo". Preencha os dados do paciente, tipo de exame, coleta e envie para o laboratório.',
+                'como emitir um relatório': 'No módulo "Relatórios Laboratoriais", selecione o exame concluído, clique em "Gerar Relatório" e escolha o formato desejado (PDF/Excel).',
+                'como imprimir etiquetas': 'Acesse "Amostras" > "Imprimir Etiquetas". Selecione as amostras desejadas e escolha o modelo de etiqueta com QR Code ou código de barras.',
+                'como validar resultados': 'No módulo "Exames" > "Resultados Pendentes". Selecione o exame, revise os dados e clique em "Validar". Insira sua senha para confirmar.',
+                'como exportar relatórios': 'No módulo "Relatórios", utilize o filtro de período, selecione os exames desejados e clique em "Exportar". Escolha entre PDF, Excel ou CSV.',
+                'como utilizar equipamentos': 'Acesse o manual do equipamento no módulo "Equipamentos" ou consulte o assistente virtual para orientações específicas.'
+            };
+
+            // ===== VARIÁVEIS GLOBAIS =====
+            let isDarkTheme = true;
+            let ticketIdCounter = tickets.length + 1;
+
+            // ===== TEMA =====
+            function toggleTheme() {
+                isDarkTheme = !isDarkTheme;
+                if (isDarkTheme) {
+                    $('body').removeClass('light-theme');
+                    $('#themeIcon').removeClass('bi-sun-fill').addClass('bi-moon-stars');
+                } else {
+                    $('body').addClass('light-theme');
+                    $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+                }
+                localStorage.setItem('sicami-theme-support', isDarkTheme ? 'dark' : 'light');
+            }
+
+            const savedTheme = localStorage.getItem('sicami-theme-support');
+            if (savedTheme === 'light') {
+                isDarkTheme = false;
+                $('body').addClass('light-theme');
+                $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+            }
+
+            $('#themeToggle').click(toggleTheme);
+
+            // ===== DASHBOARD BUTTON =====
+            $('#btnDashboard').click(function(e) {
+                e.preventDefault();
+                alert('🔙 Redirecionando para o Dashboard Principal...\n\n(Em produção, isso redirecionaria para a página principal)');
+            });
+
+            // ===== DATE/TIME =====
+            function updateDateTime() {
+                const now = new Date();
+                $('#dateTimeDisplay').text(now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR'));
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // ===== INDICADORES =====
+            function updateIndicators() {
+                const open = tickets.filter(t => t.status === 'aberto' || t.status === 'em_andamento').length;
+                const resolved = tickets.filter(t => t.status === 'resolvido' || t.status === 'fechado').length;
+                const maintenance = equipment.filter(e => e.status === 'maintenance' || e.status === 'failure').length;
+                
+                $('#totalOpenTickets').text(open);
+                $('#totalResolvedTickets').text(resolved);
+                $('#totalMaintenance').text(maintenance);
+                $('#totalFaq').text(faqData.length);
+                $('#avgResponse').text('8min');
+            }
+            updateIndicators();
+
+            // ===== RENDER TICKETS =====
+            function renderTickets(data) {
+                const container = $('#ticketList');
+                container.empty();
+
+                if (data.length === 0) {
+                    container.html('<p style="color: rgba(255,255,255,0.5); text-align: center;">Nenhum chamado encontrado</p>');
+                    return;
+                }
+
+                data.forEach(t => {
+                    const priorityLabels = { baixa: '🟢 Baixa', media: '🟡 Média', alta: '🔴 Alta', critica: '🚨 Crítica' };
+                    const statusLabels = { aberto: 'Aberto', em_andamento: 'Em Andamento', resolvido: 'Resolvido', fechado: 'Fechado' };
+                    const statusColors = { aberto: 'danger', em_andamento: 'warning', resolvido: 'success', fechado: 'secondary' };
+                    
+                    container.append(`
+                        <div class="ticket-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="priority-badge ${t.priority}">${priorityLabels[t.priority] || t.priority}</span>
+                                    <span class="badge bg-${statusColors[t.status] || 'secondary'} ms-1">${statusLabels[t.status] || t.status}</span>
+                                </div>
+                                <span class="ticket-meta">${t.date}</span>
+                            </div>
+                            <div class="ticket-title mt-1">${t.title}</div>
+                            <div class="ticket-desc">${t.desc}</div>
+                            <div class="ticket-meta mt-1">
+                                <i class="bi bi-tag"></i> ${t.category.charAt(0).toUpperCase() + t.category.slice(1)}
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            // ===== RENDER EQUIPMENT =====
+            function renderEquipment() {
+                const container = $('#equipmentList');
+                container.empty();
+
+                const statusLabels = { operational: '✅ Operacional', maintenance: '⚠️ Manutenção', failure: '🔴 Falha' };
+                const statusClasses = { operational: 'operational', maintenance: 'maintenance', failure: 'failure' };
+
+                equipment.forEach(e => {
+                    container.append(`
+                        <div class="equipment-status d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi ${e.icon} me-2" style="font-size: 1.2rem;"></i>
+                                <strong style="color: #fff;">${e.name}</strong>
+                                <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">${e.details}</div>
+                            </div>
+                            <span class="status-badge ${statusClasses[e.status]}">${statusLabels[e.status]}</span>
+                        </div>
+                    `);
+                });
+            }
+
+            // ===== RENDER FAQ =====
+            function renderFaq() {
+                const container = $('#faqList');
+                container.empty();
+
+                faqData.forEach((item, index) => {
+                    container.append(`
+                        <div class="faq-item" data-index="${index}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="question">${item.question}</span>
+                                <i class="bi bi-chevron-down toggle-icon" style="color: rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div class="answer">${item.answer}</div>
+                        </div>
+                    `);
+                });
+
+                // Toggle FAQ
+                $('.faq-item').click(function() {
+                    $(this).toggleClass('active');
+                });
+            }
+
+            // ===== RENDER CHAT =====
+            function renderChatMessages() {
+                const container = $('#chatContainer');
+                if (container.children().length === 0) {
+                    container.append(`
+                        <div class="chat-message bot">
+                            <i class="bi bi-robot me-1"></i> Olá! Sou o assistente virtual do SICAMMI. Como posso ajudá-lo hoje?
+                            <div class="time">${new Date().toLocaleTimeString()}</div>
+                        </div>
+                    `);
+                }
+            }
+
+            function addChatMessage(text, type = 'bot') {
+                const container = $('#chatContainer');
+                const time = new Date().toLocaleTimeString();
+                const icon = type === 'bot' ? '<i class="bi bi-robot me-1"></i>' : '<i class="bi bi-person me-1"></i>';
+                container.append(`
+                    <div class="chat-message ${type}">
+                        ${icon} ${text}
+                        <div class="time">${time}</div>
+                    </div>
+                `);
+                container.scrollTop(container[0].scrollHeight);
+            }
+
+            function getBotResponse(question) {
+                const lower = question.toLowerCase();
+                for (const [key, response] of Object.entries(chatResponses)) {
+                    if (lower.includes(key) || key.includes(lower)) {
+                        return response;
+                    }
+                }
+                return '📚 Não encontrei uma resposta específica para essa pergunta. Por favor, consulte a FAQ ou abra um chamado para obter ajuda especializada.';
+            }
+
+            // ===== CHAT EVENTS =====
+            $('#chatSendBtn').click(function() {
+                const input = $('#chatInput');
+                const text = input.val().trim();
+                if (text === '') return;
+
+                addChatMessage(text, 'user');
+                input.val('');
+
+                setTimeout(() => {
+                    const response = getBotResponse(text);
+                    addChatMessage(response, 'bot');
+                }, 500);
+            });
+
+            $('#chatInput').keypress(function(e) {
+                if (e.which === 13) {
+                    $('#chatSendBtn').click();
+                }
+            });
+
+            $(document).on('click', '.suggestion-btn', function() {
+                const question = $(this).data('question');
+                $('#chatInput').val(question);
+                $('#chatSendBtn').click();
+            });
+
+            // ===== FORM: ABRIR CHAMADO =====
+            $('#ticketForm').submit(function(e) {
+                e.preventDefault();
+
+                const category = $('#newTicketCategory').val();
+                const priority = $('#newTicketPriority').val();
+                const title = $('#newTicketTitle').val().trim();
+                const desc = $('#newTicketDesc').val().trim();
+
+                if (!category || !title) {
+                    alert('Por favor, preencha a categoria e o título do chamado.');
+                    return;
+                }
+
+                const newTicket = {
+                    id: ticketIdCounter++,
+                    category: category,
+                    priority: priority,
+                    title: title,
+                    desc: desc || 'Sem descrição detalhada',
+                    status: 'aberto',
+                    date: new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR')
+                };
+
+                tickets.unshift(newTicket);
+                renderTickets(tickets);
+                updateIndicators();
+
+                $('#ticketForm')[0].reset();
+                alert('✅ Chamado aberto com sucesso! Nº ' + newTicket.id);
+
+                // Mostrar na aba de chamados
+                $('#chamados-tab').tab('show');
+            });
+
+            // ===== MODAL CHAMADO =====
+            $('#btnOpenTicket').click(function() {
+                $('#ticketModal').modal('show');
+            });
+
+            $('#btnSubmitTicket').click(function() {
+                const category = $('#modalTicketCategory').val();
+                const priority = $('#modalTicketPriority').val();
+                const title = $('#modalTicketTitle').val().trim();
+                const desc = $('#modalTicketDesc').val().trim();
+
+                if (!title) {
+                    alert('Por favor, preencha o título do chamado.');
+                    return;
+                }
+
+                const newTicket = {
+                    id: ticketIdCounter++,
+                    category: category,
+                    priority: priority,
+                    title: title,
+                    desc: desc || 'Sem descrição detalhada',
+                    status: 'aberto',
+                    date: new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR')
+                };
+
+                tickets.unshift(newTicket);
+                renderTickets(tickets);
+                updateIndicators();
+
+                $('#ticketModal').modal('hide');
+                $('#modalTicketForm')[0].reset();
+                alert('✅ Chamado aberto com sucesso! Nº ' + newTicket.id);
+                $('#chamados-tab').tab('show');
+            });
+
+            // ===== FILTROS =====
+            function filterTickets() {
+                const category = $('#filterCategory').val();
+                const priority = $('#filterPriority').val();
+                const status = $('#filterStatus').val();
+
+                let filtered = tickets.filter(t => {
+                    const matchCategory = !category || t.category === category;
+                    const matchPriority = !priority || t.priority === priority;
+                    const matchStatus = !status || t.status === status;
+                    return matchCategory && matchPriority && matchStatus;
+                });
+
+                renderTickets(filtered);
+            }
+
+            $('#filterCategory, #filterPriority, #filterStatus').on('change', filterTickets);
+
+            $('#btnResetFilters').click(function() {
+                $('#filterCategory, #filterPriority, #filterStatus').val('');
+                renderTickets(tickets);
+            });
+
+            // ===== PESQUISA RÁPIDA =====
+            $('#quickSearch').on('input', function() {
+                const term = $(this).val().toLowerCase();
+                if (term === '') {
+                    renderTickets(tickets);
+                } else {
+                    const filtered = tickets.filter(t => 
+                        t.title.toLowerCase().includes(term) || 
+                        t.desc.toLowerCase().includes(term) ||
+                        t.category.includes(term)
+                    );
+                    renderTickets(filtered);
+                }
+            });
+
+            // ===== AÇÕES RÁPIDAS =====
+            $('#btnStartChat').click(function() {
+                $('#assistente-tab').tab('show');
+                $('#chatInput').focus();
+            });
+
+            $('#btnViewFaq').click(function() {
+                $('#faq-tab').tab('show');
+            });
+
+            $('#btnViewTutorials').click(function() {
+                alert('🎥 Tutoriais disponíveis:\n\n• Como registar uma amostra\n• Como emitir relatórios\n• Como imprimir etiquetas\n• Como validar resultados\n\n(Em produção, isso abriria os vídeos tutoriais)');
+            });
+
+            $('#btnDownloadManual').click(function() {
+                alert('📥 Baixando Manual do Utilizador...\n\n(Em produção, isso iniciaria o download do PDF)');
+            });
+
+            $('#btnRefresh').click(function() {
+                renderTickets(tickets);
+                renderEquipment();
+                renderFaq();
+                updateIndicators();
+                alert('🔄 Dados atualizados com sucesso!');
+            });
+
+            // ===== RELATÓRIOS CARDS =====
+            $('.report-card').click(function() {
+                const report = $(this).data('report');
+                alert(`📄 Gerando relatório: ${report}\n\n(Em produção, isso abriria o relatório detalhado)`);
+            });
+
+            // ===== INICIALIZAÇÃO =====
+            renderTickets(tickets);
+            renderEquipment();
+            renderFaq();
+            renderChatMessages();
+
+            console.log('✅ Tela de Suporte Técnico Laboratorial - SICAMMI carregada com sucesso!');
+        });
+    </script>
+</body>
+</html>

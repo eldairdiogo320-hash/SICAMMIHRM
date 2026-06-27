@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Splash · Redirecionamento para inde1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: #f8fafc;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SPLASH OVERLAY – cobre toda a janela, sem conteúdos visíveis por trás */
+        .splash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            cursor: default;
+            transition: opacity 0.45s ease-out;
+        }
+
+        /* Container do logótipo com animação suave */
+        .logo-container {
+            text-align: center;
+            animation: gentleRise 0.55s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+            max-width: 100%;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes gentleRise {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.96);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Imagem que cobre toda a tela */
+        .splash-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        }
+
+        /* Logótipo SVG principal — design moderno e subtil */
+        .logo-svg {
+            width: 130px;
+            height: 130px;
+            display: block;
+            margin: 0 auto;
+            filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.03));
+            transition: transform 0.25s ease;
+            cursor: pointer;
+        }
+
+        .logo-svg:hover {
+            transform: scale(1.02);
+        }
+
+        /* Texto do logótipo / assinatura */
+        .logo-title {
+            margin-top: 1.2rem;
+            font-size: 1.6rem;
+            font-weight: 550;
+            letter-spacing: -0.3px;
+            background: linear-gradient(120deg, #1F2B48, #2C3E6E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            cursor: pointer;
+        }
+
+        .logo-sub {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #6c7e9e;
+            margin-top: 0.25rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* Barra de progresso minimal (indica o redirecionamento) */
+        .progress-area {
+            margin-top: 2rem;
+            width: 180px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 2.5px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #8aa7d4, #4f6f9f);
+            border-radius: 10px;
+            transition: width 3s linear;
+        }
+
+        .info-message {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 0.7rem;
+            text-align: center;
+        }
+
+        .click-hint {
+            margin-top: 1.2rem;
+            font-size: 0.7rem;
+            font-weight: 400;
+            background: #eef2f9;
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            color: #3f5a8c;
+            letter-spacing: 0.2px;
+            backdrop-filter: blur(2px);
+            cursor: default;
+        }
+
+        /* Pequeno detalhe responsivo */
+        @media (max-width: 480px) {
+            .logo-svg {
+                width: 100px;
+                height: 100px;
+            }
+            .logo-title {
+                font-size: 1.4rem;
+            }
+            .progress-area {
+                width: 150px;
+            }
+        }
+
+        /* Mensagem de carregamento suave */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ECRÃ SPLASH – único conteúdo visível, sem elementos de fundo -->
+    <div id="splashScreen" class="splash-overlay">
+        <div class="logo-container" id="logoClickZone">
+            <!-- Imagem que cobre toda a tela -->
+            <img src="../images/modais.jpg" class="splash-image" alt="Splash Image"/>
+
+            <!--
+            <div class="logo-title" id="logoTitle">estúdio·âmbar</div>
+            <div class="logo-sub">identidade visual & interface</div>
+
+             Barra de progresso indicativa do redirecionamento 
+            <div class="progress-area">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="info-message">redirecionar para index1.html</div>
+            </div>
+
+            <div class="click-hint">
+                ✦ clicar no logótipo para avançar agora ✦
+            </div>
+            -->
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ========== REDIRECIONAMENTO PARA index1.html ==========
+            const DESTINATION = 'modais-medicos.html';
+            const REDIRECT_DELAY_MS = 10000;      // 3 segundos (splash subtil)
+            
+            let redirectTimer = null;
+            let isRedirecting = false;            // evita duplo redirecionamento
+            let progressStarted = false;
+
+            // Elementos do DOM
+            const splashElement = document.getElementById('splashScreen');
+            const progressFillEl = document.getElementById('progressFill');
+            const clickZone = document.getElementById('logoClickZone');  // área do logo inteira (svg + texto)
+            
+            // Função de redirecionamento segura (com proteção)
+            function performRedirect() {
+                if (isRedirecting) return;
+                isRedirecting = true;
+                
+                // Limpa timer se existir
+                if (redirectTimer) {
+                    clearTimeout(redirectTimer);
+                    redirectTimer = null;
+                }
+                
+                // Pequeno fade out antes do redirecionamento (melhora experiência)
+                if (splashElement) {
+                    splashElement.style.opacity = '0';
+                    // após fade suave, redirecionamos
+                    setTimeout(() => {
+                        window.location.href = DESTINATION;
+                    }, 180);
+                } else {
+                    // fallback imediato
+                    window.location.href = DESTINATION;
+                }
+            }
+            
+            // Iniciar animação da barra de progresso (width 0% -> 100% em REDIRECT_DELAY_MS ms)
+            function startProgressAnimation() {
+                if (!progressFillEl) return;
+                // forçar reflow para garantir que a transição seja aplicada
+                void progressFillEl.offsetWidth;
+                // Define a transição para width: 100% no tempo exato do redirect
+                progressFillEl.style.transition = `width ${REDIRECT_DELAY_MS}ms linear`;
+                progressFillEl.style.width = '100%';
+            }
+            
+            // Cancelar o redirecionamento automático (se for clicado manualmente) 
+            // e redirecionar de imediato
+            function manualRedirectHandler(event) {
+                // Impede que o clique em elementos filhos dispare múltiplas vezes sem problemas
+                if (isRedirecting) return;
+                
+                // Cancela o timeout pendente para não haver dois redirecionamentos
+                if (redirectTimer) {
+                    clearTimeout(redirectTimer);
+                    redirectTimer = null;
+                }
+                
+                // Ação de clique: redirecionar imediatamente (feedback visual discreto)
+                // Podemos dar um leve feedback de clique no logótipo
+                const logoSvg = document.querySelector('.logo-svg');
+                if (logoSvg) {
+                    logoSvg.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        if (logoSvg) logoSvg.style.transform = '';
+                    }, 120);
+                }
+                
+                // Executa o redirecionamento
+                performRedirect();
+            }
+            
+            // Inicializar o splash e configurar temporizador + eventos
+            function initSplash() {
+                // 1. Iniciar animação da barra de progresso
+                startProgressAnimation();
+                
+                // 2. Definir temporizador para redirecionamento automático após 3000ms
+                redirectTimer = setTimeout(() => {
+                    performRedirect();
+                }, REDIRECT_DELAY_MS);
+                
+                // 3. Adicionar evento de clique em toda a zona do logótipo (inclui SVG e texto)
+                if (clickZone) {
+                    clickZone.addEventListener('click', manualRedirectHandler);
+                    // também tornar o cursor pointer na área
+                    clickZone.style.cursor = 'pointer';
+                }
+                
+                // (Opcional) evitar que clique acidental em elementos filhos interrompa a ação
+                // mas como toda a área é clicável, está perfeito.
+                
+                // 4. Pequeno fallback: se por algum motivo o progressFill terminar transição antes do timer,
+                //    não fazemos nada, o timer é o dono. Mas podemos assegurar que transição não cause duplicidade.
+                if (progressFillEl) {
+                    progressFillEl.addEventListener('transitionend', function onTransitionEnd(e) {
+                        // Verifica se a transição é da propriedade 'width' e se a largura chegou a 100%
+                        if (e.propertyName === 'width' && progressFillEl.style.width === '100%') {
+                            // Apenas por segurança: se o timer ainda não tiver executado e não estiver redirecionando,
+                            // redirecionamos também (mas evitamos duplicidade)
+                            if (!isRedirecting && redirectTimer) {
+                                // timeout extra minúsculo para evitar conflito com timer principal
+                                if (redirectTimer) clearTimeout(redirectTimer);
+                                redirectTimer = null;
+                                performRedirect();
+                            }
+                        }
+                    });
+                }
+                
+                // Acessibilidade / tornar explícito que o logótipo é accionável
+                if (clickZone) {
+                    clickZone.setAttribute('aria-label', 'Clique para redirecionar para modais-medicos.html agora');
+                    clickZone.setAttribute('role', 'button');
+                    clickZone.setAttribute('tabindex', '0');
+                    // Permitir tecla Enter/Space para acessibilidade
+                    clickZone.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            manualRedirectHandler(e);
+                        }
+                    });
+                }
+            }
+            
+            // Se o documento já estiver carregado, inicializa, senão aguarda DOMContentLoaded
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSplash);
+            } else {
+                initSplash();
+            }
+            
+            // Medida extra: caso o usuário tente usar o botão voltar, não há interferência.
+            // O splash permanecerá funcional e o redirecionamento sempre leva para inde1.html.
+        })();
+    </script>
+</body>
+</html>
