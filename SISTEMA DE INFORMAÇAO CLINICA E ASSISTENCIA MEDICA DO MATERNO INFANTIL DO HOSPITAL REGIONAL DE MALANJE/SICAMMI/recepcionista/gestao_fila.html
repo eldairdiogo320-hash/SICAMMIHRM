@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Filas de Atendimento - SICAMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Estilo geral */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-image: url('../images/dash-rec.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Overlay mais suave para melhor legibilidade */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Tema Claro */
+        body.light-theme {
+            background-image: url('images/dash-rec.jpg');
+        }
+
+        body.light-theme::before {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        body.light-theme .page-title,
+        body.light-theme .indicator-card .number,
+        body.light-theme .indicator-card .label,
+        body.light-theme .info-card .card-title,
+        body.light-theme .info-card .info-label,
+        body.light-theme .info-card .info-value,
+        body.light-theme .call-panel .current-senha,
+        body.light-theme .call-panel .guiche-info,
+        body.light-theme .queue-table th,
+        body.light-theme .queue-table td,
+        body.light-theme .filter-section h6,
+        body.light-theme .filter-section .text-muted,
+        body.light-theme .nav-tabs .nav-link,
+        body.light-theme .report-card .card-body,
+        body.light-theme .report-card .card-title,
+        body.light-theme .report-card .card-text,
+        body.light-theme .chart-container h6,
+        body.light-theme .assistant-card h5,
+        body.light-theme .assistant-card p {
+            color: #1a1a2e !important;
+        }
+
+        body.light-theme .nav-tabs .nav-link {
+            color: #1a1a2e !important;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-theme .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .tab-content,
+        body.light-theme .indicator-card,
+        body.light-theme .queue-table,
+        body.light-theme .filter-section,
+        body.light-theme .chart-container,
+        body.light-theme .report-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .filter-section .form-control,
+        body.light-theme .filter-section .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .filter-section .form-control::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-theme .call-panel {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%);
+            backdrop-filter: blur(10px);
+        }
+
+        body.light-theme .assistant-card {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.85) 0%, rgba(245, 87, 108, 0.85) 100%);
+            backdrop-filter: blur(10px);
+        }
+
+        body.light-theme #currentDateTime {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .modal .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .modal .form-label {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        body.light-theme .btn-outline-secondary {
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .btn-outline-secondary:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark {
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .page-title .badge {
+            background: rgba(13, 110, 253, 0.2) !important;
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .status-badge.waiting {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .status-badge.called {
+            background: rgba(13, 202, 240, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .status-badge.attending {
+            background: rgba(25, 135, 84, 0.8);
+            color: #fff;
+        }
+
+        body.light-theme .status-badge.finished {
+            background: rgba(108, 117, 125, 0.8);
+            color: #fff;
+        }
+
+        body.light-theme .status-badge.absent {
+            background: rgba(220, 53, 69, 0.8);
+            color: #fff;
+        }
+
+        body.light-theme .indicator-card.priority {
+            border-left-color: rgba(220, 53, 69, 0.8);
+        }
+
+        body.light-theme .indicator-card.priority .number {
+            color: #dc3545;
+        }
+
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Estilo tabs - Glassmorphism */
+        .nav-tabs .nav-link {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 18px;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            margin-right: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: #fff;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: bold;
+            box-shadow: 0 -2px 20px rgba(13, 110, 253, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 0 8px 8px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Cards de indicadores - Glassmorphism */
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid rgba(13, 110, 253, 0.6);
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .indicator-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .indicator-card .label {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .indicator-card .label i {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .indicator-card.priority {
+            border-left-color: rgba(220, 53, 69, 0.6);
+        }
+
+        .indicator-card.priority .number {
+            color: #ff7a8a;
+        }
+
+        /* Tabela de fila - Glassmorphism */
+        .queue-table {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .queue-table th {
+            font-family: 'Times New Roman', Times, serif;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .queue-table td {
+            font-family: 'Times New Roman', Times, serif;
+            vertical-align: middle;
+            color: #fff;
+        }
+
+        .queue-table .table-hover tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .status-badge.waiting {
+            background: rgba(255, 193, 7, 0.7);
+            backdrop-filter: blur(5px);
+            color: #000;
+        }
+
+        .status-badge.called {
+            background: rgba(13, 202, 240, 0.7);
+            backdrop-filter: blur(5px);
+            color: #000;
+        }
+
+        .status-badge.attending {
+            background: rgba(25, 135, 84, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        .status-badge.finished {
+            background: rgba(108, 117, 125, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        .status-badge.absent {
+            background: rgba(220, 53, 69, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        /* Painel de chamada - Glassmorphism */
+        .call-panel {
+            background: rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .call-panel .current-senha {
+            font-size: 4rem;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+        }
+
+        .call-panel .guiche-info {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-family: 'Times New Roman', Times, serif;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Gráficos - Glassmorphism */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container h6 {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        /* Notificações */
+        .notification-badge {
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* Assistente - Glassmorphism */
+        .assistant-card {
+            background: rgba(240, 147, 251, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .assistant-card .bi {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .assistant-card h5 {
+            color: #fff;
+        }
+
+        .assistant-card p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Ações rápidas */
+        .quick-actions .btn {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 3px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+        }
+
+        .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.6);
+        }
+
+        .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.6);
+        }
+
+        .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.6);
+        }
+
+        .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.6);
+        }
+
+        .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.3);
+            color: #fff;
+        }
+
+        .quick-actions .btn-outline-dark {
+            background: rgba(33, 37, 41, 0.3);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn-outline-dark:hover {
+            background: rgba(33, 37, 41, 0.5);
+            color: #fff;
+        }
+
+        /* Botões de ação na tabela - Glassmorphism */
+        .action-btn {
+            padding: 4px 10px;
+            margin: 2px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-family: 'Times New Roman', Times, serif;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-btn.btn-outline-primary {
+            color: #fff;
+            border-color: rgba(13, 110, 253, 0.4);
+        }
+
+        .action-btn.btn-outline-primary:hover {
+            background: rgba(13, 110, 253, 0.2);
+        }
+
+        .action-btn.btn-outline-success {
+            color: #fff;
+            border-color: rgba(25, 135, 84, 0.4);
+        }
+
+        .action-btn.btn-outline-success:hover {
+            background: rgba(25, 135, 84, 0.2);
+        }
+
+        .action-btn.btn-outline-danger {
+            color: #fff;
+            border-color: rgba(220, 53, 69, 0.4);
+        }
+
+        .action-btn.btn-outline-danger:hover {
+            background: rgba(220, 53, 69, 0.2);
+        }
+
+        .action-btn.btn-outline-secondary {
+            color: #fff;
+            border-color: rgba(108, 117, 125, 0.4);
+        }
+
+        .action-btn.btn-outline-secondary:hover {
+            background: rgba(108, 117, 125, 0.2);
+        }
+
+        /* Filtros - Glassmorphism */
+        .filter-section {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .filter-section .form-control,
+        .filter-section .form-select {
+            font-family: 'Times New Roman', Times, serif;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .filter-section .form-control:focus,
+        .filter-section .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        .filter-section .btn-outline-primary {
+            color: #fff;
+            border-color: rgba(13, 110, 253, 0.4);
+        }
+
+        .filter-section .btn-outline-primary:hover {
+            background: rgba(13, 110, 253, 0.2);
+        }
+
+        /* Estilo dos cards de relatório - Glassmorphism */
+        .report-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .report-card .card-body {
+            padding: 25px 15px;
+            color: #fff;
+        }
+
+        .report-card .card-title {
+            color: #fff;
+        }
+
+        .report-card .card-text {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .report-card .bi {
+            opacity: 0.8;
+        }
+
+        /* Modal Glassmorphism */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal .btn-close {
+            filter: invert(1);
+        }
+
+        .modal .form-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .modal .form-control,
+        .modal .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .modal .form-control:focus,
+        .modal .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+        }
+
+        .modal .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        /* Animação de entrada */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilo do título */
+        .page-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title .bi {
+            animation: bounce 2s infinite;
+        }
+
+        .page-title .badge {
+            background: rgba(13, 110, 253, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        #currentDateTime {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:hover {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        .bg-primary {
+            background: rgba(13, 110, 253, 0.4) !important;
+            backdrop-filter: blur(5px);
+        }
+
+        .bg-info {
+            background: rgba(13, 202, 240, 0.3) !important;
+        }
+
+        .bg-success {
+            background: rgba(25, 135, 84, 0.3) !important;
+        }
+
+        /* Botão de tema */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(30deg);
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Botão Dashboard */
+        .dashboard-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        body.light-theme .dashboard-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .dashboard-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .indicator-card .number {
+                font-size: 1.8rem;
+            }
+            .call-panel .current-senha {
+                font-size: 2.5rem;
+            }
+            .tab-content {
+                padding: 15px;
+            }
+            .page-title {
+                font-size: 1.5rem;
+            }
+            .header-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Cabeçalho -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap header-actions">
+                    <h2 class="page-title">
+                        <i class="bi bi-people-fill text-primary"></i> 
+                        Gerenciamento de Filas de Atendimento
+                        <span class="badge bg-primary ms-2 notification-badge">AO VIVO</span>
+                    </h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- Botão Dashboard -->
+                        <a href="#" class="dashboard-btn" id="btnDashboard" title="Voltar ao Dashboard Principal">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+                        </a>
+
+                        <!-- Alternador de Tema -->
+                        <button class="theme-toggle-btn" id="themeToggle" title="Alternar Tema">
+                            <i class="bi bi-moon-stars" id="themeIcon"></i>
+                        </button>
+
+                        <span class="badge bg-info text-dark" id="currentDateTime">
+                            <i class="bi bi-clock"></i> 
+                            <span id="dateTimeDisplay">Carregando...</span>
+                        </span>
+                        <span class="badge bg-success">
+                            <i class="bi bi-calendar-check"></i> 
+                            Atendimentos hoje: <span id="todayAttendances">0</span>
+                        </span>
+                        <div class="input-group" style="width: 250px;">
+                            <input type="text" id="quickSearch" class="form-control" placeholder="🔍 Pesquisar paciente...">
+                            <button class="btn btn-outline-primary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de Indicadores -->
+        <div class="row mb-4">
+            <div class="col-md-2 col-6">
+                <div class="indicator-card text-center fade-in">
+                    <div class="number" id="waitingCount">0</div>
+                    <div class="label"><i class="bi bi-hourglass-split"></i> Em Espera</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card text-center fade-in">
+                    <div class="number" id="attendingCount">0</div>
+                    <div class="label"><i class="bi bi-person-check"></i> Em Atendimento</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card text-center fade-in">
+                    <div class="number" id="finishedCount">0</div>
+                    <div class="label"><i class="bi bi-check-all"></i> Atendidos</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card priority text-center fade-in">
+                    <div class="number" id="priorityCount">0</div>
+                    <div class="label"><i class="bi bi-exclamation-triangle"></i> Casos Prioritários</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card text-center fade-in">
+                    <div class="number" id="avgWaitTime">0m</div>
+                    <div class="label"><i class="bi bi-clock-history"></i> Tempo Médio</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card text-center fade-in">
+                    <div class="number" id="absentCount">0</div>
+                    <div class="label"><i class="bi bi-person-x"></i> Ausentes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="fila-tab" data-bs-toggle="tab" data-bs-target="#fila" type="button" role="tab">
+                    <i class="bi bi-list-ul"></i> Fila de Atendimento
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="chamada-tab" data-bs-toggle="tab" data-bs-target="#chamada" type="button" role="tab">
+                    <i class="bi bi-megaphone"></i> Chamada
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analitico-tab" data-bs-toggle="tab" data-bs-target="#analitico" type="button" role="tab">
+                    <i class="bi bi-graph-up"></i> Analítico
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="relatorios-tab" data-bs-toggle="tab" data-bs-target="#relatorios" type="button" role="tab">
+                    <i class="bi bi-file-earmark-text"></i> Relatórios
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Aba Fila -->
+            <div class="tab-pane fade show active" id="fila" role="tabpanel">
+                <!-- Filtros -->
+                <div class="filter-section">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input type="text" id="filterName" class="form-control" placeholder="👤 Nome do paciente">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" id="filterSenha" class="form-control" placeholder="# Senha">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filterStatus" class="form-select">
+                                <option value="">Todos os estados</option>
+                                <option value="Em Espera">Em Espera</option>
+                                <option value="Chamado">Chamado</option>
+                                <option value="Em Atendimento">Em Atendimento</option>
+                                <option value="Finalizado">Finalizado</option>
+                                <option value="Ausente">Ausente</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="filterPriority" class="form-select">
+                                <option value="">Todas prioridades</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Prioritária">Prioritária</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary w-100" id="btnResetFilters">
+                                <i class="bi bi-arrow-counterclockwise"></i> Limpar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela da Fila -->
+                <div class="queue-table table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Senha</th>
+                                <th>Paciente</th>
+                                <th>Hora Chegada</th>
+                                <th>Prioridade</th>
+                                <th>Estado</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="queueBody">
+                            <!-- Os dados serão inseridos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Ações Rápidas -->
+                <div class="quick-actions mt-3 d-flex flex-wrap gap-2">
+                    <button class="btn btn-primary" id="btnAddToQueue">
+                        <i class="bi bi-plus-circle"></i> Adicionar à Fila
+                    </button>
+                    <button class="btn btn-success" id="btnCallNext">
+                        <i class="bi bi-megaphone"></i> Chamar Próximo
+                    </button>
+                    <button class="btn btn-warning" id="btnRecall">
+                        <i class="bi bi-arrow-repeat"></i> Rechamar
+                    </button>
+                    <button class="btn btn-danger" id="btnMarkAbsent">
+                        <i class="bi bi-person-x"></i> Marcar Ausente
+                    </button>
+                    <button class="btn btn-info" id="btnPrintList">
+                        <i class="bi bi-printer"></i> Imprimir Lista
+                    </button>
+                    <button class="btn btn-secondary" id="btnGenerateReport">
+                        <i class="bi bi-file-earmark-bar-graph"></i> Gerar Relatório
+                    </button>
+                    <button class="btn btn-outline-dark" id="btnVoltarDashboard">
+                        <i class="bi bi-arrow-left"></i> Voltar ao Dashboard
+                    </button>
+                </div>
+            </div>
+
+            <!-- Aba Chamada -->
+            <div class="tab-pane fade" id="chamada" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="call-panel text-center">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h4><i class="bi bi-display"></i> Painel Eletrónico de Senhas</h4>
+                                    <div class="current-senha" id="currentSenhaDisplay">A000</div>
+                                    <div class="guiche-info">
+                                        <i class="bi bi-building"></i> Guiché: <span id="guicheDisplay">Receção 01</span>
+                                    </div>
+                                    <div class="guiche-info mt-2">
+                                        <i class="bi bi-arrow-right-circle"></i> Próxima Senha: <span id="nextSenhaDisplay">A001</span>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button class="btn btn-light btn-lg me-2" id="btnChamarProximo">
+                                            <i class="bi bi-megaphone"></i> Chamar Próximo
+                                        </button>
+                                        <button class="btn btn-outline-light btn-lg" id="btnRechamar">
+                                            <i class="bi bi-arrow-repeat"></i> Rechamar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificações -->
+                        <div class="mt-4">
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <strong>Aviso:</strong> Paciente A002 aguarda há 25 minutos (prioritário)
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>Notificação:</strong> 3 pacientes na fila de espera
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5">
+                        <!-- Assistente Inteligente -->
+                        <div class="assistant-card">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-robot me-3"></i>
+                                <div>
+                                    <h5><i class="bi bi-stars"></i> Assistente Inteligente</h5>
+                                    <p id="assistantMessage">Fila atual: 3 pacientes em espera. Tempo médio de espera: 12 minutos.</p>
+                                    <div class="mt-2">
+                                        <small class="d-block"><i class="bi bi-check-circle"></i> Sugestão: Chamar próximo prioritário</small>
+                                        <small class="d-block"><i class="bi bi-graph-up"></i> Gargalo identificado: Consulta de triagem</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Integração com Consultas -->
+                        <div class="mt-4 chart-container">
+                            <h6><i class="bi bi-calendar-check"></i> Consultas do Dia</h6>
+                            <div class="d-flex justify-content-between">
+                                <div><span class="badge bg-primary">Confirmados: 12</span></div>
+                                <div><span class="badge bg-warning text-dark">Não Confirmados: 3</span></div>
+                                <div><span class="badge bg-danger">Atrasados: 2</span></div>
+                            </div>
+                            <div class="progress mt-2" style="height: 8px;">
+                                <div class="progress-bar bg-success" style="width: 70%">70%</div>
+                                <div class="progress-bar bg-warning" style="width: 20%">20%</div>
+                                <div class="progress-bar bg-danger" style="width: 10%">10%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Analítico -->
+            <div class="tab-pane fade" id="analitico" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-graph-up"></i> Fluxo de Atendimento</h6>
+                            <div style="height: 200px; border-radius: 8px; display: flex; align-items: flex-end; padding: 10px;">
+                                <div style="width: 20%; margin: 0 2%; background: rgba(13, 110, 253, 0.7); height: 80%; border-radius: 4px;"></div>
+                                <div style="width: 20%; margin: 0 2%; background: rgba(25, 135, 84, 0.7); height: 60%; border-radius: 4px;"></div>
+                                <div style="width: 20%; margin: 0 2%; background: rgba(255, 193, 7, 0.7); height: 40%; border-radius: 4px;"></div>
+                                <div style="width: 20%; margin: 0 2%; background: rgba(220, 53, 69, 0.7); height: 20%; border-radius: 4px;"></div>
+                                <div style="width: 20%; margin: 0 2%; background: rgba(108, 117, 125, 0.7); height: 70%; border-radius: 4px;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small style="color: rgba(255,255,255,0.7);">08:00</small>
+                                <small style="color: rgba(255,255,255,0.7);">09:00</small>
+                                <small style="color: rgba(255,255,255,0.7);">10:00</small>
+                                <small style="color: rgba(255,255,255,0.7);">11:00</small>
+                                <small style="color: rgba(255,255,255,0.7);">12:00</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-pie-chart"></i> Estado dos Atendimentos</h6>
+                            <div style="height: 200px; display: flex; justify-content: center; align-items: center;">
+                                <div style="width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(
+                                    rgba(13, 110, 253, 0.8) 0% 30%,
+                                    rgba(25, 135, 84, 0.8) 30% 55%,
+                                    rgba(255, 193, 7, 0.8) 55% 75%,
+                                    rgba(220, 53, 69, 0.8) 75% 90%,
+                                    rgba(108, 117, 125, 0.8) 90% 100%
+                                );"></div>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-around mt-2">
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #0d6efd;">●</span> Em Espera (30%)</span>
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #198754;">●</span> Em Atendimento (25%)</span>
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #ffc107;">●</span> Chamado (20%)</span>
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #dc3545;">●</span> Ausentes (15%)</span>
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #6c757d;">●</span> Finalizados (10%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-clock"></i> Pacientes por Hora</h6>
+                            <div style="height: 150px; display: flex; align-items: flex-end; padding: 10px;">
+                                <div style="width: 25%; margin: 0 2%; background: rgba(13, 110, 253, 0.7); height: 40%; border-radius: 4px;"></div>
+                                <div style="width: 25%; margin: 0 2%; background: rgba(25, 135, 84, 0.7); height: 70%; border-radius: 4px;"></div>
+                                <div style="width: 25%; margin: 0 2%; background: rgba(255, 193, 7, 0.7); height: 90%; border-radius: 4px;"></div>
+                                <div style="width: 25%; margin: 0 2%; background: rgba(220, 53, 69, 0.7); height: 50%; border-radius: 4px;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small style="color: rgba(255,255,255,0.7);">Manhã</small>
+                                <small style="color: rgba(255,255,255,0.7);">Tarde</small>
+                                <small style="color: rgba(255,255,255,0.7);">Noite</small>
+                                <small style="color: rgba(255,255,255,0.7);">Madrugada</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-exclamation-triangle"></i> Alertas Inteligentes</h6>
+                            <div class="list-group">
+                                <div class="list-group-item list-group-item-warning" style="background: rgba(255, 193, 7, 0.2); color: #fff; border-color: rgba(255, 193, 7, 0.3);">
+                                    <i class="bi bi-hourglass"></i> Paciente A002 aguarda há 25min (prioritário)
+                                </div>
+                                <div class="list-group-item list-group-item-danger" style="background: rgba(220, 53, 69, 0.2); color: #fff; border-color: rgba(220, 53, 69, 0.3);">
+                                    <i class="bi bi-people"></i> Fila sobrecarregada: 8 pacientes em espera
+                                </div>
+                                <div class="list-group-item list-group-item-info" style="background: rgba(13, 202, 240, 0.2); color: #fff; border-color: rgba(13, 202, 240, 0.3);">
+                                    <i class="bi bi-calendar-x"></i> Consulta atrasada: Dr. Silva (15min)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Relatórios -->
+            <div class="tab-pane fade" id="relatorios" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card report-card h-100" id="relatorioConsultas">
+                            <div class="card-body text-center">
+                                <i class="bi bi-clipboard2-pulse text-primary fs-1"></i>
+                                <h5 class="card-title mt-3">Relatório de Consultas</h5>
+                                <p class="card-text">Gere relatório de consultas por período</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card report-card h-100" id="relatorioExames">
+                            <div class="card-body text-center">
+                                <i class="bi bi-droplet text-danger fs-1"></i>
+                                <h5 class="card-title mt-3">Relatório de Exames</h5>
+                                <p class="card-text">Gere relatório de exames realizados</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card report-card h-100" id="relatorioAgendamentos">
+                            <div class="card-body text-center">
+                                <i class="bi bi-calendar-check text-success fs-1"></i>
+                                <h5 class="card-title mt-3">Agendamentos</h5>
+                                <p class="card-text">Relatório de agendamentos por período</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card report-card h-100" id="relatorioCancelamentos">
+                            <div class="card-body text-center">
+                                <i class="bi bi-calendar-x text-warning fs-1"></i>
+                                <h5 class="card-title mt-3">Cancelamentos</h5>
+                                <p class="card-text">Relatório de cancelamentos por período</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card report-card h-100" id="relatorioPacientes">
+                            <div class="card-body text-center">
+                                <i class="bi bi-people text-info fs-1"></i>
+                                <h5 class="card-title mt-3">Cadastro de Pacientes</h5>
+                                <p class="card-text">Relatório de pacientes cadastrados</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card report-card h-100" id="relatorioFrequencia">
+                            <div class="card-body text-center">
+                                <i class="bi bi-graph-up text-secondary fs-1"></i>
+                                <h5 class="card-title mt-3">Frequência</h5>
+                                <p class="card-text">Relatório de comparecimento às consultas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para relatórios -->
+    <div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reportModalTitle">Filtros do Relatório</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reportForm">
+                        <div class="mb-3">
+                            <label for="reportStartDate" class="form-label">Data Inicial</label>
+                            <input type="date" class="form-control" id="reportStartDate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="reportEndDate" class="form-label">Data Final</label>
+                            <input type="date" class="form-control" id="reportEndDate">
+                        </div>
+                        <div class="mb-3" id="additionalFilters">
+                            <!-- Filtros adicionais -->
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnGenerateReport">Gerar Relatório</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Tema
+            let isDarkTheme = true;
+
+            function toggleTheme() {
+                isDarkTheme = !isDarkTheme;
+                if (isDarkTheme) {
+                    $('body').removeClass('light-theme');
+                    $('#themeIcon').removeClass('bi-sun-fill').addClass('bi-moon-stars');
+                } else {
+                    $('body').addClass('light-theme');
+                    $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+                }
+                localStorage.setItem('sicami-theme-queue', isDarkTheme ? 'dark' : 'light');
+            }
+
+            const savedTheme = localStorage.getItem('sicami-theme-queue');
+            if (savedTheme === 'light') {
+                isDarkTheme = false;
+                $('body').addClass('light-theme');
+                $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+            }
+
+            $('#themeToggle').click(toggleTheme);
+
+            // Botão Dashboard
+            $('#btnDashboard, #btnVoltarDashboard').click(function(e) {
+                e.preventDefault();
+                alert('🔙 Redirecionando para o Dashboard Principal...\n\n(Em produção, isso redirecionaria para a página principal do sistema)');
+                // window.location.href = 'dashboard.html';
+            });
+
+            // Dados de exemplo para a fila
+            const queueData = [
+                { id: 1, senha: 'A001', paciente: 'Maria Ana', hora: '08:00', prioridade: 'Normal', estado: 'Em Espera' },
+                { id: 2, senha: 'A002', paciente: 'Joana Manuel', hora: '08:05', prioridade: 'Prioritária', estado: 'Em Atendimento' },
+                { id: 3, senha: 'A003', paciente: 'Carlos Pedro', hora: '08:15', prioridade: 'Normal', estado: 'Finalizado' },
+                { id: 4, senha: 'A004', paciente: 'Sofia Costa', hora: '08:20', prioridade: 'Prioritária', estado: 'Chamado' },
+                { id: 5, senha: 'A005', paciente: 'Rui Santos', hora: '08:30', prioridade: 'Normal', estado: 'Em Espera' },
+                { id: 6, senha: 'A006', paciente: 'Ana Oliveira', hora: '08:35', prioridade: 'Normal', estado: 'Em Espera' },
+                { id: 7, senha: 'A007', paciente: 'Pedro Silva', hora: '08:40', prioridade: 'Prioritária', estado: 'Ausente' }
+            ];
+
+            // Variáveis de controle
+            let currentQueue = [...queueData];
+            let nextSenhaCounter = 8;
+
+            // Função para renderizar a tabela
+            function renderQueue(data) {
+                const tbody = $('#queueBody');
+                tbody.empty();
+
+                if (data.length === 0) {
+                    tbody.html('<tr><td colspan="7" class="text-center" style="color: rgba(255,255,255,0.7);">Nenhum paciente na fila</td></tr>');
+                    updateIndicators(data);
+                    return;
+                }
+
+                data.forEach((item, index) => {
+                    const statusClass = {
+                        'Em Espera': 'waiting',
+                        'Chamado': 'called',
+                        'Em Atendimento': 'attending',
+                        'Finalizado': 'finished',
+                        'Ausente': 'absent'
+                    }[item.estado] || 'waiting';
+
+                    const priorityBadge = item.prioridade === 'Prioritária' ? 
+                        '<span class="badge bg-danger"><i class="bi bi-star-fill"></i> Prioritário</span>' : 
+                        '<span class="badge bg-secondary">Normal</span>';
+
+                    const actions = `
+                        <button class="btn btn-sm btn-outline-primary action-btn btnCall" data-id="${item.id}">
+                            <i class="bi bi-megaphone"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-success action-btn btnAttend" data-id="${item.id}">
+                            <i class="bi bi-play-circle"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger action-btn btnAbsent" data-id="${item.id}">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary action-btn btnFinish" data-id="${item.id}">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                    `;
+
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${item.senha}</strong></td>
+                            <td>${item.paciente}</td>
+                            <td>${item.hora}</td>
+                            <td>${priorityBadge}</td>
+                            <td><span class="status-badge ${statusClass}">${item.estado}</span></td>
+                            <td>${actions}</td>
+                        </tr>
+                    `);
+                });
+
+                updateIndicators(data);
+                updateCurrentSenha(data);
+            }
+
+            // Função para atualizar indicadores
+            function updateIndicators(data) {
+                const waiting = data.filter(p => p.estado === 'Em Espera').length;
+                const attending = data.filter(p => p.estado === 'Em Atendimento').length;
+                const finished = data.filter(p => p.estado === 'Finalizado').length;
+                const priority = data.filter(p => p.prioridade === 'Prioritária' && p.estado !== 'Finalizado' && p.estado !== 'Ausente').length;
+                const absent = data.filter(p => p.estado === 'Ausente').length;
+                const avgWait = data.filter(p => p.estado !== 'Finalizado' && p.estado !== 'Ausente').length * 5 + 'm';
+
+                $('#waitingCount').text(waiting);
+                $('#attendingCount').text(attending);
+                $('#finishedCount').text(finished);
+                $('#priorityCount').text(priority);
+                $('#avgWaitTime').text(avgWait);
+                $('#absentCount').text(absent);
+                $('#todayAttendances').text(data.length);
+
+                // Atualizar mensagem do assistente
+                if (waiting > 5) {
+                    $('#assistantMessage').text(`⚠️ Fila sobrecarregada: ${waiting} pacientes em espera. Tempo médio: ${avgWait}.`);
+                } else if (priority > 0) {
+                    $('#assistantMessage').text(`🚨 ${priority} paciente(s) prioritário(s) aguardando. Recomendamos chamar imediatamente.`);
+                } else {
+                    $('#assistantMessage').text(`✅ Fila organizada: ${waiting} pacientes em espera. Tempo médio: ${avgWait}.`);
+                }
+            }
+
+            // Função para atualizar senha atual
+            function updateCurrentSenha(data) {
+                const attending = data.find(p => p.estado === 'Em Atendimento');
+                if (attending) {
+                    $('#currentSenhaDisplay').text(attending.senha);
+                } else {
+                    const waiting = data.filter(p => p.estado === 'Em Espera');
+                    if (waiting.length > 0) {
+                        $('#currentSenhaDisplay').text(waiting[0].senha);
+                    } else {
+                        $('#currentSenhaDisplay').text('---');
+                    }
+                }
+
+                const nextWaiting = data.find(p => p.estado === 'Em Espera' && p !== data.find(p => p.estado === 'Em Atendimento'));
+                if (nextWaiting) {
+                    $('#nextSenhaDisplay').text(nextWaiting.senha);
+                } else {
+                    $('#nextSenhaDisplay').text('A' + String(nextSenhaCounter).padStart(3, '0'));
+                }
+            }
+
+            // Função para filtrar a fila
+            function filterQueue() {
+                const name = $('#filterName').val().toLowerCase();
+                const senha = $('#filterSenha').val().toLowerCase();
+                const status = $('#filterStatus').val();
+                const priority = $('#filterPriority').val();
+
+                let filtered = currentQueue.filter(item => {
+                    const matchName = name === '' || item.paciente.toLowerCase().includes(name);
+                    const matchSenha = senha === '' || item.senha.toLowerCase().includes(senha);
+                    const matchStatus = status === '' || item.estado === status;
+                    const matchPriority = priority === '' || item.prioridade === priority;
+                    return matchName && matchSenha && matchStatus && matchPriority;
+                });
+
+                renderQueue(filtered);
+            }
+
+            // Ações dos botões da tabela
+            $(document).on('click', '.btnCall', function() {
+                const id = parseInt($(this).data('id'));
+                const patient = currentQueue.find(p => p.id === id);
+                if (patient && patient.estado === 'Em Espera') {
+                    patient.estado = 'Chamado';
+                    renderQueue(currentQueue);
+                    alert(`Paciente ${patient.senha} - ${patient.paciente} chamado!`);
+                }
+            });
+
+            $(document).on('click', '.btnAttend', function() {
+                const id = parseInt($(this).data('id'));
+                const patient = currentQueue.find(p => p.id === id);
+                if (patient && (patient.estado === 'Em Espera' || patient.estado === 'Chamado')) {
+                    // Colocar todos os outros como não em atendimento
+                    currentQueue.forEach(p => {
+                        if (p.estado === 'Em Atendimento') p.estado = 'Em Espera';
+                    });
+                    patient.estado = 'Em Atendimento';
+                    renderQueue(currentQueue);
+                    alert(`Paciente ${patient.senha} - ${patient.paciente} em atendimento!`);
+                }
+            });
+
+            $(document).on('click', '.btnAbsent', function() {
+                const id = parseInt($(this).data('id'));
+                const patient = currentQueue.find(p => p.id === id);
+                if (patient && patient.estado !== 'Finalizado' && patient.estado !== 'Ausente') {
+                    patient.estado = 'Ausente';
+                    renderQueue(currentQueue);
+                    alert(`Paciente ${patient.senha} - ${patient.paciente} marcado como ausente!`);
+                }
+            });
+
+            $(document).on('click', '.btnFinish', function() {
+                const id = parseInt($(this).data('id'));
+                const patient = currentQueue.find(p => p.id === id);
+                if (patient && patient.estado === 'Em Atendimento') {
+                    patient.estado = 'Finalizado';
+                    renderQueue(currentQueue);
+                    alert(`Atendimento do paciente ${patient.senha} - ${patient.paciente} finalizado!`);
+                } else {
+                    alert('Apenas pacientes em atendimento podem ser finalizados.');
+                }
+            });
+
+            // Botão para adicionar à fila
+            $('#btnAddToQueue').click(function() {
+                const nome = prompt('Nome do paciente:');
+                if (nome) {
+                    const prioridade = confirm('Este paciente é prioritário?') ? 'Prioritária' : 'Normal';
+                    const now = new Date();
+                    const hora = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                    
+                    const newPatient = {
+                        id: currentQueue.length + 1,
+                        senha: 'A' + String(nextSenhaCounter).padStart(3, '0'),
+                        paciente: nome,
+                        hora: hora,
+                        prioridade: prioridade,
+                        estado: 'Em Espera'
+                    };
+                    
+                    currentQueue.push(newPatient);
+                    nextSenhaCounter++;
+                    renderQueue(currentQueue);
+                    alert(`Paciente ${newPatient.senha} - ${nome} adicionado à fila!`);
+                }
+            });
+
+            // Botão chamar próximo
+            $('#btnCallNext, #btnChamarProximo').click(function() {
+                const nextPatient = currentQueue.find(p => p.estado === 'Em Espera');
+                if (nextPatient) {
+                    const priorityPatient = currentQueue.find(p => p.estado === 'Em Espera' && p.prioridade === 'Prioritária');
+                    const toCall = priorityPatient || nextPatient;
+                    toCall.estado = 'Chamado';
+                    renderQueue(currentQueue);
+                    alert(`Chamando paciente ${toCall.senha} - ${toCall.paciente}${toCall.prioridade === 'Prioritária' ? ' (PRIORITÁRIO)' : ''}`);
+                } else {
+                    alert('Não há pacientes em espera na fila.');
+                }
+            });
+
+            // Botão rechamar
+            $('#btnRecall, #btnRechamar').click(function() {
+                const patient = currentQueue.find(p => p.estado === 'Chamado' || p.estado === 'Em Atendimento');
+                if (patient) {
+                    alert(`Rechamando paciente ${patient.senha} - ${patient.paciente}`);
+                } else {
+                    alert('Nenhum paciente para rechamar.');
+                }
+            });
+
+            // Botão marcar ausente
+            $('#btnMarkAbsent').click(function() {
+                const patient = currentQueue.find(p => p.estado === 'Chamado');
+                if (patient) {
+                    patient.estado = 'Ausente';
+                    renderQueue(currentQueue);
+                    alert(`Paciente ${patient.senha} - ${patient.paciente} marcado como ausente.`);
+                } else {
+                    alert('Nenhum paciente chamado para marcar como ausente.');
+                }
+            });
+
+            // Botão imprimir lista
+            $('#btnPrintList').click(function() {
+                window.print();
+            });
+
+            // Botão gerar relatório
+            $('#btnGenerateReport').click(function() {
+                $('#relatorios-tab').tab('show');
+                setTimeout(() => {
+                    $('#relatorioAgendamentos').click();
+                }, 300);
+            });
+
+            // Filtros
+            $('#filterName, #filterSenha, #filterStatus, #filterPriority').on('input change', filterQueue);
+            
+            $('#btnResetFilters').click(function() {
+                $('#filterName').val('');
+                $('#filterSenha').val('');
+                $('#filterStatus').val('');
+                $('#filterPriority').val('');
+                renderQueue(currentQueue);
+            });
+
+            // Pesquisa rápida
+            $('#quickSearch').on('input', function() {
+                const term = $(this).val().toLowerCase();
+                if (term === '') {
+                    renderQueue(currentQueue);
+                } else {
+                    const filtered = currentQueue.filter(p => 
+                        p.paciente.toLowerCase().includes(term) || 
+                        p.senha.toLowerCase().includes(term)
+                    );
+                    renderQueue(filtered);
+                }
+            });
+
+            // Relatórios
+            $('.report-card').click(function() {
+                const reportType = $(this).attr('id').replace('relatorio', '').toLowerCase();
+                let title = '';
+                let additionalFilters = '';
+
+                switch(reportType) {
+                    case 'consultas':
+                        title = 'Relatório de Consultas';
+                        additionalFilters = `
+                            <div class="mb-3">
+                                <label for="reportDoctor" class="form-label">Profissional</label>
+                                <select class="form-select" id="reportDoctor">
+                                    <option value="">Todos</option>
+                                    <option value="dr_silva">Dr. Silva</option>
+                                    <option value="dra_oliveira">Dra. Oliveira</option>
+                                </select>
+                            </div>
+                        `;
+                        break;
+                    case 'exames':
+                        title = 'Relatório de Exames';
+                        additionalFilters = `
+                            <div class="mb-3">
+                                <label for="reportExamType" class="form-label">Tipo de Exame</label>
+                                <select class="form-select" id="reportExamType">
+                                    <option value="">Todos</option>
+                                    <option value="sangue">Exame de Sangue</option>
+                                    <option value="ultrassom">Ultrassom</option>
+                                </select>
+                            </div>
+                        `;
+                        break;
+                    default:
+                        title = 'Relatório';
+                        break;
+                }
+
+                $('#reportModalTitle').text(title);
+                $('#additionalFilters').html(additionalFilters);
+                $('#reportModal').modal('show');
+            });
+
+            $('#btnGenerateReport').click(function() {
+                const startDate = $('#reportStartDate').val();
+                const endDate = $('#reportEndDate').val();
+                
+                if (!startDate || !endDate) {
+                    alert('Por favor, preencha as datas inicial e final.');
+                    return;
+                }
+                
+                $('#reportModal').modal('hide');
+                alert(`📊 Relatório gerado para o período de ${startDate} a ${endDate}\n\n(Em produção, isso geraria o relatório em PDF ou abriria uma nova página com os resultados)`);
+            });
+
+            // Data e hora em tempo real
+            function updateDateTime() {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR');
+                const timeStr = now.toLocaleTimeString('pt-BR');
+                $('#dateTimeDisplay').text(`${dateStr} ${timeStr}`);
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Renderização inicial
+            renderQueue(currentQueue);
+
+            // Simular atualização em tempo real
+            setInterval(() => {
+                $('.indicator-card').addClass('fade-in');
+                setTimeout(() => {
+                    $('.indicator-card').removeClass('fade-in');
+                }, 500);
+            }, 10000);
+        });
+    </script>
+</body>
+</html>

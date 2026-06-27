@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observações Clínicas e Vacinação - SICAMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Estilo geral - herdado do histórico */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-image: url('../images/dash-rec.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Tema Claro */
+        body.light-theme::before {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        body.light-theme .page-title,
+        body.light-theme .glass-card .card-title,
+        body.light-theme .glass-card .card-text,
+        body.light-theme .glass-card .info-label,
+        body.light-theme .glass-card .info-value,
+        body.light-theme .glass-card .text-muted,
+        body.light-theme .modal-content,
+        body.light-theme .modal .form-label,
+        body.light-theme .indicator-card .number,
+        body.light-theme .indicator-card .label,
+        body.light-theme .form-control,
+        body.light-theme .form-select,
+        body.light-theme .vaccine-table th,
+        body.light-theme .vaccine-table td,
+        body.light-theme .vaccine-table .table-text,
+        body.light-theme .nav-tabs .nav-link,
+        body.light-theme .patient-card .patient-name,
+        body.light-theme .patient-card .patient-info,
+        body.light-theme .observations-text,
+        body.light-theme .symptom-check label,
+        body.light-theme .detail-label {
+            color: #1a1a2e !important;
+        }
+
+        body.light-theme .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .indicator-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .patient-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .vaccine-table {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .vaccine-table th {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .vaccine-table td {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .vaccine-table tbody tr:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        body.light-theme .form-control,
+        body.light-theme .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .form-control:focus,
+        body.light-theme .form-select:focus {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+        body.light-theme .form-control::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-theme #currentDateTime {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .dashboard-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .dashboard-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .status-badge {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .status-badge.stable {
+            background: rgba(25, 135, 84, 0.3);
+            color: #198754;
+        }
+
+        body.light-theme .status-badge.attention {
+            background: rgba(255, 193, 7, 0.3);
+            color: #856404;
+        }
+
+        body.light-theme .status-badge.critical {
+            background: rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+
+        body.light-theme .vaccine-status.applied {
+            background: rgba(25, 135, 84, 0.3);
+            color: #198754;
+        }
+
+        body.light-theme .vaccine-status.pending {
+            background: rgba(255, 193, 7, 0.3);
+            color: #856404;
+        }
+
+        body.light-theme .vaccine-status.delayed {
+            background: rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+
+        body.light-theme .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark {
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .modal .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .symptom-check label {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .nav-tabs .nav-link {
+            color: #1a1a2e !important;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-theme .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .tab-content {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .glass-card .card-title {
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .glass-card .card-title i {
+            margin-right: 8px;
+        }
+
+        /* Indicadores */
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .indicator-card .number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .indicator-card .label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .indicator-card.vaccination { border-left: 4px solid rgba(25, 135, 84, 0.6); }
+        .indicator-card.delayed { border-left: 4px solid rgba(220, 53, 69, 0.6); }
+        .indicator-card.observations { border-left: 4px solid rgba(13, 110, 253, 0.6); }
+        .indicator-card.surveillance { border-left: 4px solid rgba(255, 193, 7, 0.6); }
+
+        .indicator-card.vaccination .number { color: #75f0a0; }
+        .indicator-card.delayed .number { color: #ff7a8a; }
+        .indicator-card.observations .number { color: #6ee7ff; }
+        .indicator-card.surveillance .number { color: #ffd75a; }
+
+        /* Patient Card */
+        .patient-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .patient-card .patient-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(13, 110, 253, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .patient-card .patient-name {
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .patient-card .patient-info {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-badge.stable {
+            background: rgba(25, 135, 84, 0.3);
+            color: #75f0a0;
+        }
+
+        .status-badge.attention {
+            background: rgba(255, 193, 7, 0.3);
+            color: #ffd75a;
+        }
+
+        .status-badge.critical {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff7a8a;
+        }
+
+        /* Vaccine Status */
+        .vaccine-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .vaccine-status.applied {
+            background: rgba(25, 135, 84, 0.3);
+            color: #75f0a0;
+        }
+
+        .vaccine-status.pending {
+            background: rgba(255, 193, 7, 0.3);
+            color: #ffd75a;
+        }
+
+        .vaccine-status.delayed {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff7a8a;
+        }
+
+        /* Tabs */
+        .nav-tabs .nav-link {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-right: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            color: #fff;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: bold;
+            box-shadow: 0 -2px 20px rgba(13, 110, 253, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            border-radius: 0 8px 8px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Form Styles */
+        .form-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-control,
+        .form-select {
+            font-family: 'Times New Roman', Times, serif;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            color: #fff;
+        }
+
+        .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        .observations-text {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .observations-text:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(13, 110, 253, 0.5);
+            outline: none;
+        }
+
+        /* Symptom Check */
+        .symptom-check {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .symptom-check label {
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .symptom-check input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #0d6efd;
+        }
+
+        /* Vaccine Table */
+        .vaccine-table {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .vaccine-table th {
+            font-family: 'Times New Roman', Times, serif;
+            background: rgba(255, 255, 255, 0.08);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            color: #fff;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+        }
+
+        .vaccine-table td {
+            font-family: 'Times New Roman', Times, serif;
+            vertical-align: middle;
+            color: #fff;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .vaccine-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .vaccine-table .table-text {
+            color: #fff;
+        }
+
+        /* Page Title */
+        .page-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title .bi {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Theme Toggle */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(30deg);
+        }
+
+        /* Dashboard Button */
+        .dashboard-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        #currentDateTime {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:hover {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        .btn-success {
+            background: rgba(25, 135, 84, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-success:hover {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        .btn-warning {
+            background: rgba(255, 193, 7, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #000;
+        }
+
+        .btn-warning:hover {
+            background: rgba(255, 193, 7, 0.8);
+        }
+
+        .btn-danger {
+            background: rgba(220, 53, 69, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-danger:hover {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        /* Quick Actions */
+        .quick-actions .btn {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 3px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.3);
+            color: #fff;
+        }
+
+        .quick-actions .btn-outline-dark {
+            background: rgba(33, 37, 41, 0.3);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn-outline-dark:hover {
+            background: rgba(33, 37, 41, 0.5);
+            color: #fff;
+        }
+
+        /* Modal */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal .btn-close {
+            filter: invert(1);
+        }
+
+        .modal .form-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Scroll */
+        .scroll-area {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .scroll-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scroll-area::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .scroll-area::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .scroll-area::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Detail Label */
+        .detail-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        .detail-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.3rem;
+            }
+            .header-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .indicator-card .number {
+                font-size: 1.6rem;
+            }
+            .glass-card {
+                padding: 15px;
+            }
+            .tab-content {
+                padding: 15px;
+            }
+            .vaccine-table {
+                font-size: 0.85rem;
+            }
+            .vaccine-table th,
+            .vaccine-table td {
+                padding: 8px 10px;
+            }
+            .symptom-check {
+                gap: 10px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Cabeçalho -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap header-actions">
+                    <h2 class="page-title">
+                        <i class="bi bi-clipboard2-pulse text-primary"></i> 
+                        Observações Clínicas e Vacinação
+                        <span class="badge bg-primary ms-2">ENFERMAGEM</span>
+                    </h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="menuenfermeiro.html" class="dashboard-btn" 
+                            title="Voltar ao Dashboard Principal">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+                        </a>
+                        <button class="theme-toggle-btn" id="themeToggle" title="Alternar Tema">
+                            <i class="bi bi-moon-stars" id="themeIcon"></i>
+                        </button>
+                        <span class="badge" id="currentDateTime">
+                            <i class="bi bi-clock"></i> 
+                            <span id="dateTimeDisplay">Carregando...</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de Indicadores -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-6">
+                <div class="indicator-card vaccination fade-in">
+                    <div class="number" id="vaccinationRate">0%</div>
+                    <div class="label"><i class="bi bi-check-circle"></i> Vacinação Completa</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="indicator-card delayed fade-in">
+                    <div class="number" id="delayedVaccines">0</div>
+                    <div class="label"><i class="bi bi-exclamation-triangle"></i> Vacinas Atrasadas</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="indicator-card observations fade-in">
+                    <div class="number" id="todayObservations">0</div>
+                    <div class="label"><i class="bi bi-clipboard2"></i> Observações Hoje</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="indicator-card surveillance fade-in">
+                    <div class="number" id="surveillanceCases">0</div>
+                    <div class="label"><i class="bi bi-eye"></i> Casos em Vigilância</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cartão do Paciente -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="patient-card d-flex align-items-center flex-wrap gap-3 fade-in">
+                    <div class="patient-avatar">MS</div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <div>
+                                <div class="patient-name">Maria Silva</div>
+                                <div class="patient-info">
+                                    <i class="bi bi-folder"></i> Processo: P-2026-0158 &nbsp;|&nbsp;
+                                    <i class="bi bi-calendar"></i> 28 anos &nbsp;|&nbsp;
+                                    <i class="bi bi-baby"></i> Gestante - 34 semanas
+                                </div>
+                            </div>
+                            <span class="status-badge stable">
+                                <i class="bi bi-check-circle"></i> Estável
+                            </span>
+                        </div>
+                        <div class="mt-1">
+                            <small style="color: rgba(255,255,255,0.4);">
+                                <i class="bi bi-clock"></i> Última atualização: 15/08/2026 09:30
+                            </small>
+                        </div>
+                    </div>
+                    <div class="ms-auto d-flex gap-2 flex-wrap">
+                        <button class="btn btn-outline-primary btn-sm" id="btnFullHistory">
+                            <i class="bi bi-file-earmark-text"></i> Histórico
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" id="btnVaccineHistory">
+                            <i class="bi bi-syringe"></i> Vacinação
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" id="btnClinicalEvolution">
+                            <i class="bi bi-graph-up"></i> Evolução
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="observacoes-tab" data-bs-toggle="tab" data-bs-target="#observacoes" type="button" role="tab">
+                    <i class="bi bi-clipboard2"></i> Observações Clínicas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="vacinas-tab" data-bs-toggle="tab" data-bs-target="#vacinas" type="button" role="tab">
+                    <i class="bi bi-syringe"></i> Controlo de Vacinação
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Aba Observações Clínicas -->
+            <div class="tab-pane fade show active" id="observacoes" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <div class="glass-card">
+                            <h6 class="card-title"><i class="bi bi-pencil-square"></i> Registar Observação Clínica</h6>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Observações Clínicas Atuais</label>
+                                <textarea class="form-control" id="clinicalNotes" rows="4" placeholder="Descreva as observações clínicas do paciente..."></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Tipo de Evolução</label>
+                                    <select class="form-select" id="evolutionType">
+                                        <option value="routine">Rotina</option>
+                                        <option value="urgent">Urgente</option>
+                                        <option value="post-procedure">Pós-procedimento</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Sinais Vitais</label>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <input type="number" class="form-control" id="vitalTemp" placeholder="Temp °C" step="0.1">
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="text" class="form-control" id="vitalBP" placeholder="PA (120/80)">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-6">
+                                            <input type="number" class="form-control" id="vitalHR" placeholder="FC bpm">
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" class="form-control" id="vitalSpO2" placeholder="SpO₂ %">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label">Sintomas Reportados</label>
+                                <div class="symptom-check">
+                                    <label><input type="checkbox" class="symptom-checkbox" value="dor"> Dor</label>
+                                    <label><input type="checkbox" class="symptom-checkbox" value="febre"> Febre</label>
+                                    <label><input type="checkbox" class="symptom-checkbox" value="nauseas"> Náuseas</label>
+                                    <label><input type="checkbox" class="symptom-checkbox" value="tontura"> Tontura</label>
+                                    <label><input type="checkbox" class="symptom-checkbox" value="cefaleia"> Cefaleia</label>
+                                    <label>
+                                        <input type="checkbox" class="symptom-checkbox" value="outro" id="symptomOtherCheck">
+                                        Outro
+                                        <input type="text" class="form-control form-control-sm" id="symptomOtherText" placeholder="Especificar..." style="display: none; width: 120px; margin-left: 5px;">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2 flex-wrap">
+                                <button class="btn btn-success" id="btnSaveObservation">
+                                    <i class="bi bi-save"></i> Guardar Observação
+                                </button>
+                                <button class="btn btn-warning" id="btnEditPrevious">
+                                    <i class="bi bi-pencil"></i> Editar Registo Anterior
+                                </button>
+                                <button class="btn btn-danger" id="btnMarkAlert">
+                                    <i class="bi bi-exclamation-triangle"></i> Marcar como Alerta Clínico
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="glass-card">
+                            <h6 class="card-title"><i class="bi bi-clock-history"></i> Últimas Observações</h6>
+                            <div class="scroll-area" id="observationHistory">
+                                <div class="border-bottom pb-2 mb-2" style="border-color: rgba(255,255,255,0.05);">
+                                    <div style="color: rgba(255,255,255,0.4); font-size: 0.75rem;">15/08/2026 09:30 - Enf. Ana Paula</div>
+                                    <div style="color: #fff; font-size: 0.9rem;">Paciente estável, sem queixas. Sinais vitais dentro dos parâmetros normais.</div>
+                                    <span class="badge bg-success" style="font-size: 0.6rem;">Rotina</span>
+                                </div>
+                                <div class="border-bottom pb-2 mb-2" style="border-color: rgba(255,255,255,0.05);">
+                                    <div style="color: rgba(255,255,255,0.4); font-size: 0.75rem;">14/08/2026 16:45 - Enf. Carlos Silva</div>
+                                    <div style="color: #fff; font-size: 0.9rem;">Paciente apresentou febre de 38.2°C. Medicado com dipirona.</div>
+                                    <span class="badge bg-warning" style="font-size: 0.6rem;">Atenção</span>
+                                </div>
+                                <div>
+                                    <div style="color: rgba(255,255,255,0.4); font-size: 0.75rem;">14/08/2026 08:00 - Enf. Mariana Lima</div>
+                                    <div style="color: #fff; font-size: 0.9rem;">Evolução satisfatória. Paciente relata melhora dos sintomas.</div>
+                                    <span class="badge bg-success" style="font-size: 0.6rem;">Rotina</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Controlo de Vacinação -->
+            <div class="tab-pane fade" id="vacinas" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="glass-card">
+                            <h6 class="card-title">
+                                <i class="bi bi-list-check"></i> Lista de Vacinas
+                                <span class="badge bg-success ms-2" id="vaccineCount">8</span>
+                            </h6>
+                            <div class="vaccine-table table-responsive">
+                                <table class="table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Vacina</th>
+                                            <th>Dose</th>
+                                            <th>Data Admin.</th>
+                                            <th>Enfermeiro</th>
+                                            <th>Próxima Dose</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vaccineList">
+                                        <!-- Vacinas serão inseridas via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="glass-card">
+                            <h6 class="card-title"><i class="bi bi-plus-circle"></i> Ações</h6>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success" id="btnRegisterVaccine">
+                                    <i class="bi bi-plus"></i> Registrar Nova Vacina
+                                </button>
+                                <button class="btn btn-primary" id="btnScheduleNext">
+                                    <i class="bi bi-calendar-plus"></i> Agendar Próxima Dose
+                                </button>
+                                <button class="btn btn-danger" id="btnCreateAlert">
+                                    <i class="bi bi-bell"></i> Criar Alerta de Atraso
+                                </button>
+                                <button class="btn btn-info" id="btnGenerateCard">
+                                    <i class="bi bi-file-earmark-pdf"></i> Gerar Cartão Digital
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="glass-card">
+                            <h6 class="card-title"><i class="bi bi-info-circle"></i> Resumo da Vacinação</h6>
+                            <div class="d-flex justify-content-between">
+                                <span style="color: rgba(255,255,255,0.6);">Vacinas Aplicadas:</span>
+                                <span style="color: #75f0a0; font-weight: bold;" id="appliedCount">5</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span style="color: rgba(255,255,255,0.6);">Pendentes:</span>
+                                <span style="color: #ffd75a; font-weight: bold;" id="pendingCount">2</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span style="color: rgba(255,255,255,0.6);">Atrasadas:</span>
+                                <span style="color: #ff7a8a; font-weight: bold;" id="delayedCount">1</span>
+                            </div>
+                            <hr style="border-color: rgba(255,255,255,0.05);">
+                            <div class="d-flex justify-content-between">
+                                <span style="color: rgba(255,255,255,0.6);">Próxima Vacina:</span>
+                                <span style="color: #fff; font-weight: bold;">BCG (Reforço)</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span style="color: rgba(255,255,255,0.6);">Data Prevista:</span>
+                                <span style="color: #fff; font-weight: bold;">01/09/2026</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="quick-actions mt-4 d-flex flex-wrap gap-2">
+            <button class="btn btn-primary" id="btnRefreshData">
+                <i class="bi bi-arrow-repeat"></i> Atualizar Dados
+            </button>
+            <button class="btn btn-success" id="btnExportReport">
+                <i class="bi bi-file-earmark-text"></i> Exportar Relatório
+            </button>
+            <button class="btn btn-warning" id="btnPrintRecord">
+                <i class="bi bi-printer"></i> Imprimir Registo
+            </button>
+            <button class="btn btn-outline-secondary" id="btnViewFullRecord">
+                <i class="bi bi-clock-history"></i> Ver Registo Completo
+            </button>
+            <button class="btn btn-outline-dark">
+                <a href="medicamentos.html" style="color: inherit; text-decoration: none;">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Nova Vacina -->
+    <div class="modal fade" id="vaccineModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-syringe text-success"></i> 
+                        Registrar Nova Vacina
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Nome da Vacina</label>
+                        <input type="text" class="form-control" id="vacName" placeholder="Ex: BCG">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Dose</label>
+                        <select class="form-select" id="vacDose">
+                            <option value="1ª">1ª Dose</option>
+                            <option value="2ª">2ª Dose</option>
+                            <option value="Reforço">Reforço</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Data de Administração</label>
+                        <input type="date" class="form-control" id="vacDate">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Enfermeiro Responsável</label>
+                        <input type="text" class="form-control" id="vacNurse" value="Enf. Ana Paula">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Próxima Dose Agendada</label>
+                        <input type="date" class="form-control" id="vacNext">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btnConfirmVaccine">
+                        <i class="bi bi-check2"></i> Registrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Alerta de Atraso -->
+    <div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-bell text-danger"></i> 
+                        Criar Alerta de Vacinação em Atraso
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger" style="background: rgba(220, 53, 69, 0.2); border-color: rgba(220, 53, 69, 0.3); color: #ff7a8a;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Este alerta será enviado ao responsável pelo paciente.
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Vacina em Atraso</label>
+                        <select class="form-select" id="alertVaccine">
+                            <option value="">Selecione...</option>
+                            <option value="BCG">BCG</option>
+                            <option value="Poliomielite">Poliomielite</option>
+                            <option value="Hepatite B">Hepatite B</option>
+                            <option value="DTaP">DTaP</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mensagem de Alerta</label>
+                        <textarea class="form-control" id="alertMessage" rows="3" placeholder="Descreva o motivo do atraso..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmAlert">
+                        <i class="bi bi-bell"></i> Criar Alerta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Dados de exemplo - Vacinas
+            const vaccines = [
+                { id: 1, name: 'BCG', dose: '1ª', date: '10/01/2026', nurse: 'Enf. Ana Paula', next: '10/07/2026', status: 'applied' },
+                { id: 2, name: 'Hepatite B', dose: '1ª', date: '10/01/2026', nurse: 'Enf. Ana Paula', next: '10/02/2026', status: 'applied' },
+                { id: 3, name: 'Hepatite B', dose: '2ª', date: '10/02/2026', nurse: 'Enf. Carlos Silva', next: '10/08/2026', status: 'applied' },
+                { id: 4, name: 'Poliomielite', dose: '1ª', date: '10/03/2026', nurse: 'Enf. Mariana Lima', next: '10/04/2026', status: 'applied' },
+                { id: 5, name: 'Poliomielite', dose: '2ª', date: '10/04/2026', nurse: 'Enf. Mariana Lima', next: '10/10/2026', status: 'applied' },
+                { id: 6, name: 'DTaP', dose: '1ª', date: '10/05/2026', nurse: 'Enf. Ana Paula', next: '10/06/2026', status: 'pending' },
+                { id: 7, name: 'DTaP', dose: '2ª', date: '', nurse: '', next: '10/11/2026', status: 'pending' },
+                { id: 8, name: 'Febre Amarela', dose: 'Única', date: '', nurse: '', next: '10/09/2026', status: 'delayed' }
+            ];
+
+            // Tema
+            let isDarkTheme = true;
+
+            function toggleTheme() {
+                isDarkTheme = !isDarkTheme;
+                if (isDarkTheme) {
+                    $('body').removeClass('light-theme');
+                    $('#themeIcon').removeClass('bi-sun-fill').addClass('bi-moon-stars');
+                } else {
+                    $('body').addClass('light-theme');
+                    $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+                }
+                localStorage.setItem('sicami-theme-observations', isDarkTheme ? 'dark' : 'light');
+            }
+
+            const savedTheme = localStorage.getItem('sicami-theme-observations');
+            if (savedTheme === 'light') {
+                isDarkTheme = false;
+                $('body').addClass('light-theme');
+                $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+            }
+
+            $('#themeToggle').click(toggleTheme);
+
+            // Data e Hora
+            function updateDateTime() {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR');
+                const timeStr = now.toLocaleTimeString('pt-BR');
+                $('#dateTimeDisplay').text(`${dateStr} ${timeStr}`);
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Atualizar Indicadores
+            function updateIndicators() {
+                const total = vaccines.length;
+                const applied = vaccines.filter(v => v.status === 'applied').length;
+                const delayed = vaccines.filter(v => v.status === 'delayed').length;
+                const rate = total > 0 ? Math.round((applied / total) * 100) : 0;
+
+                $('#vaccinationRate').text(rate + '%');
+                $('#delayedVaccines').text(delayed);
+                $('#todayObservations').text(3);
+                $('#surveillanceCases').text(2);
+                $('#vaccineCount').text(total);
+                $('#appliedCount').text(applied);
+                $('#pendingCount').text(vaccines.filter(v => v.status === 'pending').length);
+                $('#delayedCount').text(delayed);
+            }
+
+            // Renderizar Vacinas
+            function renderVaccines() {
+                const tbody = $('#vaccineList');
+                tbody.empty();
+
+                vaccines.forEach(v => {
+                    const statusMap = {
+                        'applied': { class: 'applied', icon: 'bi-check-circle', text: 'Aplicada' },
+                        'pending': { class: 'pending', icon: 'bi-clock', text: 'Pendente' },
+                        'delayed': { class: 'delayed', icon: 'bi-exclamation-triangle', text: 'Atrasada' }
+                    };
+                    const status = statusMap[v.status] || statusMap.pending;
+
+                    tbody.append(`
+                        <tr>
+                            <td><span class="table-text">${v.name}</span></td>
+                            <td><span class="table-text">${v.dose}</span></td>
+                            <td><span class="table-text">${v.date || '---'}</span></td>
+                            <td><span class="table-text">${v.nurse || '---'}</span></td>
+                            <td><span class="table-text">${v.next || '---'}</span></td>
+                            <td>
+                                <span class="vaccine-status ${status.class}">
+                                    <i class="bi ${status.icon}"></i> ${status.text}
+                                </span>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // Sintomas - Mostrar campo "Outro"
+            $('#symptomOtherCheck').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#symptomOtherText').show();
+                } else {
+                    $('#symptomOtherText').hide();
+                }
+            });
+
+            // Guardar Observação
+            $('#btnSaveObservation').click(function() {
+                const notes = $('#clinicalNotes').val().trim();
+                const type = $('#evolutionType').val();
+                const temp = $('#vitalTemp').val();
+                const bp = $('#vitalBP').val();
+                const hr = $('#vitalHR').val();
+                const spo2 = $('#vitalSpO2').val();
+
+                if (!notes) {
+                    alert('⚠️ Por favor, preencha as observações clínicas.');
+                    return;
+                }
+
+                // Coletar sintomas
+                let symptoms = [];
+                $('.symptom-checkbox:checked').each(function() {
+                    const val = $(this).val();
+                    if (val === 'outro') {
+                        const otherText = $('#symptomOtherText').val().trim();
+                        if (otherText) symptoms.push(otherText);
+                    } else {
+                        symptoms.push(val);
+                    }
+                });
+
+                const typeMap = {
+                    'routine': 'Rotina',
+                    'urgent': 'Urgente',
+                    'post-procedure': 'Pós-procedimento'
+                };
+
+                const vitals = [];
+                if (temp) vitals.push('Temp: ' + temp + '°C');
+                if (bp) vitals.push('PA: ' + bp);
+                if (hr) vitals.push('FC: ' + hr + ' bpm');
+                if (spo2) vitals.push('SpO₂: ' + spo2 + '%');
+
+                alert('✅ Observação guardada com sucesso!\n\n' +
+                      'Tipo: ' + typeMap[type] + '\n' +
+                      'Sinais Vitais: ' + (vitals.length > 0 ? vitals.join(' | ') : 'Não registados') + '\n' +
+                      'Sintomas: ' + (symptoms.length > 0 ? symptoms.join(', ') : 'Nenhum') + '\n' +
+                      'Observação: ' + notes);
+
+                $('#clinicalNotes').val('');
+                $('#vitalTemp, #vitalBP, #vitalHR, #vitalSpO2').val('');
+                $('.symptom-checkbox').prop('checked', false);
+                $('#symptomOtherText').val('').hide();
+            });
+
+            // Editar Registo Anterior
+            $('#btnEditPrevious').click(function() {
+                alert('✏️ Editando o último registo...\n\n(Em produção, isso carregaria o último registo para edição)');
+            });
+
+            // Marcar Alerta Clínico
+            $('#btnMarkAlert').click(function() {
+                const notes = $('#clinicalNotes').val().trim();
+                if (!notes) {
+                    alert('⚠️ Por favor, preencha as observações antes de marcar como alerta.');
+                    return;
+                }
+                if (confirm('⚠️ Tem certeza que deseja marcar esta observação como ALERTA CLÍNICO?')) {
+                    alert('🚨 Alerta clínico registado com sucesso! A equipe médica será notificada.');
+                }
+            });
+
+            // Registrar Nova Vacina
+            $('#btnRegisterVaccine').click(function() {
+                $('#vaccineModal').modal('show');
+            });
+
+            $('#btnConfirmVaccine').click(function() {
+                const name = $('#vacName').val().trim();
+                const dose = $('#vacDose').val();
+                const date = $('#vacDate').val();
+                const nurse = $('#vacNurse').val().trim();
+                const next = $('#vacNext').val();
+
+                if (!name) {
+                    alert('⚠️ Por favor, informe o nome da vacina.');
+                    return;
+                }
+                if (!date) {
+                    alert('⚠️ Por favor, informe a data de administração.');
+                    return;
+                }
+
+                const newVaccine = {
+                    id: vaccines.length + 1,
+                    name: name,
+                    dose: dose,
+                    date: new Date(date).toLocaleDateString('pt-BR'),
+                    nurse: nurse || 'Enf. Ana Paula',
+                    next: next ? new Date(next).toLocaleDateString('pt-BR') : '---',
+                    status: 'applied'
+                };
+
+                vaccines.push(newVaccine);
+                renderVaccines();
+                updateIndicators();
+
+                $('#vaccineModal').modal('hide');
+                $('#vacName, #vacDate, #vacNurse, #vacNext').val('');
+                alert('✅ Vacina registrada com sucesso!\n\n' + name + ' - ' + dose);
+            });
+
+            // Agendar Próxima Dose
+            $('#btnScheduleNext').click(function() {
+                alert('📅 Agendando próxima dose...\n\n(Em produção, isso abriria um calendário para agendamento)');
+            });
+
+            // Criar Alerta de Atraso
+            $('#btnCreateAlert').click(function() {
+                $('#alertModal').modal('show');
+            });
+
+            $('#btnConfirmAlert').click(function() {
+                const vaccine = $('#alertVaccine').val();
+                const message = $('#alertMessage').val().trim();
+
+                if (!vaccine) {
+                    alert('⚠️ Por favor, selecione a vacina em atraso.');
+                    return;
+                }
+                if (!message) {
+                    alert('⚠️ Por favor, preencha a mensagem de alerta.');
+                    return;
+                }
+
+                $('#alertModal').modal('hide');
+                $('#alertVaccine').val('');
+                $('#alertMessage').val('');
+                alert('🔔 Alerta de vacinação em atraso criado com sucesso!\n\nVacina: ' + vaccine + '\nMensagem: ' + message);
+            });
+
+            // Gerar Cartão Digital
+            $('#btnGenerateCard').click(function() {
+                alert('📄 Cartão de vacinação digital gerado com sucesso!\n\n(Em produção, isso geraria um PDF com o cartão)');
+            });
+
+            // Botões do cabeçalho
+            $('#btnFullHistory').click(function() {
+                alert('📋 Redirecionando para o histórico completo do paciente...');
+            });
+
+            $('#btnVaccineHistory').click(function() {
+                $('#vacinas-tab').tab('show');
+            });
+
+            $('#btnClinicalEvolution').click(function() {
+                alert('📊 Redirecionando para evolução clínica...\n\n(Em produção, isso abriria os gráficos de evolução)');
+            });
+
+            // Ações rápidas
+            $('#btnRefreshData').click(function() {
+                renderVaccines();
+                updateIndicators();
+                alert('🔄 Dados atualizados com sucesso!');
+            });
+
+            $('#btnExportReport').click(function() {
+                alert('📄 Relatório exportado com sucesso!\n\n(Em produção, isso geraria um arquivo PDF)');
+            });
+
+            $('#btnPrintRecord').click(function() {
+                window.print();
+            });
+
+            $('#btnViewFullRecord').click(function() {
+                alert('📋 Redirecionando para o registo completo...\n\n(Em produção, isso abriria o histórico completo)');
+            });
+
+            // Botão Dashboard
+            $('#btnDashboard').click(function(e) {
+                e.preventDefault();
+                alert('🔙 Redirecionando para o Dashboard Principal...\n\n(Em produção, isso redirecionaria para a página principal do sistema)');
+            });
+
+            // Inicializar
+            renderVaccines();
+            updateIndicators();
+
+            console.log('✅ Tela de Observações Clínicas e Vacinação - SICAMI carregada com sucesso!');
+        });
+    </script>
+</body>
+</html>

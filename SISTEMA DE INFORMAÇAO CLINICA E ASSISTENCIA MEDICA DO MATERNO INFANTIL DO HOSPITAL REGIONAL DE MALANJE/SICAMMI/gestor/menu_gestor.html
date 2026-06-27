@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard do Agente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #f8f9fc;
+            --text-color: #5a5c69;
+            --card-bg: #ffffff;
+            --body-bg: #f8f9fc;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #d1d3e2;
+            --sidebar-active: #e6f7ed;
+            --alert-color: #e74a3b;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --expired-color: #e74a3b;
+        }
+
+        .dark-mode {
+            --primary-color: #2ecc71;
+            --secondary-color: #2c2c3a;
+            --text-color: #d1d3e2;
+            --card-bg: #3a3b45;
+            --body-bg: #2c2c3a;
+            --sidebar-bg: #2c2c3a;
+            --sidebar-text: #858796;
+            --sidebar-active: #2ecc71;
+            --alert-color: #e74a3b;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --expired-color: #e74a3b;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        .sidebar {
+            background: var(--sidebar-bg);
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link {
+            color: var(--sidebar-text);
+            padding: 1rem;
+            margin: 0.2rem 0;
+            border-radius: 0.35rem;
+        }
+
+        .sidebar .nav-link:hover {
+            color: var(--primary-color);
+            background: var(--sidebar-active);
+        }
+
+        .sidebar .nav-link.active {
+            color: var(--primary-color);
+            background: var(--sidebar-active);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+
+        .sidebar.toggled {
+            width: 6.5rem !important;
+            overflow: hidden;
+        }
+
+        .sidebar.toggled .nav-link {
+            text-align: center;
+            padding: 0.75rem 1rem;
+            width: 6.5rem;
+        }
+
+        .sidebar.toggled .nav-link span {
+            display: none;
+        }
+
+        .sidebar.toggled .nav-link i {
+            margin-right: 0;
+            font-size: 1.2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+            padding: 1rem 1.35rem;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+
+        .alert-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            color: #fff;
+        }
+
+        .alert-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: #fff;
+        }
+
+        .alert-danger {
+            background-color: var(--alert-color);
+            border-color: var(--alert-color);
+            color: #fff;
+        }
+
+        .alert-info {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+            color: #fff;
+        }
+
+        .alert-expired {
+            background-color: var(--expired-color);
+            border-color: var(--expired-color);
+            color: #fff;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid var(--primary-color);
+        }
+
+        .patient-card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .patient-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .patient-active {
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .badge-pending {
+            background-color: var(--warning-color);
+        }
+
+        .badge-completed {
+            background-color: var(--success-color);
+        }
+
+        .vaccine-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .vaccine-item {
+            border-left: 3px solid var(--primary-color);
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+
+        .qr-code-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(46, 204, 113, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+            }
+        }
+
+        .coverage-chart {
+            width: 100%;
+            height: 300px;
+        }
+
+        .hidden {
+            display: none;
+        }
+        .timer-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+    </style>
+</head>
+<body class="">
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar border-end" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4">
+                <h5 class="text-primary">AgenteDashboard</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="#" class="nav-link">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="bi bi-eyedropper"></i>
+                    <span>Vacinação</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="bi bi-clipboard-pulse"></i>
+                    <span>Pendências</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="bi bi-people"></i>
+                    <span>Cobertura</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="bi bi-bell"></i>
+                    <span>Notificações</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="bi bi-printer"></i>
+                    <span>Comprovantes</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <div class="container-fluid">
+                    <!-- Timer -->
+                        <div class="timer-display mx-3" id="timer">30:00</div>
+                        <button class="btn btn-sm btn-outline-primary me-2" id="startTimer">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary me-3" id="resetTimer">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
+                    <button class="btn btn-primary" id="sidebarToggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <div class="d-flex align-items-center ms-auto">
+                        <!-- UBS -->
+                        <div class="mx-3">
+                            <span class="badge bg-primary">UBS: Vila Saúde</span>
+                        </div>
+
+                        <!-- Language Selector -->
+                        <div class="dropdown me-3">
+                            <a class="language-selector" id="languageDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-translate fs-5"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-lang="pt">Português</a></li>
+                                <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                <li><a class="dropdown-item" href="#" data-lang="es">Español</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Dark Mode Toggle -->
+                        <button class="btn btn-sm me-3" id="darkModeToggle">
+                            <i class="bi bi-moon-fill"></i>
+                        </button>
+
+                        <!-- Profile -->
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown">
+                                <img src="https://ui-avatars.com/api/?name=Agente+Saude&background=2ecc71&color=fff" alt="Profile" class="profile-pic me-2">
+                                <span class="d-none d-sm-inline">Agente Saúde</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">Perfil</a></li>
+                                <li><a class="dropdown-item" href="#">Configurações</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">Sair</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid px-4 py-4">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="mb-0">Dashboard do Agente</h2>
+                        <p class="text-muted">Controle de vacinação e acompanhamento</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Vacinas Aplicadas Hoje -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success h-100">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Vacinas Hoje</div>
+                                        <div class="h5 mb-0 font-weight-bold">24</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-eyedropper fs-1 text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="#" class="small text-success text-decoration-none">Ver detalhes
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vacinas no Mês -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary h-100">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Vacinas no Mês</div>
+                                        <div class="h5 mb-0 font-weight-bold">342</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-calendar-check fs-1 text-primary"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="#" class="small text-primary text-decoration-none">Ver relatório
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pendências -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning h-100">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Pendências</div>
+                                        <div class="h5 mb-0 font-weight-bold">18</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="#" class="small text-warning text-decoration-none">Ver pendências
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cobertura Vacinal -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info h-100">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Cobertura Vacinal</div>
+                                        <div class="h5 mb-0 font-weight-bold">78%</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-graph-up fs-1 text-info"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="#" class="small text-info text-decoration-none">Ver por faixa etária
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Últimas Vacinas Aplicadas -->
+                    <div class="col-lg-5 mb-4">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold">Últimas Vacinas Aplicadas</h6>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="vaccineFilter" data-bs-toggle="dropdown">
+                                        Hoje
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#">Hoje</a></li>
+                                        <li><a class="dropdown-item" href="#">Esta semana</a></li>
+                                        <li><a class="dropdown-item" href="#">Este mês</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="vaccine-list">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#vaccineModal">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1">Maria Silva</h6>
+                                                    <small class="text-muted">Hepatite B - Dose 1</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-success">Aplicada</span>
+                                                    <small class="text-muted">08:15</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#vaccineModal">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1">João Santos</h6>
+                                                    <small class="text-muted">Febre Amarela - Dose única</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-success">Aplicada</span>
+                                                    <small class="text-muted">08:45</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#vaccineModal">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1">Ana Oliveira</h6>
+                                                    <small class="text-muted">Influenza - Dose anual</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-success">Aplicada</span>
+                                                    <small class="text-muted">09:30</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#vaccineModal">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1">Carlos Mendes</h6>
+                                                    <small class="text-muted">Tríplice Viral - Dose 2</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-success">Aplicada</span>
+                                                    <small class="text-muted">10:15</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#vaccineModal">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1">Pedro Costa</h6>
+                                                    <small class="text-muted">HPV - Dose 1</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-success">Aplicada</span>
+                                                    <small class="text-muted">10:45</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pendências por Paciente -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold">Pendências por Paciente <span class="badge bg-warning text-dark ms-2">5</span></h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="vaccine-list">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1">Lucas Almeida</h6>
+                                                    <small class="text-muted">Penta - Dose 3 atrasada</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-warning text-dark">45 dias</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1">Beatriz Souza</h6>
+                                                    <small class="text-muted">Pneumocócica - Dose 2</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-warning text-dark">30 dias</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1">Rafael Lima</h6>
+                                                    <small class="text-muted">Meningocócica C - Reforço</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-warning text-dark">60 dias</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1">Juliana Santos</h6>
+                                                    <small class="text-muted">Hepatite B - Dose 3</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-warning text-dark">15 dias</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1">Marcos Oliveira</h6>
+                                                    <small class="text-muted">Influenza - Dose anual</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-warning text-dark">90 dias</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cobertura Vacinal e Notificações -->
+                    <div class="col-lg-7 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold">Cobertura Vacinal por Faixa Etária</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="coverage-chart">
+                                    <canvas id="coverageChart"></canvas>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-download"></i> Exportar Dados
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificações Programadas -->
+                        <div class="card mt-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold">Notificações Programadas <span class="badge bg-primary ms-2">3</span></h6>
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                                    <i class="bi bi-plus"></i> Nova
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info d-flex align-items-center">
+                                    <i class="bi bi-calendar-check me-2"></i>
+                                    <div>
+                                        <strong>Campanha de Influenza:</strong> Inicia em 15/04/2023
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning d-flex align-items-center">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    <div>
+                                        <strong>Lote próximo ao vencimento:</strong> Vacina HPV - Vence em 30/05/2023
+                                    </div>
+                                </div>
+                                <div class="alert alert-success d-flex align-items-center">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    <div>
+                                        <strong>Reunião mensal:</strong> 05/04/2023 às 14:00
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Registrar Vacinação -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold">Registrar Nova Vacinação</h6>
+                            </div>
+                            <div class="card-body">
+                                <form id="vaccineForm">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="patientSearch" class="form-label">Paciente</label>
+                                            <input type="text" class="form-control" id="patientSearch" placeholder="Buscar paciente...">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="vaccineType" class="form-label">Vacina</label>
+                                            <select class="form-select" id="vaccineType">
+                                                <option selected disabled>Selecione...</option>
+                                                <option value="bcg">BCG</option>
+                                                <option value="hepatite_b">Hepatite B</option>
+                                                <option value="penta">Penta (DTP/Hib/Hep B)</option>
+                                                <option value="vip">VIP (Pólio inativada)</option>
+                                                <option value="vop">VOP (Pólio oral)</option>
+                                                <option value="pneumo">Pneumocócica 10-valente</option>
+                                                <option value="rotavirus">Rotavírus</option>
+                                                <option value="meningo">Meningocócica C</option>
+                                                <option value="febre_amarela">Febre Amarela</option>
+                                                <option value="triplice">Tríplice Viral (SCR)</option>
+                                                <option value="tetra">Tetra Viral (SCRV)</option>
+                                                <option value="dpt">DTP (tríplice bacteriana)</option>
+                                                <option value="hpv">HPV</option>
+                                                <option value="influenza">Influenza (gripe)</option>
+                                                <option value="covid">COVID-19</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <label for="vaccineDose" class="form-label">Dose</label>
+                                            <select class="form-select" id="vaccineDose">
+                                                <option value="1">Dose 1</option>
+                                                <option value="2">Dose 2</option>
+                                                <option value="3">Dose 3</option>
+                                                <option value="unica">Dose única</option>
+                                                <option value="reforco">Reforço</option>
+                                                <option value="anual">Dose anual</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="vaccineDate" class="form-label">Data</label>
+                                            <input type="date" class="form-control" id="vaccineDate">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="vaccineLot" class="form-label">Lote</label>
+                                            <input type="text" class="form-control" id="vaccineLot" placeholder="Nº do lote">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="vaccineNotes" class="form-label">Observações</label>
+                                        <textarea class="form-control" id="vaccineNotes" rows="2" placeholder="Observações sobre a aplicação..."></textarea>
+                                    </div>
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <button type="button" class="btn btn-outline-secondary me-md-2">Cancelar</button>
+                                        <button type="submit" class="btn btn-primary">Registrar Vacina</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão de QR Code -->
+    <button class="btn btn-success qr-code-btn" data-bs-toggle="modal" data-bs-target="#qrCodeModal">
+        <i class="bi bi-qr-code"></i>
+    </button>
+
+    <!-- Modal de Vacina -->
+    <div class="modal fade" id="vaccineModal" tabindex="-1" aria-labelledby="vaccineModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="vaccineModalLabel">Detalhes da Vacinação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h5>Maria Silva</h5>
+                        <p class="text-muted">12/05/2018 (4 anos) | Registro: 123456789</p>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Vacina:</strong></label>
+                            <p>Hepatite B</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Dose:</strong></label>
+                            <p>Dose 1</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Data:</strong></label>
+                            <p>15/03/2023</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Lote:</strong></label>
+                            <p>HB2023A1</p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Próxima dose:</strong></label>
+                        <p>15/05/2023 - Hepatite B (Dose 2)</p>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Lembre-se de agendar a próxima dose com o responsável.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary">Imprimir Comprovante</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de QR Code -->
+    <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrCodeModalLabel">Comprovante de Vacinação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-4">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=VACINA:123456789;PACIENTE:MariaSilva;VACINA:HepatiteB;DOSE:1;DATA:15/03/2023;LOTE:HB2023A1;UBS:VilaSaude" alt="QR Code" class="img-fluid">
+                        <h5 class="mt-3">Maria Silva</h5>
+                        <p class="text-muted">Hepatite B - Dose 1</p>
+                        <p>15/03/2023 | Lote: HB2023A1</p>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Este QR Code contém todas as informações da vacinação para verificação.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-success">
+                        <i class="bi bi-printer"></i> Imprimir Comprovante
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Notificação -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Nova Notificação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="notificationTitle" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="notificationTitle" placeholder="Título da notificação">
+                        </div>
+                        <div class="mb-3">
+                            <label for="notificationType" class="form-label">Tipo</label>
+                            <select class="form-select" id="notificationType">
+                                <option selected disabled>Selecione...</option>
+                                <option value="campaign">Campanha</option>
+                                <option value="lot">Lote de vacina</option>
+                                <option value="meeting">Reunião</option>
+                                <option value="training">Treinamento</option>
+                                <option value="other">Outro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notificationDate" class="form-label">Data</label>
+                            <input type="datetime-local" class="form-control" id="notificationDate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="notificationDetails" class="form-label">Detalhes</label>
+                            <textarea class="form-control" id="notificationDetails" rows="3" placeholder="Detalhes da notificação..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notificationPriority" class="form-label">Prioridade</label>
+                            <select class="form-select" id="notificationPriority">
+                                <option value="low">Baixa</option>
+                                <option value="medium" selected>Média</option>
+                                <option value="high">Alta</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar Notificação</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">Editar Perfil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <img src="https://ui-avatars.com/api/?name=Agente+Saude&background=2ecc71&color=fff&size=128" id="profileImage" class="profile-pic-lg mb-3" alt="Profile">
+                        <input type="file" id="profileUpload" accept="image/*" class="d-none">
+                        <button class="btn btn-sm btn-outline-primary" onclick="document.getElementById('profileUpload').click()">
+                            <i class="bi bi-camera"></i> Alterar Foto
+                        </button>
+                    </div>
+                    <form>
+                        <div class="mb-3">
+                            <label for="agentName" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="agentName" value="Agente Saúde">
+                        </div>
+                        <div class="mb-3">
+                            <label for="agentRegistry" class="form-label">Registro Profissional</label>
+                            <input type="text" class="form-control" id="agentRegistry" value="123456789">
+                        </div>
+                        <div class="mb-3">
+                            <label for="agentUbs" class="form-label">UBS</label>
+                            <input type="text" class="form-control" id="agentUbs" value="UBS Vila Saúde">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar-wrapper').classList.toggle('toggled');
+        });
+
+        // Dark Mode Toggle
+        document.getElementById('darkModeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            
+            const icon = this.querySelector('i');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('bi-moon-fill');
+                icon.classList.add('bi-sun-fill');
+            } else {
+                icon.classList.remove('bi-sun-fill');
+                icon.classList.add('bi-moon-fill');
+            }
+        });
+
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeToggle').querySelector('i').classList.remove('bi-moon-fill');
+            document.getElementById('darkModeToggle').querySelector('i').classList.add('bi-sun-fill');
+        }
+
+        // Initialize coverage chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('coverageChart').getContext('2d');
+            const coverageChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['<1 ano', '1-4 anos', '5-9 anos', '10-19 anos', '20-59 anos', '60+ anos'],
+                    datasets: [{
+                        label: 'Cobertura Vacinal (%)',
+                        data: [95, 88, 82, 75, 65, 78],
+                        backgroundColor: [
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(46, 204, 113, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(46, 204, 113, 1)',
+                            'rgba(46, 204, 113, 1)',
+                            'rgba(46, 204, 113, 1)',
+                            'rgba(46, 204, 113, 1)',
+                            'rgba(46, 204, 113, 1)',
+                            'rgba(46, 204, 113, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // Vaccine form validation
+        document.getElementById('vaccineForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const vaccineLot = document.getElementById('vaccineLot').value;
+            const vaccineDate = document.getElementById('vaccineDate').value;
+            
+            // Simulate expired lot check (in a real app, this would check against a database)
+            if (vaccineLot.includes('EXP')) {
+                alert('ATENÇÃO: Este lote está vencido. Não é possível registrar a vacinação com este lote.');
+                return;
+            }
+            
+            // Check if date is in the future
+            const today = new Date().toISOString().split('T')[0];
+            if (vaccineDate > today) {
+                alert('Data de vacinação não pode ser no futuro');
+                return;
+            }
+            
+            // If all validations pass
+            alert('Vacinação registrada com sucesso!');
+            this.reset();
+        });
+
+        // Language selector
+        document.querySelectorAll('[data-lang]').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                alert(`Idioma alterado para ${lang === 'pt' ? 'Português' : lang === 'en' ? 'Inglês' : 'Espanhol'}`);
+            });
+        });
+
+        // Profile image upload
+        document.getElementById('profileUpload').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('profileImage').src = event.target.result;
+                    document.querySelector('.profile-pic').src = event.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+         // Timer functionality
+        let timerInterval;
+        let timeLeft = 30 * 60; // 30 minutes in seconds
+        const timerDisplay = document.getElementById('timer');
+        const startButton = document.getElementById('startTimer');
+        const resetButton = document.getElementById('resetTimer');
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        startButton.addEventListener('click', function() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                startButton.innerHTML = '<i class="bi bi-play-fill"></i>';
+            } else {
+                timerInterval = setInterval(function() {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        alert('Tempo esgotado!');
+                    }
+                }, 1000);
+                startButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
+            }
+        });
+
+        resetButton.addEventListener('click', function() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timeLeft = 30 * 60;
+            updateTimerDisplay();
+            startButton.innerHTML = '<i class="bi bi-play-fill"></i>';
+        });
+
+        // Initialize timer display
+        updateTimerDisplay();
+    </script>
+</body>
+</html>

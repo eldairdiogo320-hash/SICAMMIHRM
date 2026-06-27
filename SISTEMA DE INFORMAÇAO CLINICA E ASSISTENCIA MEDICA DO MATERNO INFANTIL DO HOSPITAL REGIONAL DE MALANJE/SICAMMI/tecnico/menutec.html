@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard do Técnico - Vitrio Cristalino</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap');
+
+        * {
+            font-family: 'Times New Roman', Times, serif;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c7be5;
+            --secondary-color: #f8f9fc;
+            --text-color: #5a5c69;
+            --card-bg: rgba(255, 255, 255, 0.20);
+            --body-bg: #0a0a1a;
+            --sidebar-bg: rgba(255, 255, 255, 0.12);
+            --sidebar-text: #e0e0e0;
+            --sidebar-active: rgba(44, 123, 229, 0.25);
+            --alert-color: #e74a3b;
+            --success-color: #00d97e;
+            --warning-color: #f6c23e;
+            --info-color: #39afd1;
+            --priority-high: #e63757;
+            --priority-medium: #f6c23e;
+            --priority-low: #2c7be5;
+            --glass-blur: 30px;
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.6);
+            --glass-glow: 0 0 60px rgba(44, 123, 229, 0.08);
+            --transition-speed: 0.3s;
+        }
+
+        .dark-mode {
+            --primary-color: #4d8cf7;
+            --secondary-color: #1a1a2e;
+            --text-color: #e8e8e8;
+            --card-bg: rgba(25, 25, 50, 0.30);
+            --body-bg: #0a0a18;
+            --sidebar-bg: rgba(20, 20, 40, 0.25);
+            --sidebar-text: #c0c0d0;
+            --sidebar-active: rgba(77, 140, 247, 0.20);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.7);
+            --glass-glow: 0 0 60px rgba(77, 140, 247, 0.05);
+        }
+
+        /* ===== BASE ===== */
+        body {
+            font-family: 'Times New Roman', Times, serif !important;
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            transition: all var(--transition-speed) ease;
+            min-height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.50);
+            z-index: 0;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        body > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== EFEITO VIDRO CRISTALINO PREMIUM ===== */
+        .glass-effect {
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(var(--glass-blur)) !important;
+            -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow), var(--glass-glow) !important;
+            border-radius: 24px !important;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .glass-effect:hover {
+            box-shadow: var(--glass-shadow), 0 0 80px rgba(44, 123, 229, 0.12) !important;
+            border-color: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        /* ===== SIDEBAR CRISTALINA ===== */
+        .sidebar {
+            background: var(--sidebar-bg) !important;
+            backdrop-filter: blur(35px) !important;
+            -webkit-backdrop-filter: blur(35px) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 0 32px 32px 0 !important;
+            min-height: 100vh;
+            transition: all var(--transition-speed) ease;
+            box-shadow: var(--glass-shadow), var(--glass-glow) !important;
+            width: 280px !important;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar .nav-link {
+            color: var(--sidebar-text);
+            padding: 1rem 1.2rem;
+            margin: 0.25rem 0.8rem;
+            border-radius: 16px;
+            transition: all var(--transition-speed) ease;
+            font-family: 'Times New Roman', Times, serif !important;
+            font-size: 1.05rem;
+            border: 1px solid transparent;
+            backdrop-filter: blur(5px);
+        }
+
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background: var(--sidebar-active);
+            transform: translateX(6px) scale(1.02);
+            border-color: var(--glass-border);
+            box-shadow: 0 0 30px rgba(44, 123, 229, 0.08);
+        }
+
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: var(--sidebar-active);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 40px rgba(44, 123, 229, 0.15);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 14px;
+            width: 22px;
+            text-align: center;
+            font-size: 1.15rem;
+        }
+
+        .sidebar.toggled {
+            width: 80px !important;
+            overflow: hidden;
+        }
+
+        .sidebar.toggled .nav-link {
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            width: 80px;
+            margin: 0.25rem 0;
+            border-radius: 16px;
+        }
+
+        .sidebar.toggled .nav-link span {
+            display: none;
+        }
+
+        .sidebar.toggled .nav-link i {
+            margin-right: 0;
+            font-size: 1.5rem;
+        }
+
+        .sidebar.toggled .sidebar-heading h5 {
+            font-size: 0.7rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-heading h5 {
+            font-family: 'Times New Roman', Times, serif !important;
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 1.3rem;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(44, 123, 229, 0.2);
+        }
+
+        /* ===== CARDS CRISTALINOS ===== */
+        .card {
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(30px) !important;
+            -webkit-backdrop-filter: blur(30px) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 24px !important;
+            box-shadow: var(--glass-shadow), var(--glass-glow) !important;
+            margin-bottom: 1.5rem;
+            transition: all var(--transition-speed) ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--glass-shadow), 0 20px 60px rgba(0, 0, 0, 0.4) !important;
+            border-color: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        .card-header {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-bottom: 1px solid var(--glass-border) !important;
+            padding: 1.1rem 1.5rem;
+            font-family: 'Times New Roman', Times, serif !important;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            border-radius: 24px 24px 0 0 !important;
+            color: #fff;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+
+        /* ===== NAVBAR CRISTALINA ===== */
+        .navbar {
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(35px) !important;
+            -webkit-backdrop-filter: blur(35px) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 28px !important;
+            margin: 12px 20px 20px 20px;
+            box-shadow: var(--glass-shadow), var(--glass-glow) !important;
+            padding: 0.5rem 1.2rem !important;
+        }
+
+        .navbar .container-fluid {
+            padding: 0 !important;
+        }
+
+        /* ===== PERFIL ===== */
+        .profile-pic {
+            width: 42px;
+            height: 42px;
+            border-radius: 50% !important;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2.5px solid var(--primary-color);
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 0 20px rgba(44, 123, 229, 0.15);
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(44, 123, 229, 0.3);
+        }
+
+        .profile-pic-lg {
+            width: 128px;
+            height: 128px;
+            border-radius: 50% !important;
+            object-fit: cover;
+            border: 3.5px solid var(--primary-color);
+            box-shadow: 0 0 40px rgba(44, 123, 229, 0.2);
+        }
+
+        /* ===== PACIENTES ===== */
+        .patient-card {
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            border-radius: 16px !important;
+            margin: 6px 0;
+            background: rgba(255, 255, 255, 0.04) !important;
+            border-left: 6px solid transparent !important;
+            padding: 12px 16px !important;
+            backdrop-filter: blur(5px);
+        }
+
+        .patient-card:hover {
+            transform: translateX(10px) scale(1.01);
+            background: rgba(255, 255, 255, 0.10) !important;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .patient-card.priority-high {
+            border-left-color: var(--priority-high) !important;
+        }
+
+        .patient-card.priority-medium {
+            border-left-color: var(--priority-medium) !important;
+        }
+
+        .patient-card.priority-low {
+            border-left-color: var(--priority-low) !important;
+        }
+
+        .badge-priority-high {
+            background-color: var(--priority-high) !important;
+            color: #fff !important;
+        }
+
+        .badge-priority-medium {
+            background-color: var(--priority-medium) !important;
+            color: #000 !important;
+        }
+
+        .badge-priority-low {
+            background-color: var(--priority-low) !important;
+            color: #fff !important;
+        }
+
+        .triage-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .triage-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .triage-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .triage-list::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        /* ===== BOTÃO BIOMETRIA - BORDER-RADIUS 50% ===== */
+        .biometric-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 74px;
+            height: 74px;
+            border-radius: 50% !important;
+            font-size: 2.2rem;
+            z-index: 9999;
+            animation: pulseGlow 2.5s infinite;
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: 2px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow), 0 0 60px rgba(44, 123, 229, 0.15) !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color) !important;
+            transition: all var(--transition-speed) ease;
+            padding: 0 !important;
+            border-radius: 50% !important;
+        }
+
+        .biometric-btn:hover {
+            transform: scale(1.15) rotate(-5deg);
+            box-shadow: var(--glass-shadow), 0 0 80px rgba(44, 123, 229, 0.35) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .biometric-btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: var(--glass-shadow), 0 0 0 0 rgba(44, 123, 229, 0.25);
+            }
+            70% {
+                box-shadow: var(--glass-shadow), 0 0 0 25px rgba(44, 123, 229, 0);
+            }
+            100% {
+                box-shadow: var(--glass-shadow), 0 0 0 0 rgba(44, 123, 229, 0);
+            }
+        }
+
+        /* ===== TIMER ===== */
+        .timer-display {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif !important;
+            min-width: 120px;
+            text-align: center;
+            letter-spacing: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 0.2rem 1.2rem;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            text-shadow: 0 0 30px rgba(44, 123, 229, 0.1);
+        }
+
+        /* ===== MODAIS CRISTALINOS ===== */
+        .modal-content {
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(40px) !important;
+            -webkit-backdrop-filter: blur(40px) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 28px !important;
+            box-shadow: var(--glass-shadow), var(--glass-glow) !important;
+            color: var(--text-color);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--glass-border) !important;
+            font-family: 'Times New Roman', Times, serif !important;
+            border-radius: 28px 28px 0 0 !important;
+            color: #fff;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--glass-border) !important;
+            border-radius: 0 0 28px 28px !important;
+        }
+
+        .modal .btn-close {
+            filter: invert(1);
+            opacity: 0.7;
+        }
+
+        .modal .btn-close:hover {
+            opacity: 1;
+        }
+
+        /* ===== FORMULÁRIOS ===== */
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 16px !important;
+            color: var(--text-color) !important;
+            transition: all var(--transition-speed) ease;
+            font-family: 'Times New Roman', Times, serif !important;
+            padding: 0.7rem 1rem !important;
+            backdrop-filter: blur(5px);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.12) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 40px rgba(44, 123, 229, 0.12) !important;
+            outline: none;
+            color: var(--text-color) !important;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-check-input {
+            border-color: var(--glass-border) !important;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .form-check-label {
+            color: var(--text-color);
+        }
+
+        /* ===== ALERTAS ===== */
+        .alert {
+            border-radius: 16px !important;
+            backdrop-filter: blur(15px) !important;
+            border: 1px solid var(--glass-border) !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: var(--text-color);
+        }
+
+        .alert-warning {
+            border-left: 4px solid var(--warning-color) !important;
+        }
+
+        .alert-info {
+            border-left: 4px solid var(--info-color) !important;
+        }
+
+        .alert-danger {
+            border-left: 4px solid var(--alert-color) !important;
+        }
+
+        /* ===== BOTÕES ===== */
+        .btn {
+            border-radius: 16px !important;
+            font-family: 'Times New Roman', Times, serif !important;
+            font-weight: bold !important;
+            padding: 0.5rem 1.4rem !important;
+            transition: all var(--transition-speed) ease !important;
+            border: 1px solid transparent !important;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-primary {
+            background: var(--primary-color) !important;
+            border: none !important;
+            color: #fff !important;
+            box-shadow: 0 4px 20px rgba(44, 123, 229, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px rgba(44, 123, 229, 0.35) !important;
+        }
+
+        .btn-outline-primary {
+            border-color: var(--primary-color) !important;
+            color: var(--primary-color) !important;
+            background: transparent !important;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color) !important;
+            color: #fff !important;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-secondary {
+            border-color: var(--glass-border) !important;
+            color: var(--text-color) !important;
+            background: transparent !important;
+        }
+
+        .btn-outline-secondary:hover {
+            background: rgba(255, 255, 255, 0.08) !important;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-success {
+            border-color: var(--success-color) !important;
+            color: var(--success-color) !important;
+            background: transparent !important;
+        }
+
+        .btn-outline-success:hover {
+            background: var(--success-color) !important;
+            color: #fff !important;
+        }
+
+        .btn-outline-danger {
+            border-color: var(--alert-color) !important;
+            color: var(--alert-color) !important;
+            background: transparent !important;
+        }
+
+        .btn-outline-danger:hover {
+            background: var(--alert-color) !important;
+            color: #fff !important;
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            border-radius: 12px !important;
+            padding: 0.4rem 0.9rem !important;
+            font-family: 'Times New Roman', Times, serif !important;
+            font-weight: 600 !important;
+        }
+
+        /* ===== DROPDOWN ===== */
+        .dropdown-menu {
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(35px) !important;
+            -webkit-backdrop-filter: blur(35px) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 18px !important;
+            box-shadow: var(--glass-shadow) !important;
+        }
+
+        .dropdown-item {
+            color: var(--text-color) !important;
+            font-family: 'Times New Roman', Times, serif !important;
+            transition: all var(--transition-speed) ease;
+            border-radius: 12px !important;
+            margin: 2px 6px;
+        }
+
+        .dropdown-item:hover {
+            background: var(--sidebar-active) !important;
+            color: #fff !important;
+        }
+
+        /* ===== LANGUAGE SELECTOR ===== */
+        .language-selector {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .language-selector:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        /* ===== SCROLLBAR GLOBAL ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                border-radius: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: auto !important;
+                position: relative !important;
+            }
+
+            .sidebar.toggled {
+                width: 100% !important;
+            }
+
+            .navbar {
+                margin: 5px 10px 10px 10px;
+                border-radius: 18px !important;
+            }
+
+            .timer-display {
+                font-size: 1.2rem;
+                min-width: 70px;
+                padding: 0.1rem 0.6rem;
+            }
+
+            .biometric-btn {
+                width: 58px;
+                height: 58px;
+                font-size: 1.6rem;
+                bottom: 15px;
+                right: 15px;
+            }
+
+            .card {
+                margin-bottom: 1rem;
+            }
+
+            #page-content-wrapper {
+                padding: 0 10px 10px 10px !important;
+            }
+
+            .profile-pic-lg {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        /* ===== UTILITÁRIOS ===== */
+        #page-content-wrapper {
+            padding: 0 20px 20px 20px;
+            width: 100%;
+        }
+
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        .fa-fw {
+            width: 1.5em !important;
+            text-align: center !important;
+        }
+
+        .text-muted {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+
+        .text-white {
+            color: #fff !important;
+        }
+
+        .bg-primary {
+            background: var(--primary-color) !important;
+        }
+
+        .fade-transition {
+            transition: all var(--transition-speed) ease;
+        }
+
+        /* Animações de entrada */
+        .fade-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-1 { animation-delay: 0.05s; }
+        .delay-2 { animation-delay: 0.10s; }
+        .delay-3 { animation-delay: 0.15s; }
+        .delay-4 { animation-delay: 0.20s; }
+        .delay-5 { animation-delay: 0.25s; }
+    </style>
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar Cristalina -->
+        <div class="sidebar border-end" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4">
+                <h5 class="text-primary"><i class="fas fa-heartbeat me-2"></i><span data-i18n="sidebar.title">Tecnico</span><span style="font-weight:300; color: rgba(255,255,255,0.6);" data-i18n="sidebar.subtitle">Tech</span></h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-tachometer-alt fa-fw"></i>
+                    <span data-i18n="nav.dashboard">Dashboard</span>
+                </a>
+                <a href="triagem.html" class="nav-link">
+                    <i class="fas fa-clipboard-list fa-fw"></i>
+                    <span data-i18n="nav.triage">Triagem</span>
+                </a>
+                <a href="coleta.html" class="nav-link">
+                    <i class="fas fa-syringe fa-fw"></i>
+                    <span data-i18n="nav.collections">Coletas</span>
+                </a>
+                <a href="registro.html" class="nav-link">
+                    <i class="fas fa-user-check fa-fw"></i>
+                    <span data-i18n="nav.checkins">Check-ins</span>
+                </a>
+                <a href="apoio.html" class="nav-link">
+                    <i class="fas fa-exclamation-triangle fa-fw"></i>
+                    <span data-i18n="nav.support">Suporte</span>
+                </a>
+                <a href="relatorios.html" class="nav-link">
+                    <i class="fas fa-file-alt fa-fw"></i>
+                    <span data-i18n="nav.reports">Relatórios</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+                    <button class="btn btn-primary" id="sidebarToggle" style="border-radius: 50% !important; width: 44px; height: 44px; padding: 0 !important;">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <!-- Timer -->
+                    <div class="timer-display mx-3" id="timer">30:00</div>
+                    <button class="btn btn-sm btn-outline-primary me-2" id="startTimer" style="border-radius: 50% !important; width: 40px; height: 40px; padding: 0 !important;">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary me-3" id="resetTimer" style="border-radius: 50% !important; width: 40px; height: 40px; padding: 0 !important;">
+                        <i class="fas fa-undo"></i>
+                    </button>
+
+                    <div class="d-flex align-items-center ms-auto">
+                        <!-- Turno -->
+                        <div class="mx-3 d-none d-md-block">
+                            <span class="badge bg-primary"><i class="fas fa-sun me-1"></i><span data-i18n="shift.morning">Turno: Matutino</span></span>
+                        </div>
+
+                        <!-- Language Selector -->
+                        <div class="dropdown me-2">
+                            <a class="language-selector" id="languageDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-language fs-5"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-lang="pt"><i class="fas fa-check me-2 text-primary"></i>Português</a></li>
+                                <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                <li><a class="dropdown-item" href="#" data-lang="es">Español</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Dark Mode Toggle -->
+                        <button class="btn btn-sm me-2" id="darkModeToggle" style="background: transparent; border: none; color: var(--text-color); border-radius: 50% !important; width: 40px; height: 40px;">
+                            <i class="fas fa-moon"></i>
+                        </button>
+
+                        <!-- Profile -->
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown">
+                                <img src="https://ui-avatars.com/api/?name=Tec+Enfermagem&background=2c7be5&color=fff&size=40" alt="Profile" class="profile-pic me-2">
+                                <span class="d-none d-sm-inline" style="font-weight:600; color: var(--text-color);" data-i18n="profile.name">Tec. Enfermagem</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user me-2"></i><span data-i18n="profile.edit">Perfil</span></a></li>
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal"><i class="fas fa-key me-2"></i><span data-i18n="profile.changePassword">Alterar Senha</span></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i><span data-i18n="profile.logout">Sair</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid px-4 py-3">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="mb-0" style="font-weight:700; color: #fff; text-shadow: 0 0 30px rgba(44,123,229,0.1);">
+                            <i class="fas fa-chart-pie me-2 text-primary"></i><span data-i18n="dashboard.title">Dashboard do Técnico</span>
+                        </h2>
+                        <p class="text-muted"><i class="fas fa-clock me-1"></i><span data-i18n="dashboard.subtitle">Controle de triagem e atendimentos - Sistema Vitrio</span></p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Pacientes para Triagem -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card fade-in delay-1">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold"><i class="fas fa-users me-2 text-primary"></i><span data-i18n="triage.patientsTitle">Pacientes para Triagem</span> <span class="badge bg-primary ms-2" id="patientCount">5</span></h6>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" style="color: var(--text-color); border-color: var(--glass-border);">
+                                        <i class="fas fa-filter me-1"></i><span data-i18n="triage.filter">Prioridade</span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item filter-priority" data-filter="all" href="#"><i class="fas fa-check me-2 text-primary"></i><span data-i18n="triage.filterAll">Todas</span></a></li>
+                                        <li><a class="dropdown-item filter-priority" data-filter="high" href="#"><span data-i18n="triage.high">Alta</span></a></li>
+                                        <li><a class="dropdown-item filter-priority" data-filter="medium" href="#"><span data-i18n="triage.medium">Média</span></a></li>
+                                        <li><a class="dropdown-item filter-priority" data-filter="low" href="#"><span data-i18n="triage.low">Baixa</span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="triage-list" id="patientList">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#" class="list-group-item list-group-item-action patient-card priority-high" data-patient-id="1" data-bs-toggle="modal" data-bs-target="#triageModal">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1" style="color: #fff;"><i class="fas fa-user me-2"></i><span data-i18n="patients.joao">João Silva</span> <span class="badge badge-priority-high ms-2"><i class="fas fa-arrow-up me-1"></i><span data-i18n="priority.high">Alta</span></span></h6>
+                                                    <small class="text-muted"><i class="fas fa-heartbeat me-1"></i><span data-i18n="symptoms.chestPain">Dor torácica intensa</span></small>
+                                                </div>
+                                                <small class="text-muted"><i class="far fa-clock me-1"></i>08:15</small>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action patient-card priority-medium" data-patient-id="2" data-bs-toggle="modal" data-bs-target="#triageModal">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1" style="color: #fff;"><i class="fas fa-user me-2"></i><span data-i18n="patients.maria">Maria Oliveira</span> <span class="badge badge-priority-medium ms-2"><i class="fas fa-minus me-1"></i><span data-i18n="priority.medium">Média</span></span></h6>
+                                                    <small class="text-muted"><i class="fas fa-thermometer-half me-1"></i><span data-i18n="symptoms.fever">Febre persistente</span></small>
+                                                </div>
+                                                <small class="text-muted"><i class="far fa-clock me-1"></i>08:30</small>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action patient-card priority-low" data-patient-id="3" data-bs-toggle="modal" data-bs-target="#triageModal">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1" style="color: #fff;"><i class="fas fa-user me-2"></i><span data-i18n="patients.carlos">Carlos Mendes</span> <span class="badge badge-priority-low ms-2"><i class="fas fa-arrow-down me-1"></i><span data-i18n="priority.low">Baixa</span></span></h6>
+                                                    <small class="text-muted"><i class="fas fa-file-medical me-1"></i><span data-i18n="symptoms.routine">Consulta de rotina</span></small>
+                                                </div>
+                                                <small class="text-muted"><i class="far fa-clock me-1"></i>08:45</small>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action patient-card priority-high" data-patient-id="4" data-bs-toggle="modal" data-bs-target="#triageModal">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1" style="color: #fff;"><i class="fas fa-user me-2"></i><span data-i18n="patients.ana">Ana Santos</span> <span class="badge badge-priority-high ms-2"><i class="fas fa-arrow-up me-1"></i><span data-i18n="priority.high">Alta</span></span></h6>
+                                                    <small class="text-muted"><i class="fas fa-lungs me-1"></i><span data-i18n="symptoms.respiratory">Dificuldade respiratória</span></small>
+                                                </div>
+                                                <small class="text-muted"><i class="far fa-clock me-1"></i>09:00</small>
+                                            </div>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action patient-card priority-medium" data-patient-id="5" data-bs-toggle="modal" data-bs-target="#triageModal">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <div>
+                                                    <h6 class="mb-1" style="color: #fff;"><i class="fas fa-user me-2"></i><span data-i18n="patients.pedro">Pedro Costa</span> <span class="badge badge-priority-medium ms-2"><i class="fas fa-minus me-1"></i><span data-i18n="priority.medium">Média</span></span></h6>
+                                                    <small class="text-muted"><i class="fas fa-cut me-1"></i><span data-i18n="symptoms.cut">Ferimento cortante</span></small>
+                                                </div>
+                                                <small class="text-muted"><i class="far fa-clock me-1"></i>09:15</small>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dados Pendentes -->
+                        <div class="card mt-4 fade-in delay-2">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold"><i class="fas fa-clock me-2 text-warning"></i><span data-i18n="pending.title">Dados Pendentes de Coleta</span> <span class="badge bg-warning text-dark ms-2">3</span></h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                    <i class="fas fa-heartbeat me-2 fa-fw"></i>
+                                    <div>
+                                        <strong data-i18n="pending.vitals">Sinais vitais:</strong> <span data-i18n="pending.vitalsCount">2 pacientes aguardando</span>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info d-flex align-items-center" role="alert">
+                                    <i class="fas fa-tint me-2 fa-fw"></i>
+                                    <div>
+                                        <strong data-i18n="pending.blood">Coleta sanguínea:</strong> <span data-i18n="pending.bloodCount">1 paciente em jejum</span>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                    <i class="fas fa-file-alt me-2 fa-fw"></i>
+                                    <div>
+                                        <strong data-i18n="pending.history">Histórico médico:</strong> <span data-i18n="pending.historyCount">3 formulários incompletos</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalhes da Triagem -->
+                    <div class="col-xl-5 mb-4">
+                        <div class="card fade-in delay-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold"><i class="fas fa-notes-medical me-2 text-primary"></i><span data-i18n="triage.formTitle">Formulário de Triagem</span></h6>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="fas fa-print"></i> <span data-i18n="triage.print">Imprimir</span>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success" id="finalizeTriage">
+                                        <i class="fas fa-check-circle"></i> <span data-i18n="triage.finalize">Finalizar</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-4">
+                                    <h4 id="patientName" style="color: #fff;"><i class="fas fa-user-md me-2"></i><span data-i18n="patients.joao">João Silva</span></h4>
+                                    <p class="text-muted" id="patientInfo"><i class="far fa-calendar-alt me-1"></i><span data-i18n="patient.age">45 anos</span> | <i class="fas fa-venus-mars me-1"></i><span data-i18n="patient.gender">Masculino</span> | <i class="far fa-clock me-1"></i><span data-i18n="patient.arrival">Chegada: 08:15</span></p>
+                                    <span class="badge bg-danger" id="patientPriority"><i class="fas fa-exclamation-circle me-1"></i><span data-i18n="priority.high">Prioridade Alta</span></span>
+                                </div>
+
+                                <form id="triageForm">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="bloodPressure" class="form-label" style="color: var(--text-color);"><i class="fas fa-heart me-1"></i><span data-i18n="form.bloodPressure">Pressão Arterial</span></label>
+                                            <input type="text" class="form-control" id="bloodPressure" placeholder="Ex: 120/80" data-i18n-placeholder="form.bloodPressurePlaceholder">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="heartRate" class="form-label" style="color: var(--text-color);"><i class="fas fa-heartbeat me-1"></i><span data-i18n="form.heartRate">Frequência Cardíaca</span></label>
+                                            <input type="number" class="form-control" id="heartRate" placeholder="Ex: 75" data-i18n-placeholder="form.heartRatePlaceholder">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="temperature" class="form-label" style="color: var(--text-color);"><i class="fas fa-thermometer-half me-1"></i><span data-i18n="form.temperature">Temperatura (°C)</span></label>
+                                            <input type="number" step="0.1" class="form-control" id="temperature" placeholder="Ex: 36.5" data-i18n-placeholder="form.temperaturePlaceholder">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="oxygenSaturation" class="form-label" style="color: var(--text-color);"><i class="fas fa-lungs me-1"></i><span data-i18n="form.oxygen">Sat. O² (%)</span></label>
+                                            <input type="number" class="form-control" id="oxygenSaturation" placeholder="Ex: 98" data-i18n-placeholder="form.oxygenPlaceholder">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="mainComplaint" class="form-label" style="color: var(--text-color);"><i class="fas fa-comment-medical me-1"></i><span data-i18n="form.complaint">Queixa Principal</span></label>
+                                        <textarea class="form-control" id="mainComplaint" rows="2" placeholder="Descreva a queixa principal do paciente" data-i18n-placeholder="form.complaintPlaceholder"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="allergies" class="form-label" style="color: var(--text-color);"><i class="fas fa-allergies me-1"></i><span data-i18n="form.allergies">Alergias Conhecidas</span></label>
+                                        <input type="text" class="form-control" id="allergies" placeholder="Liste as alergias, se houver" data-i18n-placeholder="form.allergiesPlaceholder">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="medications" class="form-label" style="color: var(--text-color);"><i class="fas fa-pills me-1"></i><span data-i18n="form.medications">Medicações em Uso</span></label>
+                                        <input type="text" class="form-control" id="medications" placeholder="Liste as medicações, se houver" data-i18n-placeholder="form.medicationsPlaceholder">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" style="color: var(--text-color);"><i class="fas fa-flag me-1"></i><span data-i18n="form.priority">Prioridade</span></label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="priority" id="priorityHigh" value="high">
+                                                <label class="form-check-label" for="priorityHigh"><span class="text-danger" data-i18n="priority.high">Alta</span></label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="priority" id="priorityMedium" value="medium" checked>
+                                                <label class="form-check-label" for="priorityMedium"><span class="text-warning" data-i18n="priority.medium">Média</span></label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="priority" id="priorityLow" value="low">
+                                                <label class="form-check-label" for="priorityLow"><span class="text-info" data-i18n="priority.low">Baixa</span></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-warning" id="triageAlert">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <span data-i18n="form.alert">Preencha todos os campos obrigatórios antes de finalizar a triagem.</span>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Check-ins e Suporte -->
+                    <div class="col-xl-3 mb-4">
+                        <div class="card fade-in delay-4">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold"><i class="fas fa-user-check me-2 text-primary"></i><span data-i18n="checkins.title">Check-ins por Turno</span> <span class="badge bg-primary ms-2">12</span></h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div>
+                                        <h6 class="mb-0" style="color: var(--text-color);"><i class="fas fa-sun me-1 text-warning"></i><span data-i18n="checkins.morning">Manhã</span></h6>
+                                        <small class="text-muted" data-i18n="checkins.morningHours">(06:00 - 12:00)</small>
+                                    </div>
+                                    <span class="badge bg-primary">8</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div>
+                                        <h6 class="mb-0" style="color: var(--text-color);"><i class="fas fa-cloud-sun me-1 text-secondary"></i><span data-i18n="checkins.afternoon">Tarde</span></h6>
+                                        <small class="text-muted" data-i18n="checkins.afternoonHours">(12:00 - 18:00)</small>
+                                    </div>
+                                    <span class="badge bg-secondary">4</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0" style="color: var(--text-color);"><i class="fas fa-moon me-1 text-primary"></i><span data-i18n="checkins.night">Noite</span></h6>
+                                        <small class="text-muted" data-i18n="checkins.nightHours">(18:00 - 00:00)</small>
+                                    </div>
+                                    <span class="badge bg-secondary">0</span>
+                                </div>
+                                <hr style="border-color: var(--glass-border);">
+                                <div class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-arrow-right"></i> <span data-i18n="checkins.viewAll">Ver todos</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Avisos de Suporte -->
+                        <div class="card mt-4 fade-in delay-5">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold"><i class="fas fa-life-ring me-2 text-danger"></i><span data-i18n="support.title">Suporte Necessário</span> <span class="badge bg-danger ms-2">2</span></h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <div>
+                                        <strong data-i18n="support.bed302">Leito 302:</strong> <span data-i18n="support.bed302Desc">Necessidade de curativo complexo</span>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                    <i class="fas fa-walking me-2"></i>
+                                    <div>
+                                        <strong data-i18n="support.bed305">Leito 305:</strong> <span data-i18n="support.bed305Desc">Paciente requer auxílio para mobilidade</span>
+                                    </div>
+                                </div>
+                                <div class="alert alert-success d-flex align-items-center" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <div>
+                                        <strong data-i18n="support.bed310">Leito 310:</strong> <span data-i18n="support.bed310Desc">Coleta realizada</span>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#supportModal">
+                                        <i class="fas fa-plus-circle"></i> <span data-i18n="support.request">Solicitar Suporte</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== BOTÃO BIOMETRIA - BORDER-RADIUS 50% ===== -->
+    <button class="btn biometric-btn" data-bs-toggle="modal" data-bs-target="#biometricModal" style="border-radius: 50% !important;">
+        <i class="fas fa-fingerprint"></i>
+    </button>
+
+    <!-- ===== MODAIS ===== -->
+
+    <!-- Modal de Triagem -->
+    <div class="modal fade" id="triageModal" tabindex="-1" aria-labelledby="triageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="triageModalLabel"><i class="fas fa-clipboard-check me-2 text-primary"></i><span data-i18n="modal.triage.title">Iniciar Triagem</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><span data-i18n="modal.triage.message">Você está prestes a iniciar a triagem do paciente</span> <strong id="modalPatientName" style="color: var(--primary-color);"><span data-i18n="patients.joao">João Silva</span></strong>.</p>
+                    <p class="text-muted"><span data-i18n="modal.triage.confirm">Por favor, confirme os dados do paciente antes de prosseguir.</span></p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span data-i18n="modal.triage.equipment">Certifique-se de que todos os equipamentos necessários estão disponíveis.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i><span data-i18n="modal.cancel">Cancelar</span></button>
+                    <button type="button" class="btn btn-primary" id="confirmTriage"><i class="fas fa-play me-1"></i><span data-i18n="modal.triage.start">Iniciar Triagem</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Biometria/PIN -->
+    <div class="modal fade" id="biometricModal" tabindex="-1" aria-labelledby="biometricModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="biometricModalLabel"><i class="fas fa-fingerprint me-2 text-primary"></i><span data-i18n="modal.biometric.title">Autenticação Rápida</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-4">
+                        <div style="width: 80px; height: 80px; border-radius: 50% !important; background: var(--card-bg); backdrop-filter: blur(20px); border: 2px solid var(--glass-border); display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: var(--glass-shadow);">
+                            <i class="fas fa-fingerprint" style="font-size: 3.5rem; color: var(--primary-color);"></i>
+                        </div>
+                        <h5 class="mt-2" style="color: #fff;"><span data-i18n="modal.biometric.touch">Toque no sensor biométrico</span></h5>
+                        <p class="text-muted"><span data-i18n="modal.biometric.or">ou</span></p>
+                        <div class="d-flex justify-content-center">
+                            <input type="password" class="form-control w-50 text-center" placeholder="Digite seu PIN" maxlength="4" id="pinInput" style="font-size: 1.5rem; letter-spacing: 8px;" data-i18n-placeholder="modal.biometric.pinPlaceholder">
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span data-i18n="modal.biometric.info">Esta autenticação é necessária para confirmar procedimentos críticos.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i><span data-i18n="modal.cancel">Cancelar</span></button>
+                    <button type="button" class="btn btn-primary" id="confirmBiometric"><i class="fas fa-check me-1"></i><span data-i18n="modal.confirm">Confirmar</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Suporte -->
+    <div class="modal fade" id="supportModal" tabindex="-1" aria-labelledby="supportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="supportModalLabel"><i class="fas fa-life-ring me-2 text-primary"></i><span data-i18n="modal.support.title">Solicitar Suporte</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="supportType" class="form-label"><i class="fas fa-tag me-1"></i><span data-i18n="modal.support.type">Tipo de Suporte</span></label>
+                        <select class="form-select" id="supportType">
+                            <option selected><span data-i18n="modal.support.select">Selecione...</span></option>
+                            <option value="nursing"><i class="fas fa-user-nurse me-1"></i><span data-i18n="modal.support.nursing">Enfermagem</span></option>
+                            <option value="medical"><i class="fas fa-user-md me-1"></i><span data-i18n="modal.support.medical">Médico</span></option>
+                            <option value="procedure"><i class="fas fa-syringe me-1"></i><span data-i18n="modal.support.procedure">Procedimento</span></option>
+                            <option value="equipment"><i class="fas fa-microscope me-1"></i><span data-i18n="modal.support.equipment">Equipamento</span></option>
+                            <option value="other"><i class="fas fa-ellipsis-h me-1"></i><span data-i18n="modal.support.other">Outro</span></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="supportLocation" class="form-label"><i class="fas fa-map-pin me-1"></i><span data-i18n="modal.support.location">Local/Leito</span></label>
+                        <input type="text" class="form-control" id="supportLocation" placeholder="Ex: Leito 302" data-i18n-placeholder="modal.support.locationPlaceholder">
+                    </div>
+                    <div class="mb-3">
+                        <label for="supportDetails" class="form-label"><i class="fas fa-comment me-1"></i><span data-i18n="modal.support.details">Detalhes</span></label>
+                        <textarea class="form-control" id="supportDetails" rows="3" placeholder="Descreva a necessidade de suporte..." data-i18n-placeholder="modal.support.detailsPlaceholder"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="supportPriority" class="form-label"><i class="fas fa-flag me-1"></i><span data-i18n="modal.support.priority">Prioridade</span></label>
+                        <select class="form-select" id="supportPriority">
+                            <option value="routine"><i class="fas fa-circle text-info me-1"></i><span data-i18n="modal.support.routine">Rotina</span></option>
+                            <option value="urgent"><i class="fas fa-circle text-warning me-1"></i><span data-i18n="modal.support.urgent">Urgente</span></option>
+                            <option value="emergency"><i class="fas fa-circle text-danger me-1"></i><span data-i18n="modal.support.emergency">Emergência</span></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i><span data-i18n="modal.cancel">Cancelar</span></button>
+                    <button type="button" class="btn btn-primary" id="sendSupport"><i class="fas fa-paper-plane me-1"></i><span data-i18n="modal.support.send">Solicitar Suporte</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel"><i class="fas fa-user-edit me-2 text-primary"></i><span data-i18n="modal.profile.title">Editar Perfil</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <img src="https://ui-avatars.com/api/?name=Tec+Enfermagem&background=2c7be5&color=fff&size=128" id="profileImage" class="profile-pic-lg mb-3" alt="Profile">
+                        <input type="file" id="profileUpload" accept="image/*" class="d-none">
+                        <button class="btn btn-sm btn-outline-primary" onclick="document.getElementById('profileUpload').click()">
+                            <i class="fas fa-camera me-1"></i> <span data-i18n="modal.profile.changePhoto">Alterar Foto</span>
+                        </button>
+                    </div>
+                    <form id="profileForm">
+                        <div class="mb-3">
+                            <label for="techName" class="form-label"><i class="fas fa-user me-1"></i><span data-i18n="modal.profile.name">Nome</span></label>
+                            <input type="text" class="form-control" id="techName" value="Tec. Enfermagem">
+                        </div>
+                        <div class="mb-3">
+                            <label for="techCoren" class="form-label"><i class="fas fa-id-card me-1"></i><span data-i18n="modal.profile.coren">COREN</span></label>
+                            <input type="text" class="form-control" id="techCoren" value="COREN/SP 123.456">
+                        </div>
+                        <div class="mb-3">
+                            <label for="techUnit" class="form-label"><i class="fas fa-hospital me-1"></i><span data-i18n="modal.profile.unit">Unidade</span></label>
+                            <input type="text" class="form-control" id="techUnit" value="Pronto Atendimento">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i><span data-i18n="modal.cancel">Cancelar</span></button>
+                    <button type="button" class="btn btn-outline-success" id="saveProfile"><i class="fas fa-save me-1"></i><span data-i18n="modal.save">Salvar Alterações</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Alterar Senha -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel"><i class="fas fa-key me-2 text-primary"></i><span data-i18n="modal.password.title">Alterar Senha</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="passwordForm">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label"><i class="fas fa-lock me-1"></i><span data-i18n="modal.password.current">Senha Atual</span></label>
+                            <input type="password" class="form-control" id="currentPassword" placeholder="Digite sua senha atual" data-i18n-placeholder="modal.password.currentPlaceholder">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label"><i class="fas fa-key me-1"></i><span data-i18n="modal.password.new">Nova Senha</span></label>
+                            <input type="password" class="form-control" id="newPassword" placeholder="Digite a nova senha" data-i18n-placeholder="modal.password.newPlaceholder">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label"><i class="fas fa-check-circle me-1"></i><span data-i18n="modal.password.confirm">Confirmar Nova Senha</span></label>
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirme a nova senha" data-i18n-placeholder="modal.password.confirmPlaceholder">
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span data-i18n="modal.password.requirements">A senha deve ter no mínimo 8 caracteres, incluindo letras e números.</span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i><span data-i18n="modal.cancel">Cancelar</span></button>
+                    <button type="button" class="btn btn-primary" id="savePassword"><i class="fas fa-save me-1"></i><span data-i18n="modal.save">Salvar Senha</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            'use strict';
+
+            // =============================================
+            // 0. SISTEMA DE IDIOMA (i18n)
+            // =============================================
+            const translations = {
+                pt: {
+                    'sidebar.title': 'Tecnico',
+                    'sidebar.subtitle': 'Tech',
+                    'nav.dashboard': 'Dashboard',
+                    'nav.triage': 'Triagem',
+                    'nav.collections': 'Coletas',
+                    'nav.checkins': 'Check-ins',
+                    'nav.support': 'Suporte',
+                    'nav.reports': 'Relatórios',
+                    'shift.morning': 'Turno: Matutino',
+                    'profile.name': 'Tec. Enfermagem',
+                    'profile.edit': 'Perfil',
+                    'profile.changePassword': 'Alterar Senha',
+                    'profile.logout': 'Sair',
+                    'dashboard.title': 'Dashboard do Técnico',
+                    'dashboard.subtitle': 'Controle de triagem e atendimentos - Sistema Vitrio',
+                    'triage.patientsTitle': 'Pacientes para Triagem',
+                    'triage.filter': 'Prioridade',
+                    'triage.filterAll': 'Todas',
+                    'triage.high': 'Alta',
+                    'triage.medium': 'Média',
+                    'triage.low': 'Baixa',
+                    'triage.formTitle': 'Formulário de Triagem',
+                    'triage.print': 'Imprimir',
+                    'triage.finalize': 'Finalizar',
+                    'pending.title': 'Dados Pendentes de Coleta',
+                    'pending.vitals': 'Sinais vitais:',
+                    'pending.vitalsCount': '2 pacientes aguardando',
+                    'pending.blood': 'Coleta sanguínea:',
+                    'pending.bloodCount': '1 paciente em jejum',
+                    'pending.history': 'Histórico médico:',
+                    'pending.historyCount': '3 formulários incompletos',
+                    'patient.age': '45 anos',
+                    'patient.gender': 'Masculino',
+                    'patient.arrival': 'Chegada: 08:15',
+                    'priority.high': 'Alta',
+                    'priority.medium': 'Média',
+                    'priority.low': 'Baixa',
+                    'form.bloodPressure': 'Pressão Arterial',
+                    'form.bloodPressurePlaceholder': 'Ex: 120/80',
+                    'form.heartRate': 'Frequência Cardíaca',
+                    'form.heartRatePlaceholder': 'Ex: 75',
+                    'form.temperature': 'Temperatura (°C)',
+                    'form.temperaturePlaceholder': 'Ex: 36.5',
+                    'form.oxygen': 'Sat. O² (%)',
+                    'form.oxygenPlaceholder': 'Ex: 98',
+                    'form.complaint': 'Queixa Principal',
+                    'form.complaintPlaceholder': 'Descreva a queixa principal do paciente',
+                    'form.allergies': 'Alergias Conhecidas',
+                    'form.allergiesPlaceholder': 'Liste as alergias, se houver',
+                    'form.medications': 'Medicações em Uso',
+                    'form.medicationsPlaceholder': 'Liste as medicações, se houver',
+                    'form.priority': 'Prioridade',
+                    'form.alert': 'Preencha todos os campos obrigatórios antes de finalizar a triagem.',
+                    'checkins.title': 'Check-ins por Turno',
+                    'checkins.morning': 'Manhã',
+                    'checkins.morningHours': '(06:00 - 12:00)',
+                    'checkins.afternoon': 'Tarde',
+                    'checkins.afternoonHours': '(12:00 - 18:00)',
+                    'checkins.night': 'Noite',
+                    'checkins.nightHours': '(18:00 - 00:00)',
+                    'checkins.viewAll': 'Ver todos',
+                    'support.title': 'Suporte Necessário',
+                    'support.bed302': 'Leito 302:',
+                    'support.bed302Desc': 'Necessidade de curativo complexo',
+                    'support.bed305': 'Leito 305:',
+                    'support.bed305Desc': 'Paciente requer auxílio para mobilidade',
+                    'support.bed310': 'Leito 310:',
+                    'support.bed310Desc': 'Coleta realizada',
+                    'support.request': 'Solicitar Suporte',
+                    'modal.cancel': 'Cancelar',
+                    'modal.confirm': 'Confirmar',
+                    'modal.save': 'Salvar',
+                    'modal.triage.title': 'Iniciar Triagem',
+                    'modal.triage.message': 'Você está prestes a iniciar a triagem do paciente',
+                    'modal.triage.confirm': 'Por favor, confirme os dados do paciente antes de prosseguir.',
+                    'modal.triage.equipment': 'Certifique-se de que todos os equipamentos necessários estão disponíveis.',
+                    'modal.triage.start': 'Iniciar Triagem',
+                    'modal.biometric.title': 'Autenticação Rápida',
+                    'modal.biometric.touch': 'Toque no sensor biométrico',
+                    'modal.biometric.or': 'ou',
+                    'modal.biometric.pinPlaceholder': 'Digite seu PIN',
+                    'modal.biometric.info': 'Esta autenticação é necessária para confirmar procedimentos críticos.',
+                    'modal.support.title': 'Solicitar Suporte',
+                    'modal.support.type': 'Tipo de Suporte',
+                    'modal.support.select': 'Selecione...',
+                    'modal.support.nursing': 'Enfermagem',
+                    'modal.support.medical': 'Médico',
+                    'modal.support.procedure': 'Procedimento',
+                    'modal.support.equipment': 'Equipamento',
+                    'modal.support.other': 'Outro',
+                    'modal.support.location': 'Local/Leito',
+                    'modal.support.locationPlaceholder': 'Ex: Leito 302',
+                    'modal.support.details': 'Detalhes',
+                    'modal.support.detailsPlaceholder': 'Descreva a necessidade de suporte...',
+                    'modal.support.priority': 'Prioridade',
+                    'modal.support.routine': 'Rotina',
+                    'modal.support.urgent': 'Urgente',
+                    'modal.support.emergency': 'Emergência',
+                    'modal.support.send': 'Solicitar Suporte',
+                    'modal.profile.title': 'Editar Perfil',
+                    'modal.profile.changePhoto': 'Alterar Foto',
+                    'modal.profile.name': 'Nome',
+                    'modal.profile.coren': 'COREN',
+                    'modal.profile.unit': 'Unidade',
+                    'modal.password.title': 'Alterar Senha',
+                    'modal.password.current': 'Senha Atual',
+                    'modal.password.currentPlaceholder': 'Digite sua senha atual',
+                    'modal.password.new': 'Nova Senha',
+                    'modal.password.newPlaceholder': 'Digite a nova senha',
+                    'modal.password.confirm': 'Confirmar Nova Senha',
+                    'modal.password.confirmPlaceholder': 'Confirme a nova senha',
+                    'modal.password.requirements': 'A senha deve ter no mínimo 8 caracteres, incluindo letras e números.',
+                    'patients.joao': 'João Silva',
+                    'patients.maria': 'Maria Oliveira',
+                    'patients.carlos': 'Carlos Mendes',
+                    'patients.ana': 'Ana Santos',
+                    'patients.pedro': 'Pedro Costa',
+                    'symptoms.chestPain': 'Dor torácica intensa',
+                    'symptoms.fever': 'Febre persistente',
+                    'symptoms.routine': 'Consulta de rotina',
+                    'symptoms.respiratory': 'Dificuldade respiratória',
+                    'symptoms.cut': 'Ferimento cortante',
+                    'alerts.triageComplete': '✅ Triagem iniciada para {patient}. Preencha o formulário e finalize.',
+                    'alerts.fillRequired': '⚠️ Por favor, preencha todos os campos obrigatórios antes de finalizar.',
+                    'alerts.triageSaved': '✅ Triagem finalizada e salva com sucesso!',
+                    'alerts.profileUpdated': '✅ Perfil atualizado com sucesso!',
+                    'alerts.passwordChanged': '✅ Senha alterada com sucesso!',
+                    'alerts.fillProfile': '⚠️ Preencha todos os campos do perfil.',
+                    'alerts.fillPassword': '⚠️ Preencha todos os campos.',
+                    'alerts.passwordMin': '⚠️ A nova senha deve ter pelo menos 8 caracteres.',
+                    'alerts.passwordMismatch': '⚠️ As senhas não coincidem.',
+                    'alerts.enterPin': '⚠️ Digite seu PIN ou use o sensor biométrico.',
+                    'alerts.biometricConfirm': '✅ Autenticação confirmada com sucesso!',
+                    'alerts.fillSupport': '⚠️ Preencha todos os campos do suporte.',
+                    'alerts.supportSent': '✅ Suporte solicitado com sucesso!',
+                    'alerts.temperatureAlert': '⚠️ ATENÇÃO: Temperatura fora da faixa normal (35°C - 42°C). Verifique a medida.',
+                    'alerts.temperatureWarning': '⚠️ ALERTA: Temperatura fora da faixa de normalidade (36°C - 37.8°C).',
+                    'alerts.bpInvalid': '⚠️ Formato inválido. Use SISTÓLICA/DIATÓLICA (ex: 120/80)',
+                    'alerts.bpCritical': '🚨 CRÍTICO: Crise hipertensiva. Notifique o médico imediatamente.',
+                    'alerts.bpHypertension': '⚠️ ALERTA: Hipertensão. Verifique novamente.',
+                    'alerts.bpHypotension': '⚠️ ALERTA: Hipotensão. Verifique novamente.',
+                    'alerts.hrAbnormal': '⚠️ Frequência cardíaca fora do padrão normal (40-150 bpm). Verifique.',
+                    'alerts.satCritical': '🚨 SATURAÇÃO CRÍTICA! Intervenção imediata necessária.',
+                    'alerts.satLow': '⚠️ SATURAÇÃO BAIXA. Monitorar e considerar oxigênio suplementar.',
+                    'alerts.timeout': '⏰ Tempo esgotado!'
+                },
+                en: {
+                    'sidebar.title': 'Technician',
+                    'sidebar.subtitle': 'Tech',
+                    'nav.dashboard': 'Dashboard',
+                    'nav.triage': 'Triage',
+                    'nav.collections': 'Collections',
+                    'nav.checkins': 'Check-ins',
+                    'nav.support': 'Support',
+                    'nav.reports': 'Reports',
+                    'shift.morning': 'Shift: Morning',
+                    'profile.name': 'Nurse Tech',
+                    'profile.edit': 'Profile',
+                    'profile.changePassword': 'Change Password',
+                    'profile.logout': 'Logout',
+                    'dashboard.title': 'Technician Dashboard',
+                    'dashboard.subtitle': 'Triage and attendance control - Vitrio System',
+                    'triage.patientsTitle': 'Patients for Triage',
+                    'triage.filter': 'Priority',
+                    'triage.filterAll': 'All',
+                    'triage.high': 'High',
+                    'triage.medium': 'Medium',
+                    'triage.low': 'Low',
+                    'triage.formTitle': 'Triage Form',
+                    'triage.print': 'Print',
+                    'triage.finalize': 'Finalize',
+                    'pending.title': 'Pending Collection Data',
+                    'pending.vitals': 'Vital signs:',
+                    'pending.vitalsCount': '2 patients waiting',
+                    'pending.blood': 'Blood collection:',
+                    'pending.bloodCount': '1 fasting patient',
+                    'pending.history': 'Medical history:',
+                    'pending.historyCount': '3 incomplete forms',
+                    'patient.age': '45 years',
+                    'patient.gender': 'Male',
+                    'patient.arrival': 'Arrival: 08:15',
+                    'priority.high': 'High',
+                    'priority.medium': 'Medium',
+                    'priority.low': 'Low',
+                    'form.bloodPressure': 'Blood Pressure',
+                    'form.bloodPressurePlaceholder': 'Ex: 120/80',
+                    'form.heartRate': 'Heart Rate',
+                    'form.heartRatePlaceholder': 'Ex: 75',
+                    'form.temperature': 'Temperature (°C)',
+                    'form.temperaturePlaceholder': 'Ex: 36.5',
+                    'form.oxygen': 'O² Sat (%)',
+                    'form.oxygenPlaceholder': 'Ex: 98',
+                    'form.complaint': 'Main Complaint',
+                    'form.complaintPlaceholder': 'Describe the patient\'s main complaint',
+                    'form.allergies': 'Known Allergies',
+                    'form.allergiesPlaceholder': 'List allergies, if any',
+                    'form.medications': 'Current Medications',
+                    'form.medicationsPlaceholder': 'List medications, if any',
+                    'form.priority': 'Priority',
+                    'form.alert': 'Please fill in all required fields before finalizing the triage.',
+                    'checkins.title': 'Check-ins by Shift',
+                    'checkins.morning': 'Morning',
+                    'checkins.morningHours': '(06:00 - 12:00)',
+                    'checkins.afternoon': 'Afternoon',
+                    'checkins.afternoonHours': '(12:00 - 18:00)',
+                    'checkins.night': 'Night',
+                    'checkins.nightHours': '(18:00 - 00:00)',
+                    'checkins.viewAll': 'View all',
+                    'support.title': 'Support Needed',
+                    'support.bed302': 'Bed 302:',
+                    'support.bed302Desc': 'Complex dressing needed',
+                    'support.bed305': 'Bed 305:',
+                    'support.bed305Desc': 'Patient requires mobility assistance',
+                    'support.bed310': 'Bed 310:',
+                    'support.bed310Desc': 'Collection completed',
+                    'support.request': 'Request Support',
+                    'modal.cancel': 'Cancel',
+                    'modal.confirm': 'Confirm',
+                    'modal.save': 'Save',
+                    'modal.triage.title': 'Start Triage',
+                    'modal.triage.message': 'You are about to start triage for patient',
+                    'modal.triage.confirm': 'Please confirm patient data before proceeding.',
+                    'modal.triage.equipment': 'Make sure all necessary equipment is available.',
+                    'modal.triage.start': 'Start Triage',
+                    'modal.biometric.title': 'Quick Authentication',
+                    'modal.biometric.touch': 'Touch the biometric sensor',
+                    'modal.biometric.or': 'or',
+                    'modal.biometric.pinPlaceholder': 'Enter your PIN',
+                    'modal.biometric.info': 'This authentication is required to confirm critical procedures.',
+                    'modal.support.title': 'Request Support',
+                    'modal.support.type': 'Support Type',
+                    'modal.support.select': 'Select...',
+                    'modal.support.nursing': 'Nursing',
+                    'modal.support.medical': 'Medical',
+                    'modal.support.procedure': 'Procedure',
+                    'modal.support.equipment': 'Equipment',
+                    'modal.support.other': 'Other',
+                    'modal.support.location': 'Location/Bed',
+                    'modal.support.locationPlaceholder': 'Ex: Bed 302',
+                    'modal.support.details': 'Details',
+                    'modal.support.detailsPlaceholder': 'Describe the support need...',
+                    'modal.support.priority': 'Priority',
+                    'modal.support.routine': 'Routine',
+                    'modal.support.urgent': 'Urgent',
+                    'modal.support.emergency': 'Emergency',
+                    'modal.support.send': 'Request Support',
+                    'modal.profile.title': 'Edit Profile',
+                    'modal.profile.changePhoto': 'Change Photo',
+                    'modal.profile.name': 'Name',
+                    'modal.profile.coren': 'COREN',
+                    'modal.profile.unit': 'Unit',
+                    'modal.password.title': 'Change Password',
+                    'modal.password.current': 'Current Password',
+                    'modal.password.currentPlaceholder': 'Enter your current password',
+                    'modal.password.new': 'New Password',
+                    'modal.password.newPlaceholder': 'Enter new password',
+                    'modal.password.confirm': 'Confirm New Password',
+                    'modal.password.confirmPlaceholder': 'Confirm new password',
+                    'modal.password.requirements': 'Password must have at least 8 characters, including letters and numbers.',
+                    'patients.joao': 'John Smith',
+                    'patients.maria': 'Mary Oliveira',
+                    'patients.carlos': 'Carlos Mendes',
+                    'patients.ana': 'Anna Santos',
+                    'patients.pedro': 'Peter Costa',
+                    'symptoms.chestPain': 'Severe chest pain',
+                    'symptoms.fever': 'Persistent fever',
+                    'symptoms.routine': 'Routine checkup',
+                    'symptoms.respiratory': 'Respiratory distress',
+                    'symptoms.cut': 'Cutting wound',
+                    'alerts.triageComplete': '✅ Triage started for {patient}. Fill out the form and finalize.',
+                    'alerts.fillRequired': '⚠️ Please fill in all required fields before finalizing.',
+                    'alerts.triageSaved': '✅ Triage finalized and saved successfully!',
+                    'alerts.profileUpdated': '✅ Profile updated successfully!',
+                    'alerts.passwordChanged': '✅ Password changed successfully!',
+                    'alerts.fillProfile': '⚠️ Please fill in all profile fields.',
+                    'alerts.fillPassword': '⚠️ Please fill in all fields.',
+                    'alerts.passwordMin': '⚠️ New password must have at least 8 characters.',
+                    'alerts.passwordMismatch': '⚠️ Passwords do not match.',
+                    'alerts.enterPin': '⚠️ Enter your PIN or use the biometric sensor.',
+                    'alerts.biometricConfirm': '✅ Authentication confirmed successfully!',
+                    'alerts.fillSupport': '⚠️ Please fill in all support fields.',
+                    'alerts.supportSent': '✅ Support requested successfully!',
+                    'alerts.temperatureAlert': '⚠️ ATTENTION: Temperature outside normal range (35°C - 42°C). Check measurement.',
+                    'alerts.temperatureWarning': '⚠️ ALERT: Temperature outside normal range (36°C - 37.8°C).',
+                    'alerts.bpInvalid': '⚠️ Invalid format. Use SYSTOLIC/Diastolic (ex: 120/80)',
+                    'alerts.bpCritical': '🚨 CRITICAL: Hypertensive crisis. Notify the doctor immediately.',
+                    'alerts.bpHypertension': '⚠️ ALERT: Hypertension. Check again.',
+                    'alerts.bpHypotension': '⚠️ ALERT: Hypotension. Check again.',
+                    'alerts.hrAbnormal': '⚠️ Heart rate outside normal range (40-150 bpm). Check.',
+                    'alerts.satCritical': '🚨 CRITICAL SATURATION! Immediate intervention needed.',
+                    'alerts.satLow': '⚠️ LOW SATURATION. Monitor and consider supplemental oxygen.',
+                    'alerts.timeout': '⏰ Time out!'
+                },
+                es: {
+                    'sidebar.title': 'Técnico',
+                    'sidebar.subtitle': 'Tech',
+                    'nav.dashboard': 'Tablero',
+                    'nav.triage': 'Triaje',
+                    'nav.collections': 'Recolecciones',
+                    'nav.checkins': 'Registros',
+                    'nav.support': 'Soporte',
+                    'nav.reports': 'Informes',
+                    'shift.morning': 'Turno: Matutino',
+                    'profile.name': 'Tec. Enfermería',
+                    'profile.edit': 'Perfil',
+                    'profile.changePassword': 'Cambiar Contraseña',
+                    'profile.logout': 'Salir',
+                    'dashboard.title': 'Tablero del Técnico',
+                    'dashboard.subtitle': 'Control de triaje y atenciones - Sistema Vitrio',
+                    'triage.patientsTitle': 'Pacientes para Triaje',
+                    'triage.filter': 'Prioridad',
+                    'triage.filterAll': 'Todas',
+                    'triage.high': 'Alta',
+                    'triage.medium': 'Media',
+                    'triage.low': 'Baja',
+                    'triage.formTitle': 'Formulario de Triaje',
+                    'triage.print': 'Imprimir',
+                    'triage.finalize': 'Finalizar',
+                    'pending.title': 'Datos Pendientes de Recolección',
+                    'pending.vitals': 'Signos vitales:',
+                    'pending.vitalsCount': '2 pacientes esperando',
+                    'pending.blood': 'Recolección sanguínea:',
+                    'pending.bloodCount': '1 paciente en ayuno',
+                    'pending.history': 'Historial médico:',
+                    'pending.historyCount': '3 formularios incompletos',
+                    'patient.age': '45 años',
+                    'patient.gender': 'Masculino',
+                    'patient.arrival': 'Llegada: 08:15',
+                    'priority.high': 'Alta',
+                    'priority.medium': 'Media',
+                    'priority.low': 'Baja',
+                    'form.bloodPressure': 'Presión Arterial',
+                    'form.bloodPressurePlaceholder': 'Ej: 120/80',
+                    'form.heartRate': 'Frecuencia Cardíaca',
+                    'form.heartRatePlaceholder': 'Ej: 75',
+                    'form.temperature': 'Temperatura (°C)',
+                    'form.temperaturePlaceholder': 'Ej: 36.5',
+                    'form.oxygen': 'Sat. O² (%)',
+                    'form.oxygenPlaceholder': 'Ej: 98',
+                    'form.complaint': 'Queja Principal',
+                    'form.complaintPlaceholder': 'Describa la queja principal del paciente',
+                    'form.allergies': 'Alergias Conocidas',
+                    'form.allergiesPlaceholder': 'Liste las alergias, si las hay',
+                    'form.medications': 'Medicamentos en Uso',
+                    'form.medicationsPlaceholder': 'Liste los medicamentos, si los hay',
+                    'form.priority': 'Prioridad',
+                    'form.alert': 'Complete todos los campos obligatorios antes de finalizar el triaje.',
+                    'checkins.title': 'Registros por Turno',
+                    'checkins.morning': 'Mañana',
+                    'checkins.morningHours': '(06:00 - 12:00)',
+                    'checkins.afternoon': 'Tarde',
+                    'checkins.afternoonHours': '(12:00 - 18:00)',
+                    'checkins.night': 'Noche',
+                    'checkins.nightHours': '(18:00 - 00:00)',
+                    'checkins.viewAll': 'Ver todos',
+                    'support.title': 'Soporte Necesario',
+                    'support.bed302': 'Cama 302:',
+                    'support.bed302Desc': 'Necesidad de curativo complejo',
+                    'support.bed305': 'Cama 305:',
+                    'support.bed305Desc': 'Paciente requiere ayuda para movilidad',
+                    'support.bed310': 'Cama 310:',
+                    'support.bed310Desc': 'Recolección realizada',
+                    'support.request': 'Solicitar Soporte',
+                    'modal.cancel': 'Cancelar',
+                    'modal.confirm': 'Confirmar',
+                    'modal.save': 'Guardar',
+                    'modal.triage.title': 'Iniciar Triaje',
+                    'modal.triage.message': 'Está a punto de iniciar el triaje del paciente',
+                    'modal.triage.confirm': 'Por favor, confirme los datos del paciente antes de continuar.',
+                    'modal.triage.equipment': 'Asegúrese de que todos los equipos necesarios estén disponibles.',
+                    'modal.triage.start': 'Iniciar Triaje',
+                    'modal.biometric.title': 'Autenticación Rápida',
+                    'modal.biometric.touch': 'Toque el sensor biométrico',
+                    'modal.biometric.or': 'o',
+                    'modal.biometric.pinPlaceholder': 'Ingrese su PIN',
+                    'modal.biometric.info': 'Esta autenticación es necesaria para confirmar procedimientos críticos.',
+                    'modal.support.title': 'Solicitar Soporte',
+                    'modal.support.type': 'Tipo de Soporte',
+                    'modal.support.select': 'Seleccione...',
+                    'modal.support.nursing': 'Enfermería',
+                    'modal.support.medical': 'Médico',
+                    'modal.support.procedure': 'Procedimiento',
+                    'modal.support.equipment': 'Equipo',
+                    'modal.support.other': 'Otro',
+                    'modal.support.location': 'Ubicación/Cama',
+                    'modal.support.locationPlaceholder': 'Ej: Cama 302',
+                    'modal.support.details': 'Detalles',
+                    'modal.support.detailsPlaceholder': 'Describa la necesidad de soporte...',
+                    'modal.support.priority': 'Prioridad',
+                    'modal.support.routine': 'Rutina',
+                    'modal.support.urgent': 'Urgente',
+                    'modal.support.emergency': 'Emergencia',
+                    'modal.support.send': 'Solicitar Soporte',
+                    'modal.profile.title': 'Editar Perfil',
+                    'modal.profile.changePhoto': 'Cambiar Foto',
+                    'modal.profile.name': 'Nombre',
+                    'modal.profile.coren': 'COREN',
+                    'modal.profile.unit': 'Unidad',
+                    'modal.password.title': 'Cambiar Contraseña',
+                    'modal.password.current': 'Contraseña Actual',
+                    'modal.password.currentPlaceholder': 'Ingrese su contraseña actual',
+                    'modal.password.new': 'Nueva Contraseña',
+                    'modal.password.newPlaceholder': 'Ingrese la nueva contraseña',
+                    'modal.password.confirm': 'Confirmar Nueva Contraseña',
+                    'modal.password.confirmPlaceholder': 'Confirme la nueva contraseña',
+                    'modal.password.requirements': 'La contraseña debe tener al menos 8 caracteres, incluyendo letras y números.',
+                    'patients.joao': 'Juan Silva',
+                    'patients.maria': 'María Oliveira',
+                    'patients.carlos': 'Carlos Mendes',
+                    'patients.ana': 'Ana Santos',
+                    'patients.pedro': 'Pedro Costa',
+                    'symptoms.chestPain': 'Dolor torácico intenso',
+                    'symptoms.fever': 'Fiebre persistente',
+                    'symptoms.routine': 'Consulta de rutina',
+                    'symptoms.respiratory': 'Dificultad respiratoria',
+                    'symptoms.cut': 'Herida cortante',
+                    'alerts.triageComplete': '✅ Triaje iniciado para {patient}. Complete el formulario y finalice.',
+                    'alerts.fillRequired': '⚠️ Por favor, complete todos los campos obligatorios antes de finalizar.',
+                    'alerts.triageSaved': '✅ Triaje finalizado y guardado con éxito!',
+                    'alerts.profileUpdated': '✅ Perfil actualizado con éxito!',
+                    'alerts.passwordChanged': '✅ Contraseña cambiada con éxito!',
+                    'alerts.fillProfile': '⚠️ Complete todos los campos del perfil.',
+                    'alerts.fillPassword': '⚠️ Complete todos los campos.',
+                    'alerts.passwordMin': '⚠️ La nueva contraseña debe tener al menos 8 caracteres.',
+                    'alerts.passwordMismatch': '⚠️ Las contraseñas no coinciden.',
+                    'alerts.enterPin': '⚠️ Ingrese su PIN o use el sensor biométrico.',
+                    'alerts.biometricConfirm': '✅ Autenticación confirmada con éxito!',
+                    'alerts.fillSupport': '⚠️ Complete todos los campos de soporte.',
+                    'alerts.supportSent': '✅ Soporte solicitado con éxito!',
+                    'alerts.temperatureAlert': '⚠️ ATENCIÓN: Temperatura fuera del rango normal (35°C - 42°C). Verifique la medición.',
+                    'alerts.temperatureWarning': '⚠️ ALERTA: Temperatura fuera del rango de normalidad (36°C - 37.8°C).',
+                    'alerts.bpInvalid': '⚠️ Formato inválido. Use SISTÓLICA/Diastólica (ej: 120/80)',
+                    'alerts.bpCritical': '🚨 CRÍTICO: Crisis hipertensiva. Notifique al médico inmediatamente.',
+                    'alerts.bpHypertension': '⚠️ ALERTA: Hipertensión. Verifique nuevamente.',
+                    'alerts.bpHypotension': '⚠️ ALERTA: Hipotensión. Verifique nuevamente.',
+                    'alerts.hrAbnormal': '⚠️ Frecuencia cardíaca fuera del rango normal (40-150 lpm). Verifique.',
+                    'alerts.satCritical': '🚨 SATURACIÓN CRÍTICA! Intervención inmediata necesaria.',
+                    'alerts.satLow': '⚠️ SATURACIÓN BAJA. Monitorear y considerar oxígeno suplementario.',
+                    'alerts.timeout': '⏰ Tiempo agotado!'
+                }
+            };
+
+            let currentLanguage = localStorage.getItem('vitrioLanguage') || 'pt';
+
+            function translatePage(lang) {
+                if (!translations[lang]) return;
+
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations[lang][key] !== undefined) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+
+                // Placeholders
+                document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-placeholder');
+                    if (translations[lang][key] !== undefined) {
+                        el.placeholder = translations[lang][key];
+                    }
+                });
+
+                // Modals titles
+                document.querySelectorAll('.modal-title [data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations[lang][key] !== undefined) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+
+                // Update language selector indicator
+                document.querySelectorAll('[data-lang] .fa-check').forEach(icon => icon.remove());
+                document.querySelector(`[data-lang="${lang}"]`)?.prepend(
+                    Object.assign(document.createElement('i'), {
+                        className: 'fas fa-check me-2 text-primary'
+                    })
+                );
+
+                currentLanguage = lang;
+                localStorage.setItem('vitrioLanguage', lang);
+            }
+
+            // Language selector click
+            document.querySelectorAll('[data-lang]').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    translatePage(lang);
+                });
+            });
+
+            // Apply initial language
+            translatePage(currentLanguage);
+
+            // =============================================
+            // 1. SIDEBAR TOGGLE
+            // =============================================
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar-wrapper');
+
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('toggled');
+                    const icon = this.querySelector('i');
+                    if (sidebar.classList.contains('toggled')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-chevron-right');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+            }
+
+            // =============================================
+            // 2. DARK MODE TOGGLE
+            // =============================================
+            const darkModeToggle = document.getElementById('darkModeToggle');
+
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                const icon = darkModeToggle.querySelector('i');
+                if (icon) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
+            }
+
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    localStorage.setItem('darkMode', isDark);
+
+                    const icon = this.querySelector('i');
+                    if (isDark) {
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun');
+                    } else {
+                        icon.classList.remove('fa-sun');
+                        icon.classList.add('fa-moon');
+                    }
+                });
+            }
+
+            // =============================================
+            // 3. TIMER
+            // =============================================
+            let timerInterval;
+            let timeLeft = 30 * 60;
+            let isTimerRunning = true;
+            const timerDisplay = document.getElementById('timer');
+            const startButton = document.getElementById('startTimer');
+            const resetButton = document.getElementById('resetTimer');
+
+            function updateTimerDisplay() {
+                if (!timerDisplay) return;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft < 60) {
+                    timerDisplay.style.color = '#e74a3b';
+                    timerDisplay.style.animation = 'pulseGlow 0.5s infinite';
+                } else {
+                    timerDisplay.style.color = '#fff';
+                    timerDisplay.style.animation = 'none';
+                }
+            }
+
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(function() {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        isTimerRunning = false;
+                        if (startButton) {
+                            startButton.innerHTML = '<i class="fas fa-play"></i>';
+                        }
+                        alert(getTranslation('alerts.timeout'));
+                    }
+                }, 1000);
+                isTimerRunning = true;
+                if (startButton) {
+                    startButton.innerHTML = '<i class="fas fa-pause"></i>';
+                }
+            }
+
+            if (startButton) {
+                startButton.addEventListener('click', function() {
+                    if (isTimerRunning) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        isTimerRunning = false;
+                        startButton.innerHTML = '<i class="fas fa-play"></i>';
+                    } else {
+                        if (timeLeft > 0) {
+                            startTimer();
+                        } else {
+                            timeLeft = 30 * 60;
+                            updateTimerDisplay();
+                            startTimer();
+                        }
+                    }
+                });
+            }
+
+            if (resetButton) {
+                resetButton.addEventListener('click', function() {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    timeLeft = 30 * 60;
+                    updateTimerDisplay();
+                    isTimerRunning = false;
+                    if (startButton) {
+                        startButton.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                    if (timerDisplay) {
+                        timerDisplay.style.color = '#fff';
+                        timerDisplay.style.animation = 'none';
+                    }
+                });
+            }
+
+            // Inicia automaticamente
+            if (timerDisplay) {
+                updateTimerDisplay();
+                startTimer();
+            }
+
+            // =============================================
+            // 4. PATIENT SELECTION
+            // =============================================
+            const patientCards = document.querySelectorAll('.patient-card');
+            const modalPatientName = document.getElementById('modalPatientName');
+            const patientNameDisplay = document.getElementById('patientName');
+            const patientInfoDisplay = document.getElementById('patientInfo');
+            const patientPriorityDisplay = document.getElementById('patientPriority');
+
+            patientCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const patientName = this.querySelector('h6')?.textContent?.trim() || 'Paciente';
+                    const patientInfo = this.querySelector('small')?.textContent?.trim() || '';
+                    const priorityClass = this.classList.contains('priority-high') ? 'Alta' :
+                                         this.classList.contains('priority-medium') ? 'Média' : 'Baixa';
+
+                    if (modalPatientName) modalPatientName.textContent = patientName;
+
+                    if (patientNameDisplay) {
+                        patientNameDisplay.innerHTML = `<i class="fas fa-user-md me-2"></i>${patientName}`;
+                    }
+
+                    if (patientInfoDisplay) {
+                        patientInfoDisplay.innerHTML = patientInfo;
+                    }
+
+                    if (patientPriorityDisplay) {
+                        patientPriorityDisplay.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i>Prioridade ${priorityClass}`;
+                    }
+
+                    // Set priority radio
+                    if (priorityClass === 'Alta') {
+                        const el = document.getElementById('priorityHigh');
+                        if (el) el.checked = true;
+                    } else if (priorityClass === 'Média') {
+                        const el = document.getElementById('priorityMedium');
+                        if (el) el.checked = true;
+                    } else {
+                        const el = document.getElementById('priorityLow');
+                        if (el) el.checked = true;
+                    }
+
+                    if (patientPriorityDisplay) {
+                        patientPriorityDisplay.className = 'badge';
+                        if (priorityClass === 'Alta') {
+                            patientPriorityDisplay.classList.add('bg-danger');
+                        } else if (priorityClass === 'Média') {
+                            patientPriorityDisplay.classList.add('bg-warning', 'text-dark');
+                        } else {
+                            patientPriorityDisplay.classList.add('bg-info');
+                        }
+                    }
+                });
+            });
+
+            // =============================================
+            // 5. CONFIRM TRIAGE
+            // =============================================
+            const confirmTriageBtn = document.getElementById('confirmTriage');
+            if (confirmTriageBtn) {
+                confirmTriageBtn.addEventListener('click', function() {
+                    const patientName = modalPatientName ? modalPatientName.textContent : 'Paciente';
+                    alert(getTranslation('alerts.triageComplete').replace('{patient}', patientName));
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('triageModal'));
+                    if (modal) modal.hide();
+                });
+            }
+
+            // =============================================
+            // 6. FINALIZE TRIAGE - SALVAR ALTERAÇÕES
+            // =============================================
+            const finalizeBtn = document.getElementById('finalizeTriage');
+            if (finalizeBtn) {
+                finalizeBtn.addEventListener('click', function() {
+                    const bp = document.getElementById('bloodPressure')?.value || '';
+                    const hr = document.getElementById('heartRate')?.value || '';
+                    const temp = document.getElementById('temperature')?.value || '';
+                    const sat = document.getElementById('oxygenSaturation')?.value || '';
+                    const complaint = document.getElementById('mainComplaint')?.value || '';
+
+                    if (!bp || !hr || !temp || !sat || !complaint) {
+                        alert(getTranslation('alerts.fillRequired'));
+                        return;
+                    }
+
+                    // Salvar dados em memória (localStorage)
+                    const triageData = {
+                        bloodPressure: bp,
+                        heartRate: hr,
+                        temperature: temp,
+                        oxygenSaturation: sat,
+                        mainComplaint: complaint,
+                        allergies: document.getElementById('allergies')?.value || '',
+                        medications: document.getElementById('medications')?.value || '',
+                        priority: document.querySelector('input[name="priority"]:checked')?.value || 'medium',
+                        timestamp: new Date().toISOString()
+                    };
+
+                    try {
+                        const savedTriages = JSON.parse(localStorage.getItem('vitrioTriages') || '[]');
+                        savedTriages.push(triageData);
+                        localStorage.setItem('vitrioTriages', JSON.stringify(savedTriages));
+                        console.log('📝 Triagem salva em memória:', triageData);
+                    } catch (e) {
+                        console.warn('Não foi possível salvar no localStorage:', e);
+                    }
+
+                    alert(getTranslation('alerts.triageSaved'));
+                });
+            }
+
+            // =============================================
+            // 7. FILTER PATIENTS
+            // =============================================
+            document.querySelectorAll('.filter-priority').forEach(filter => {
+                filter.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const filterValue = this.getAttribute('data-filter');
+                    const cards = document.querySelectorAll('.patient-card');
+
+                    cards.forEach(card => {
+                        if (filterValue === 'all') {
+                            card.style.display = 'block';
+                        } else {
+                            const priority = card.classList.contains('priority-high') ? 'high' :
+                                             card.classList.contains('priority-medium') ? 'medium' : 'low';
+                            card.style.display = priority === filterValue ? 'block' : 'none';
+                        }
+                    });
+                });
+            });
+
+            // =============================================
+            // 8. PROFILE IMAGE UPLOAD
+            // =============================================
+            const profileUpload = document.getElementById('profileUpload');
+            if (profileUpload) {
+                profileUpload.addEventListener('change', function(e) {
+                    if (e.target.files && e.target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            const profileImage = document.getElementById('profileImage');
+                            if (profileImage) profileImage.src = event.target.result;
+                            const profilePic = document.querySelector('.profile-pic');
+                            if (profilePic) profilePic.src = event.target.result;
+                        };
+                        reader.readAsDataURL(e.target.files[0]);
+                    }
+                });
+            }
+
+            // =============================================
+            // 9. SAVE PROFILE - SALVAR ALTERAÇÕES
+            // =============================================
+            const saveProfileBtn = document.getElementById('saveProfile');
+            if (saveProfileBtn) {
+                saveProfileBtn.addEventListener('click', function() {
+                    const name = document.getElementById('techName')?.value || '';
+                    const coren = document.getElementById('techCoren')?.value || '';
+                    const unit = document.getElementById('techUnit')?.value || '';
+
+                    if (!name || !coren || !unit) {
+                        alert(getTranslation('alerts.fillProfile'));
+                        return;
+                    }
+
+                    // Salvar perfil em memória (localStorage)
+                    try {
+                        const profileData = { name, coren, unit, updatedAt: new Date().toISOString() };
+                        localStorage.setItem('vitrioProfile', JSON.stringify(profileData));
+                        console.log('👤 Perfil salvo em memória:', profileData);
+                    } catch (e) {
+                        console.warn('Não foi possível salvar o perfil:', e);
+                    }
+
+                    // Update profile display
+                    const profileSpan = document.querySelector('.profile-pic + span');
+                    if (profileSpan) profileSpan.textContent = name;
+
+                    alert(getTranslation('alerts.profileUpdated'));
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
+                    if (modal) modal.hide();
+                });
+            }
+
+            // =============================================
+            // 10. CHANGE PASSWORD - SALVAR ALTERAÇÕES
+            // =============================================
+            const savePasswordBtn = document.getElementById('savePassword');
+            if (savePasswordBtn) {
+                savePasswordBtn.addEventListener('click', function() {
+                    const current = document.getElementById('currentPassword')?.value || '';
+                    const newPass = document.getElementById('newPassword')?.value || '';
+                    const confirm = document.getElementById('confirmPassword')?.value || '';
+
+                    if (!current || !newPass || !confirm) {
+                        alert(getTranslation('alerts.fillPassword'));
+                        return;
+                    }
+
+                    if (newPass.length < 8) {
+                        alert(getTranslation('alerts.passwordMin'));
+                        return;
+                    }
+
+                    if (newPass !== confirm) {
+                        alert(getTranslation('alerts.passwordMismatch'));
+                        return;
+                    }
+
+                    // Salvar senha em memória (simulado)
+                    try {
+                        const passwordData = {
+                            changedAt: new Date().toISOString(),
+                            passwordHash: btoa(newPass) // Simulação apenas!
+                        };
+                        localStorage.setItem('vitrioPassword', JSON.stringify(passwordData));
+                        console.log('🔑 Senha alterada em memória (simulação)');
+                    } catch (e) {
+                        console.warn('Não foi possível salvar a senha:', e);
+                    }
+
+                    alert(getTranslation('alerts.passwordChanged'));
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                    if (modal) modal.hide();
+
+                    const fields = ['currentPassword', 'newPassword', 'confirmPassword'];
+                    fields.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.value = '';
+                    });
+                });
+            }
+
+            // =============================================
+            // 11. BIOMETRIC CONFIRMATION
+            // =============================================
+            const confirmBiometricBtn = document.getElementById('confirmBiometric');
+            if (confirmBiometricBtn) {
+                confirmBiometricBtn.addEventListener('click', function() {
+                    const pin = document.getElementById('pinInput')?.value || '';
+                    if (!pin) {
+                        alert(getTranslation('alerts.enterPin'));
+                        return;
+                    }
+                    alert(getTranslation('alerts.biometricConfirm'));
+                    const pinInput = document.getElementById('pinInput');
+                    if (pinInput) pinInput.value = '';
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('biometricModal'));
+                    if (modal) modal.hide();
+                });
+            }
+
+            // Enter key on PIN input
+            const pinInput = document.getElementById('pinInput');
+            if (pinInput) {
+                pinInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const btn = document.getElementById('confirmBiometric');
+                        if (btn) btn.click();
+                    }
+                });
+            }
+
+            // =============================================
+            // 12. SUPPORT REQUEST
+            // =============================================
+            const sendSupportBtn = document.getElementById('sendSupport');
+            if (sendSupportBtn) {
+                sendSupportBtn.addEventListener('click', function() {
+                    const type = document.getElementById('supportType')?.value || '';
+                    const location = document.getElementById('supportLocation')?.value || '';
+                    const details = document.getElementById('supportDetails')?.value || '';
+                    const priority = document.getElementById('supportPriority')?.value || 'routine';
+
+                    if (type === 'Selecione...' || !location || !details) {
+                        alert(getTranslation('alerts.fillSupport'));
+                        return;
+                    }
+
+                    const priorityLabels = {
+                        'routine': getTranslation('modal.support.routine'),
+                        'urgent': getTranslation('modal.support.urgent'),
+                        'emergency': getTranslation('modal.support.emergency')
+                    };
+
+                    // Salvar suporte em memória
+                    try {
+                        const supportData = {
+                            type,
+                            location,
+                            details,
+                            priority,
+                            priorityLabel: priorityLabels[priority] || priority,
+                            timestamp: new Date().toISOString()
+                        };
+                        const savedSupports = JSON.parse(localStorage.getItem('vitrioSupports') || '[]');
+                        savedSupports.push(supportData);
+                        localStorage.setItem('vitrioSupports', JSON.stringify(savedSupports));
+                        console.log('🆘 Suporte salvo em memória:', supportData);
+                    } catch (e) {
+                        console.warn('Não foi possível salvar o suporte:', e);
+                    }
+
+                    alert(getTranslation('alerts.supportSent'));
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('supportModal'));
+                    if (modal) modal.hide();
+
+                    const fields = ['supportType', 'supportLocation', 'supportDetails', 'supportPriority'];
+                    fields.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            if (id === 'supportType') el.value = 'Selecione...';
+                            else if (id === 'supportPriority') el.value = 'routine';
+                            else el.value = '';
+                        }
+                    });
+                });
+            }
+
+            // =============================================
+            // 13. HELPER FUNCTION FOR TRANSLATIONS
+            // =============================================
+            function getTranslation(key) {
+                return translations[currentLanguage]?.[key] || key;
+            }
+
+            // =============================================
+            // 14. VALIDAÇÕES EM TEMPO REAL
+            // =============================================
+            // Temperatura
+            const tempInput = document.getElementById('temperature');
+            if (tempInput) {
+                tempInput.addEventListener('change', function() {
+                    const temp = parseFloat(this.value);
+                    if (!isNaN(temp)) {
+                        if (temp < 35 || temp > 42) {
+                            alert(getTranslation('alerts.temperatureAlert'));
+                        } else if (temp < 36 || temp > 37.8) {
+                            alert(getTranslation('alerts.temperatureWarning'));
+                        }
+                    }
+                });
+            }
+
+            // Pressão Arterial
+            const bpInput = document.getElementById('bloodPressure');
+            if (bpInput) {
+                bpInput.addEventListener('change', function() {
+                    const bp = this.value.split('/');
+                    if (bp.length !== 2 || isNaN(bp[0]) || isNaN(bp[1])) {
+                        alert(getTranslation('alerts.bpInvalid'));
+                        return;
+                    }
+                    const systolic = parseInt(bp[0]);
+                    const diastolic = parseInt(bp[1]);
+                    if (systolic > 180 || diastolic > 120) {
+                        alert(getTranslation('alerts.bpCritical'));
+                    } else if (systolic > 140 || diastolic > 90) {
+                        alert(getTranslation('alerts.bpHypertension'));
+                    } else if (systolic < 90 || diastolic < 60) {
+                        alert(getTranslation('alerts.bpHypotension'));
+                    }
+                });
+            }
+
+            // Frequência Cardíaca
+            const hrInput = document.getElementById('heartRate');
+            if (hrInput) {
+                hrInput.addEventListener('change', function() {
+                    const hr = parseInt(this.value);
+                    if (!isNaN(hr)) {
+                        if (hr < 40 || hr > 150) {
+                            alert(getTranslation('alerts.hrAbnormal'));
+                        }
+                    }
+                });
+            }
+
+            // Saturação
+            const satInput = document.getElementById('oxygenSaturation');
+            if (satInput) {
+                satInput.addEventListener('change', function() {
+                    const sat = parseInt(this.value);
+                    if (!isNaN(sat)) {
+                        if (sat < 85) {
+                            alert(getTranslation('alerts.satCritical'));
+                        } else if (sat < 90) {
+                            alert(getTranslation('alerts.satLow'));
+                        }
+                    }
+                });
+            }
+
+            // =============================================
+            // 15. CARREGAR DADOS SALVOS EM MEMÓRIA
+            // =============================================
+            try {
+                // Carregar perfil salvo
+                const savedProfile = localStorage.getItem('vitrioProfile');
+                if (savedProfile) {
+                    const profile = JSON.parse(savedProfile);
+                    const nameInput = document.getElementById('techName');
+                    const corenInput = document.getElementById('techCoren');
+                    const unitInput = document.getElementById('techUnit');
+                    if (nameInput) nameInput.value = profile.name || nameInput.value;
+                    if (corenInput) corenInput.value = profile.coren || corenInput.value;
+                    if (unitInput) unitInput.value = profile.unit || unitInput.value;
+                    const profileSpan = document.querySelector('.profile-pic + span');
+                    if (profileSpan && profile.name) profileSpan.textContent = profile.name;
+                    console.log('📂 Perfil carregado da memória:', profile);
+                }
+
+                // Carregar contagem de triagens
+                const savedTriages = JSON.parse(localStorage.getItem('vitrioTriages') || '[]');
+                const patientCount = document.getElementById('patientCount');
+                if (patientCount) {
+                    patientCount.textContent = savedTriages.length + 5;
+                }
+                console.log('📊 Total de triagens salvas:', savedTriages.length);
+
+            } catch (e) {
+                console.warn('Erro ao carregar dados da memória:', e);
+            }
+
+            console.log('✅ Sistema Vitrio - Dashboard do Técnico carregado com sucesso!');
+            console.log('🔮 Interface com efeito vidro cristalino premium ativado.');
+            console.log('🖐️ Botão de impressão digital com border-radius: 50%');
+            console.log('💾 Funcionalidades de salvar alterações operacionais (memória)');
+            console.log('🌐 Sistema de idiomas totalmente integrado e funcional');
+        });
+    </script>
+</body>
+</html>

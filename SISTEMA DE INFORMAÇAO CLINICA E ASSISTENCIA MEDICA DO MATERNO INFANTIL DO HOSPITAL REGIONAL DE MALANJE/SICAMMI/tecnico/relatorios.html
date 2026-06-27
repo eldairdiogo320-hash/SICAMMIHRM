@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emitir Relatórios Laboratoriais - SICAMMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Estilo geral - mantido do original */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-image: url('../images/dash-rec.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Tema Claro - mantido do original */
+        body.light-theme::before {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        body.light-theme .page-title,
+        body.light-theme .indicator-card .number,
+        body.light-theme .indicator-card .label,
+        body.light-theme .info-card .card-title,
+        body.light-theme .info-card .info-label,
+        body.light-theme .info-card .info-value,
+        body.light-theme .timeline-item .timeline-content h6,
+        body.light-theme .timeline-item .timeline-content p,
+        body.light-theme .filter-section h6,
+        body.light-theme .filter-section .text-muted,
+        body.light-theme .nav-tabs .nav-link,
+        body.light-theme .report-card .card-body,
+        body.light-theme .report-card .card-title,
+        body.light-theme .report-card .card-text,
+        body.light-theme .chart-container h6,
+        body.light-theme .assistant-card h5,
+        body.light-theme .assistant-card p,
+        body.light-theme .activity-table th,
+        body.light-theme .activity-table td,
+        body.light-theme .patient-detail h5,
+        body.light-theme .patient-detail p,
+        body.light-theme .modal-content,
+        body.light-theme .modal .form-label,
+        body.light-theme .form-label,
+        body.light-theme .sample-info,
+        body.light-theme .result-table th,
+        body.light-theme .result-table td,
+        body.light-theme .signature-area p,
+        body.light-theme .report-viewer h6 {
+            color: #1a1a2e !important;
+        }
+
+        body.light-theme .nav-tabs .nav-link {
+            color: #1a1a2e !important;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-theme .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .tab-content,
+        body.light-theme .indicator-card,
+        body.light-theme .info-card,
+        body.light-theme .filter-section,
+        body.light-theme .chart-container,
+        body.light-theme .report-card,
+        body.light-theme .activity-table,
+        body.light-theme .timeline-item .timeline-content,
+        body.light-theme .patient-detail,
+        body.light-theme .sample-form-card,
+        body.light-theme .report-viewer,
+        body.light-theme .signature-area {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .filter-section .form-control,
+        body.light-theme .filter-section .form-select,
+        body.light-theme .sample-form-card .form-control,
+        body.light-theme .sample-form-card .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .filter-section .form-control::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-theme #currentDateTime {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .modal .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .timeline-item .timeline-badge {
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark {
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .page-title .badge {
+            background: rgba(13, 110, 253, 0.2) !important;
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .assistant-card {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.85) 0%, rgba(245, 87, 108, 0.85) 100%);
+        }
+
+        body.light-theme .flow-step {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .flow-arrow {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .sample-tag {
+            background: rgba(0, 0, 0, 0.08);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .result-table {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        body.light-theme .result-table th {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .result-table td {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .signature-area {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Estilo tabs - Glassmorphism - mantido */
+        .nav-tabs .nav-link {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 18px;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            margin-right: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: #fff;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: bold;
+            box-shadow: 0 -2px 20px rgba(13, 110, 253, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 0 8px 8px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Cards de indicadores - Glassmorphism - mantido */
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid rgba(13, 110, 253, 0.6);
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .indicator-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .indicator-card .label {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .indicator-card .label i {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .indicator-card.total { border-left-color: rgba(13, 110, 253, 0.6); }
+        .indicator-card.completed { border-left-color: rgba(25, 135, 84, 0.6); }
+        .indicator-card.pending { border-left-color: rgba(255, 193, 7, 0.6); }
+        .indicator-card.urgent { border-left-color: rgba(220, 53, 69, 0.6); }
+        .indicator-card.archived { border-left-color: rgba(108, 117, 125, 0.6); }
+
+        .indicator-card.total .number { color: #6ee7ff; }
+        .indicator-card.completed .number { color: #75f0a0; }
+        .indicator-card.pending .number { color: #ffd75a; }
+        .indicator-card.urgent .number { color: #ff7a8a; }
+        .indicator-card.archived .number { color: #adb5bd; }
+
+        /* Filtros - Glassmorphism - mantido */
+        .filter-section {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .filter-section h6 {
+            color: #fff;
+        }
+
+        .filter-section .form-control,
+        .filter-section .form-select {
+            font-family: 'Times New Roman', Times, serif;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .filter-section .form-control:focus,
+        .filter-section .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        .filter-section .btn-outline-primary {
+            color: #fff;
+            border-color: rgba(13, 110, 253, 0.4);
+        }
+
+        .filter-section .btn-outline-primary:hover {
+            background: rgba(13, 110, 253, 0.2);
+        }
+
+        /* Info Card - Glassmorphism - mantido */
+        .info-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .info-card .card-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-card .info-label {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .info-card .info-value {
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        /* Result Table */
+        .result-table {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .result-table th {
+            font-family: 'Times New Roman', Times, serif;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            color: #fff;
+            padding: 12px;
+        }
+
+        .result-table td {
+            font-family: 'Times New Roman', Times, serif;
+            vertical-align: middle;
+            color: #fff;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .result-table .normal {
+            color: #75f0a0;
+        }
+        .result-table .attention {
+            color: #ffd75a;
+        }
+        .result-table .critical {
+            color: #ff7a8a;
+        }
+
+        /* Signature Area */
+        .signature-area {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-top: 15px;
+        }
+
+        .signature-area .signature-line {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 0;
+            margin: 5px 0;
+        }
+
+        .signature-area p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+
+        /* Report Viewer */
+        .report-viewer {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            min-height: 400px;
+        }
+
+        .report-viewer h6 {
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .report-viewer .report-header {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .report-viewer .report-footer {
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        /* QR Code Display */
+        .qr-code-display {
+            width: 100px;
+            height: 100px;
+            margin: 10px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .status-badge.issued {
+            background: rgba(13, 110, 253, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        .status-badge.completed {
+            background: rgba(25, 135, 84, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 193, 7, 0.7);
+            backdrop-filter: blur(5px);
+            color: #000;
+        }
+
+        .status-badge.urgent {
+            background: rgba(220, 53, 69, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        .status-badge.archived {
+            background: rgba(108, 117, 125, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        /* Page Title - mantido */
+        .page-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title .bi {
+            animation: bounce 2s infinite;
+        }
+
+        .page-title .badge {
+            background: rgba(13, 110, 253, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Theme Toggle - mantido */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(30deg);
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Dashboard Button - mantido */
+        .dashboard-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        body.light-theme .dashboard-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .dashboard-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        #currentDateTime {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:hover {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal Glassmorphism - mantido */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal .btn-close {
+            filter: invert(1);
+        }
+
+        .modal .form-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .modal .form-control,
+        .modal .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .modal .form-control:focus,
+        .modal .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+        }
+
+        .modal .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        /* Quick Actions - mantido */
+        .quick-actions .btn {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 3px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+        }
+
+        .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.6);
+        }
+
+        .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.6);
+        }
+
+        .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.6);
+        }
+
+        .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.6);
+        }
+
+        .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.3);
+            color: #fff;
+        }
+
+        .quick-actions .btn-outline-dark {
+            background: rgba(33, 37, 41, 0.3);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn-outline-dark:hover {
+            background: rgba(33, 37, 41, 0.5);
+            color: #fff;
+        }
+
+        .quick-actions .btn-dark {
+            background: rgba(33, 37, 41, 0.5);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn-dark:hover {
+            background: rgba(33, 37, 41, 0.7);
+            color: #fff;
+        }
+
+        /* Sample Tag */
+        .sample-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 0.9rem;
+            margin: 3px;
+        }
+
+        .sample-tag i {
+            margin-right: 5px;
+        }
+
+        /* Assistant Card - mantido */
+        .assistant-card {
+            background: rgba(240, 147, 251, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .assistant-card .bi {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .assistant-card h5 {
+            color: #fff;
+        }
+
+        .assistant-card p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Chart Container - mantido */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container h6 {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        /* Timeline - mantido */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+            padding-left: 20px;
+        }
+
+        .timeline-item .timeline-badge {
+            position: absolute;
+            left: -22px;
+            top: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+        }
+
+        .timeline-item .timeline-badge.primary { background: rgba(13, 110, 253, 0.6); }
+        .timeline-item .timeline-badge.success { background: rgba(25, 135, 84, 0.6); }
+        .timeline-item .timeline-badge.warning { background: rgba(255, 193, 7, 0.6); }
+        .timeline-item .timeline-badge.info { background: rgba(13, 202, 240, 0.6); }
+        .timeline-item .timeline-badge.danger { background: rgba(220, 53, 69, 0.6); }
+
+        .timeline-item .timeline-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-item .timeline-content:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .timeline-item .timeline-content h6 {
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .timeline-item .timeline-content p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        .timeline-item .timeline-content .time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        /* Activity Table - Glassmorphism - mantido */
+        .activity-table {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .activity-table th {
+            font-family: 'Times New Roman', Times, serif;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .activity-table td {
+            font-family: 'Times New Roman', Times, serif;
+            vertical-align: middle;
+            color: #fff;
+        }
+
+        .activity-table .table-hover tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-table .clickable-row {
+            cursor: pointer;
+        }
+
+        .activity-table .clickable-row:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .indicator-card .number {
+                font-size: 1.8rem;
+            }
+            .tab-content {
+                padding: 15px;
+            }
+            .page-title {
+                font-size: 1.5rem;
+            }
+            .header-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .timeline {
+                padding-left: 20px;
+            }
+            .timeline-item {
+                padding-left: 10px;
+            }
+            .timeline-item .timeline-badge {
+                left: -18px;
+                width: 14px;
+                height: 14px;
+                font-size: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Cabeçalho -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap header-actions">
+                    <h2 class="page-title">
+                        <i class="bi bi-file-earmark-bar-graph text-primary"></i> 
+                        Emitir Relatórios Laboratoriais
+                        <span class="badge bg-primary ms-2 notification-badge">📊 RELATÓRIOS</span>
+                    </h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- Botão Dashboard -->
+                        <a href="menutec.html" class="dashboard-btn" title="Voltar ao Dashboard Principal">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+                        </a>
+
+                        <!-- Alternador de Tema -->
+                        <button class="theme-toggle-btn" id="themeToggle" title="Alternar Tema">
+                            <i class="bi bi-moon-stars" id="themeIcon"></i>
+                        </button>
+
+                        <span class="badge bg-info text-dark" id="currentDateTime">
+                            <i class="bi bi-clock"></i> 
+                            <span id="dateTimeDisplay">Carregando...</span>
+                        </span>
+                        <button class="btn btn-primary" id="btnExportAll">
+                            <i class="bi bi-download"></i> Exportar
+                        </button>
+                        <div class="input-group" style="width: 250px;">
+                            <input type="text" id="quickSearch" class="form-control" placeholder="🔍 Pesquisar relatório...">
+                            <button class="btn btn-outline-primary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de Indicadores -->
+        <div class="row mb-4">
+            <div class="col-md-2 col-6">
+                <div class="indicator-card total fade-in">
+                    <div class="number" id="totalReports">0</div>
+                    <div class="label"><i class="bi bi-file-earmark-text"></i> Relatórios Emitidos Hoje</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card completed fade-in">
+                    <div class="number" id="totalCompleted">0</div>
+                    <div class="label"><i class="bi bi-check2-circle"></i> Exames Concluídos</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card pending fade-in">
+                    <div class="number" id="totalPending">0</div>
+                    <div class="label"><i class="bi bi-hourglass-split"></i> Relatórios Pendentes</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card urgent fade-in">
+                    <div class="number" id="totalUrgent">0</div>
+                    <div class="label"><i class="bi bi-exclamation-triangle"></i> Casos Urgentes</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card archived fade-in">
+                    <div class="number" id="totalArchived">0</div>
+                    <div class="label"><i class="bi bi-archive"></i> Relatórios Arquivados</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="emitir-tab" data-bs-toggle="tab" data-bs-target="#emitir" type="button" role="tab">
+                    <i class="bi bi-file-earmark-plus"></i> Emitir Relatório
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="visualizar-tab" data-bs-toggle="tab" data-bs-target="#visualizar" type="button" role="tab">
+                    <i class="bi bi-eye"></i> Visualizar
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab">
+                    <i class="bi bi-clock-history"></i> Histórico
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Aba Emitir Relatório -->
+            <div class="tab-pane fade show active" id="emitir" role="tabpanel">
+                <!-- Filtros de Pesquisa -->
+                <div class="filter-section">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <h6><i class="bi bi-search"></i> Pesquisa Inteligente</h6>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" id="searchProcess" class="form-control" placeholder="# Processo Clínico">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" id="searchPatient" class="form-control" placeholder="👤 Nome do Paciente">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" id="searchSample" class="form-control" placeholder="🔬 Código da Amostra">
+                        </div>
+                        <div class="col-md-2">
+                            <select id="searchExam" class="form-select">
+                                <option value="">Todos os exames</option>
+                                <option value="Hemograma">Hemograma</option>
+                                <option value="Glicemia">Glicemia</option>
+                                <option value="HIV">HIV</option>
+                                <option value="Malária">Malária</option>
+                                <option value="Urina Tipo II">Urina Tipo II</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100" id="btnSearchReports">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-3">
+                            <input type="date" id="searchStartDate" class="form-control" placeholder="Data Inicial">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" id="searchEndDate" class="form-control" placeholder="Data Final">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="searchPeriod" class="form-select">
+                                <option value="today">Hoje</option>
+                                <option value="week">Esta semana</option>
+                                <option value="month">Este mês</option>
+                                <option value="custom">Personalizado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-secondary w-100" id="btnClearSearch">
+                                <i class="bi bi-arrow-counterclockwise"></i> Limpar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Lista de Exames -->
+                    <div class="col-md-5">
+                        <div class="info-card">
+                            <h6 class="card-title"><i class="bi bi-list-check"></i> Exames Disponíveis</h6>
+                            <div class="list-group" id="examList">
+                                <!-- Exames serão inseridos via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visualização do Relatório -->
+                    <div class="col-md-7">
+                        <div class="report-viewer" id="reportViewer">
+                            <div class="text-center" id="noReportSelected">
+                                <i class="bi bi-file-earmark-text" style="font-size: 4rem; color: rgba(255,255,255,0.3);"></i>
+                                <p style="color: rgba(255,255,255,0.5); margin-top: 10px;">Selecione um exame para visualizar o relatório</p>
+                            </div>
+
+                            <!-- Conteúdo do Relatório (oculto inicialmente) -->
+                            <div id="reportContent" style="display: none;">
+                                <div class="report-header">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 style="color: #0d6efd;"><i class="bi bi-file-earmark-text"></i> RELATÓRIO LABORATORIAL</h6>
+                                            <h5 id="reportPatientName" style="color: #fff;">Maria Silva</h5>
+                                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                                <span class="sample-tag"><i class="bi bi-folder"></i> <span id="reportProcess">P-2026-0158</span></span>
+                                                <span class="sample-tag"><i class="bi bi-vial"></i> <span id="reportSampleCode">SICAMMI-2026-0001</span></span>
+                                                <span class="sample-tag"><i class="bi bi-calendar"></i> <span id="reportDate">15/08/2026</span></span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="qr-code-display" style="width: 80px; height: 80px;">
+                                                <i class="bi bi-qr-code"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Dados do Paciente -->
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="info-label">Sexo</div>
+                                        <div class="info-value" id="reportSex">Feminino</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Idade</div>
+                                        <div class="info-value" id="reportAge">32 anos</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Nome da Mãe</div>
+                                        <div class="info-value" id="reportMother">Ana Costa</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Serviço de Origem</div>
+                                        <div class="info-value" id="reportService">Pediatria</div>
+                                    </div>
+                                </div>
+
+                                <!-- Resultados -->
+                                <h6 class="mt-3" style="color: rgba(255,255,255,0.7);"><i class="bi bi-table"></i> Resultados Laboratoriais</h6>
+                                <div class="result-table table-responsive">
+                                    <table class="table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Parâmetro</th>
+                                                <th>Resultado</th>
+                                                <th>Referência</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reportResults">
+                                            <!-- Resultados serão inseridos via JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Interpretação da IA -->
+                                <div class="assistant-card mt-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="bi bi-robot me-3"></i>
+                                        <div>
+                                            <h6 style="color: #fff;"><i class="bi bi-stars"></i> Interpretação Inteligente</h6>
+                                            <p id="reportInterpretation" style="font-size: 0.9rem;">Todos os parâmetros dentro dos valores de referência. Resultados normais.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Assinaturas -->
+                                <div class="signature-area mt-3">
+                                    <div class="row">
+                                        <div class="col-md-6 text-center">
+                                            <div class="signature-line">
+                                                <p style="font-size: 1.2rem; font-weight: bold;">___________________</p>
+                                                <p><i class="bi bi-person-badge"></i> <span id="reportTechnician">Dr. Carlos Santos</span></p>
+                                                <p style="font-size: 0.8rem;">👨‍🔬 Técnico de Laboratório</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 text-center">
+                                            <div class="signature-line">
+                                                <p style="font-size: 1.2rem; font-weight: bold;">___________________</p>
+                                                <p><i class="bi bi-person-check"></i> <span id="reportPathologist">Dra. Ana Manuel</span></p>
+                                                <p style="font-size: 0.8rem;">👨‍⚕️ Médico Patologista</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <p style="font-size: 0.8rem;"><i class="bi bi-calendar-check"></i> Data da Validação: <span id="reportValidationDate">15/08/2026 10:30</span></p>
+                                    </div>
+                                </div>
+
+                                <!-- Botões de Ação do Relatório -->
+                                <div class="d-flex flex-wrap gap-2 mt-3">
+                                    <button class="btn btn-primary" id="btnEmitirRelatorio">
+                                        <i class="bi bi-file-earmark-check"></i> Emitir Relatório
+                                    </button>
+                                    <button class="btn btn-success" id="btnExportPDF">
+                                        <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+                                    </button>
+                                    <button class="btn btn-info" id="btnExportExcel">
+                                        <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+                                    </button>
+                                    <button class="btn btn-warning" id="btnPrintReport">
+                                        <i class="bi bi-printer"></i> Imprimir
+                                    </button>
+                                    <button class="btn btn-outline-primary" id="btnSendEmail">
+                                        <i class="bi bi-envelope"></i> Enviar
+                                    </button>
+                                    <button class="btn btn-outline-secondary" id="btnArchiveReport">
+                                        <i class="bi bi-archive"></i> Arquivar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Visualizar -->
+            <div class="tab-pane fade" id="visualizar" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="report-viewer" style="min-height: 500px;">
+                            <div class="text-center" id="noReportSelectedView">
+                                <i class="bi bi-eye" style="font-size: 4rem; color: rgba(255,255,255,0.3);"></i>
+                                <p style="color: rgba(255,255,255,0.5); margin-top: 10px;">Selecione um relatório para visualizar</p>
+                            </div>
+
+                            <div id="viewReportContent" style="display: none;">
+                                <!-- Conteúdo similar ao da aba Emitir, mas com visualização em tela cheia -->
+                                <div class="report-header">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 style="color: #0d6efd;"><i class="bi bi-file-earmark-text"></i> RELATÓRIO LABORATORIAL</h6>
+                                            <h5 id="viewPatientName" style="color: #fff;">Maria Silva</h5>
+                                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                                <span class="sample-tag"><i class="bi bi-folder"></i> <span id="viewProcess">P-2026-0158</span></span>
+                                                <span class="sample-tag"><i class="bi bi-vial"></i> <span id="viewSampleCode">SICAMMI-2026-0001</span></span>
+                                                <span class="sample-tag"><i class="bi bi-calendar"></i> <span id="viewDate">15/08/2026</span></span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="qr-code-display" style="width: 80px; height: 80px;">
+                                                <i class="bi bi-qr-code"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="info-label">Sexo</div>
+                                        <div class="info-value" id="viewSex">Feminino</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Idade</div>
+                                        <div class="info-value" id="viewAge">32 anos</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Nome da Mãe</div>
+                                        <div class="info-value" id="viewMother">Ana Costa</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Serviço de Origem</div>
+                                        <div class="info-value" id="viewService">Pediatria</div>
+                                    </div>
+                                </div>
+
+                                <h6 class="mt-3" style="color: rgba(255,255,255,0.7);"><i class="bi bi-table"></i> Resultados Laboratoriais</h6>
+                                <div class="result-table table-responsive">
+                                    <table class="table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Parâmetro</th>
+                                                <th>Resultado</th>
+                                                <th>Referência</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="viewResults">
+                                            <!-- Resultados serão inseridos via JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="assistant-card mt-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="bi bi-robot me-3"></i>
+                                        <div>
+                                            <h6 style="color: #fff;"><i class="bi bi-stars"></i> Interpretação Inteligente</h6>
+                                            <p id="viewInterpretation" style="font-size: 0.9rem;">Todos os parâmetros dentro dos valores de referência. Resultados normais.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="signature-area mt-3">
+                                    <div class="row">
+                                        <div class="col-md-6 text-center">
+                                            <div class="signature-line">
+                                                <p style="font-size: 1.2rem; font-weight: bold;">___________________</p>
+                                                <p><i class="bi bi-person-badge"></i> <span id="viewTechnician">Dr. Carlos Santos</span></p>
+                                                <p style="font-size: 0.8rem;">👨‍🔬 Técnico de Laboratório</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 text-center">
+                                            <div class="signature-line">
+                                                <p style="font-size: 1.2rem; font-weight: bold;">___________________</p>
+                                                <p><i class="bi bi-person-check"></i> <span id="viewPathologist">Dra. Ana Manuel</span></p>
+                                                <p style="font-size: 0.8rem;">👨‍⚕️ Médico Patologista</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <p style="font-size: 0.8rem;"><i class="bi bi-calendar-check"></i> Data da Validação: <span id="viewValidationDate">15/08/2026 10:30</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <!-- Gráficos Inteligentes -->
+                        <div class="chart-container">
+                            <h6><i class="bi bi-graph-up"></i> Evolução da Hemoglobina</h6>
+                            <div style="height: 150px; display: flex; align-items: flex-end; padding: 10px;">
+                                <div style="width: 18%; margin: 0 1%; background: rgba(13, 110, 253, 0.7); height: 60%; border-radius: 4px;"></div>
+                                <div style="width: 18%; margin: 0 1%; background: rgba(25, 135, 84, 0.7); height: 75%; border-radius: 4px;"></div>
+                                <div style="width: 18%; margin: 0 1%; background: rgba(255, 193, 7, 0.7); height: 70%; border-radius: 4px;"></div>
+                                <div style="width: 18%; margin: 0 1%; background: rgba(13, 202, 240, 0.7); height: 85%; border-radius: 4px;"></div>
+                                <div style="width: 18%; margin: 0 1%; background: rgba(220, 53, 69, 0.7); height: 80%; border-radius: 4px;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small style="color: rgba(255,255,255,0.7);">Jan</small>
+                                <small style="color: rgba(255,255,255,0.7);">Fev</small>
+                                <small style="color: rgba(255,255,255,0.7);">Mar</small>
+                                <small style="color: rgba(255,255,255,0.7);">Abr</small>
+                                <small style="color: rgba(255,255,255,0.7);">Mai</small>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <h6><i class="bi bi-graph-up-arrow"></i> Evolução da Glicemia</h6>
+                            <div style="height: 150px; display: flex; align-items: flex-end; padding: 10px;">
+                                <div style="width: 18%; margin: 0 1%; background: rgba(13, 110, 253, 0.7); height: 45%; border-radius: 4px;"></div>
+                                <div style="width: 18%; margin: 0 1%; background: rgba(25, 135, 84, 0.7); height: 55%; border-radius: 4px;"></div>
+                                <div style="width: 18%; margin: 0 1%; background: rgba(255, 193, 7, 0.7); height: 65%; border-radius: 4px;"></div>
+                                <div style="width: 18%; margin: 0 1%; background: rgba(13, 202, 240, 0.7); height: 70%; border-radius: 4px;"></div>
+                                <div style="width: 18%; margin: 0 1%; background: rgba(220, 53, 69, 0.7); height: 60%; border-radius: 4px;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small style="color: rgba(255,255,255,0.7);">Jan</small>
+                                <small style="color: rgba(255,255,255,0.7);">Fev</small>
+                                <small style="color: rgba(255,255,255,0.7);">Mar</small>
+                                <small style="color: rgba(255,255,255,0.7);">Abr</small>
+                                <small style="color: rgba(255,255,255,0.7);">Mai</small>
+                            </div>
+                        </div>
+
+                        <!-- Estatísticas -->
+                        <div class="chart-container">
+                            <h6><i class="bi bi-pie-chart"></i> Distribuição de Resultados</h6>
+                            <div style="height: 120px; display: flex; justify-content: center; align-items: center;">
+                                <div style="width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(
+                                    rgba(25, 135, 84, 0.8) 0% 60%,
+                                    rgba(255, 193, 7, 0.8) 60% 85%,
+                                    rgba(220, 53, 69, 0.8) 85% 100%
+                                );"></div>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-around mt-2">
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #198754;">●</span> Normal (60%)</span>
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #ffc107;">●</span> Atenção (25%)</span>
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #dc3545;">●</span> Crítico (15%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Histórico -->
+            <div class="tab-pane fade" id="historico" role="tabpanel">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="activity-table table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Processo</th>
+                                        <th>Paciente</th>
+                                        <th>Exame</th>
+                                        <th>Data</th>
+                                        <th>Estado</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody">
+                                    <!-- Relatórios serão inseridos via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="quick-actions mt-4 d-flex flex-wrap gap-2">
+            <button class="btn btn-primary" id="btnNewReport">
+                <i class="bi bi-plus-circle"></i> Novo Relatório
+            </button>
+            <button class="btn btn-success" id="btnExportReports">
+                <i class="bi bi-download"></i> Exportar Todos
+            </button>
+            <button class="btn btn-info" id="btnViewStats">
+                <i class="bi bi-graph-up"></i> Estatísticas
+            </button>
+            <button class="btn btn-warning" id="btnPrintAll">
+                <i class="bi bi-printer"></i> Imprimir Todos
+            </button>
+            <button class="btn btn-outline-primary" id="btnRefresh">
+                <i class="bi bi-arrow-repeat"></i> Atualizar
+            </button>
+            <button class="btn btn-outline-dark">
+                <a href="menu_recepcionista.html" style="color: inherit; text-decoration: none;">
+                    <i class="bi bi-arrow-left"></i> Voltar ao Dashboard
+                </a>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Relatório Emitido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="bi bi-check-circle-fill" style="font-size: 3rem; color: #198754;"></i>
+                        <h6 class="mt-2">Relatório emitido com sucesso!</h6>
+                        <p><strong>Código:</strong> <span id="confirmReportCode">REL-2026-0001</span></p>
+                        <p><strong>Paciente:</strong> <span id="confirmReportPatient">Maria Silva</span></p>
+                        <div class="qr-code-display" style="width: 80px; height: 80px; margin: 10px auto;">
+                            <i class="bi bi-qr-code"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="btnPrintConfirmReport">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Dados de exemplo
+            const exams = [
+                { 
+                    id: 1, 
+                    code: 'SICAMMI-2026-0001', 
+                    patient: 'Maria Silva', 
+                    process: 'P-2026-0158', 
+                    exam: 'Hemograma', 
+                    date: '15/08/2026',
+                    sex: 'Feminino',
+                    age: '32 anos',
+                    mother: 'Ana Costa',
+                    service: 'Pediatria',
+                    technician: 'Dr. Carlos Santos',
+                    pathologist: 'Dra. Ana Manuel',
+                    status: 'Concluído',
+                    results: [
+                        { param: 'Hemoglobina', result: '13.2 g/dL', reference: '12-16 g/dL', status: 'normal' },
+                        { param: 'Leucócitos', result: '7.500/mm³', reference: '4.000-11.000/mm³', status: 'normal' },
+                        { param: 'Plaquetas', result: '280.000/mm³', reference: '150.000-450.000/mm³', status: 'normal' },
+                        { param: 'Hemácias', result: '4.8 milhões/mm³', reference: '4.2-5.4 milhões/mm³', status: 'normal' }
+                    ],
+                    interpretation: 'Todos os parâmetros dentro dos valores de referência. Resultados normais.'
+                },
+                { 
+                    id: 2, 
+                    code: 'SICAMMI-2026-0002', 
+                    patient: 'João Pedro', 
+                    process: 'P-2026-0159', 
+                    exam: 'Glicemia', 
+                    date: '15/08/2026',
+                    sex: 'Masculino',
+                    age: '45 anos',
+                    mother: 'Maria Pedro',
+                    service: 'Cardiologia',
+                    technician: 'Dr. Carlos Santos',
+                    pathologist: 'Dra. Ana Manuel',
+                    status: 'Urgente',
+                    results: [
+                        { param: 'Glicemia em Jejum', result: '180 mg/dL', reference: '70-100 mg/dL', status: 'critical' },
+                        { param: 'Hemoglobina Glicada', result: '8.2%', reference: '4-5.6%', status: 'critical' }
+                    ],
+                    interpretation: '⚠️ Valores elevados de glicemia. Sugere-se repetição do exame e avaliação médica urgente.'
+                },
+                { 
+                    id: 3, 
+                    code: 'SICAMMI-2026-0003', 
+                    patient: 'Ana Oliveira', 
+                    process: 'P-2026-0160', 
+                    exam: 'HIV', 
+                    date: '14/08/2026',
+                    sex: 'Feminino',
+                    age: '28 anos',
+                    mother: 'Teresa Oliveira',
+                    service: 'Ginecologia',
+                    technician: 'Dra. Sofia Lima',
+                    pathologist: 'Dr. Ricardo Santos',
+                    status: 'Pendente',
+                    results: [
+                        { param: 'Teste Rápido HIV', result: 'Não reagente', reference: 'Não reagente', status: 'normal' }
+                    ],
+                    interpretation: 'Resultado não reagente para HIV. Recomenda-se acompanhamento conforme protocolo.'
+                },
+                { 
+                    id: 4, 
+                    code: 'SICAMMI-2026-0004', 
+                    patient: 'Carlos Santos', 
+                    process: 'P-2026-0161', 
+                    exam: 'Malária', 
+                    date: '14/08/2026',
+                    sex: 'Masculino',
+                    age: '35 anos',
+                    mother: 'Lúcia Santos',
+                    service: 'Urgência',
+                    technician: 'Dr. Carlos Santos',
+                    pathologist: 'Dra. Ana Manuel',
+                    status: 'Concluído',
+                    results: [
+                        { param: 'Pesquisa de Hematozoários', result: 'Positivo', reference: 'Negativo', status: 'critical' },
+                        { param: 'Gota Espessa', result: 'Plasmodium falciparum', reference: 'Ausente', status: 'critical' }
+                    ],
+                    interpretation: '⚠️ Positivo para Plasmodium falciparum. Iniciar tratamento imediatamente.'
+                },
+                { 
+                    id: 5, 
+                    code: 'SICAMMI-2026-0005', 
+                    patient: 'Sofia Costa', 
+                    process: 'P-2026-0162', 
+                    exam: 'Urina Tipo II', 
+                    date: '13/08/2026',
+                    sex: 'Feminino',
+                    age: '12 anos',
+                    mother: 'Carla Costa',
+                    service: 'Pediatria',
+                    technician: 'Dra. Sofia Lima',
+                    pathologist: 'Dr. Ricardo Santos',
+                    status: 'Arquivado',
+                    results: [
+                        { param: 'Leucócitos', result: '5/μL', reference: '0-10/μL', status: 'normal' },
+                        { param: 'Nitrito', result: 'Negativo', reference: 'Negativo', status: 'normal' },
+                        { param: 'Proteínas', result: '15 mg/dL', reference: '0-20 mg/dL', status: 'normal' }
+                    ],
+                    interpretation: 'Resultados normais. Nenhuma alteração significativa detectada.'
+                }
+            ];
+
+            const historyReports = [
+                { process: 'P-2026-0158', patient: 'Maria Silva', exam: 'Hemograma', date: '15/08/2026', status: 'Emitido' },
+                { process: 'P-2026-0159', patient: 'João Pedro', exam: 'Glicemia', date: '15/08/2026', status: 'Urgente' },
+                { process: 'P-2026-0160', patient: 'Ana Oliveira', exam: 'HIV', date: '14/08/2026', status: 'Pendente' },
+                { process: 'P-2026-0161', patient: 'Carlos Santos', exam: 'Malária', date: '14/08/2026', status: 'Emitido' },
+                { process: 'P-2026-0162', patient: 'Sofia Costa', exam: 'Urina Tipo II', date: '13/08/2026', status: 'Arquivado' }
+            ];
+
+            // Tema
+            let isDarkTheme = true;
+
+            function toggleTheme() {
+                isDarkTheme = !isDarkTheme;
+                if (isDarkTheme) {
+                    $('body').removeClass('light-theme');
+                    $('#themeIcon').removeClass('bi-sun-fill').addClass('bi-moon-stars');
+                } else {
+                    $('body').addClass('light-theme');
+                    $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+                }
+                localStorage.setItem('sicami-theme-reports', isDarkTheme ? 'dark' : 'light');
+            }
+
+            const savedTheme = localStorage.getItem('sicami-theme-reports');
+            if (savedTheme === 'light') {
+                isDarkTheme = false;
+                $('body').addClass('light-theme');
+                $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+            }
+
+            $('#themeToggle').click(toggleTheme);
+
+            // Botão Dashboard
+            $('#btnDashboard').click(function(e) {
+                e.preventDefault();
+                alert('🔙 Redirecionando para o Dashboard Principal...\n\n(Em produção, isso redirecionaria para a página principal do sistema)');
+            });
+
+            // Data e Hora
+            function updateDateTime() {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR');
+                const timeStr = now.toLocaleTimeString('pt-BR');
+                $('#dateTimeDisplay').text(`${dateStr} ${timeStr}`);
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Atualizar indicadores
+            function updateIndicators() {
+                const total = exams.length;
+                const completed = exams.filter(e => e.status === 'Concluído').length;
+                const pending = exams.filter(e => e.status === 'Pendente').length;
+                const urgent = exams.filter(e => e.status === 'Urgente').length;
+                const archived = exams.filter(e => e.status === 'Arquivado').length;
+
+                $('#totalReports').text(total);
+                $('#totalCompleted').text(completed);
+                $('#totalPending').text(pending);
+                $('#totalUrgent').text(urgent);
+                $('#totalArchived').text(archived);
+            }
+            updateIndicators();
+
+            // Renderizar lista de exames
+            function renderExamList(data) {
+                const list = $('#examList');
+                list.empty();
+
+                if (data.length === 0) {
+                    list.html('<div class="list-group-item" style="color: rgba(255,255,255,0.7);">Nenhum exame disponível</div>');
+                    return;
+                }
+
+                data.forEach(e => {
+                    const statusClass = e.status === 'Concluído' ? 'completed' :
+                                      e.status === 'Pendente' ? 'pending' :
+                                      e.status === 'Urgente' ? 'urgent' : 'archived';
+
+                    list.append(`
+                        <div class="list-group-item list-group-item-action exam-item" data-id="${e.id}" style="background: rgba(255,255,255,0.05); color: #fff; border-color: rgba(255,255,255,0.1); cursor: pointer;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${e.patient}</strong>
+                                    <br><small style="color: rgba(255,255,255,0.6);">${e.exam} - ${e.code}</small>
+                                </div>
+                                <span class="status-badge ${statusClass}">${e.status}</span>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            // Selecionar exame e mostrar relatório
+            $(document).on('click', '.exam-item', function() {
+                const id = parseInt($(this).data('id'));
+                const exam = exams.find(e => e.id === id);
+                if (exam) {
+                    showReport(exam);
+                }
+            });
+
+            // Mostrar relatório
+            function showReport(exam) {
+                // Esconder mensagem de nenhum selecionado
+                $('#noReportSelected').hide();
+                $('#reportContent').show();
+
+                // Preencher dados do paciente
+                $('#reportPatientName').text(exam.patient);
+                $('#reportProcess').text(exam.process);
+                $('#reportSampleCode').text(exam.code);
+                $('#reportDate').text(exam.date);
+                $('#reportSex').text(exam.sex);
+                $('#reportAge').text(exam.age);
+                $('#reportMother').text(exam.mother);
+                $('#reportService').text(exam.service);
+                $('#reportTechnician').text(exam.technician);
+                $('#reportPathologist').text(exam.pathologist);
+                $('#reportValidationDate').text(`${exam.date} 10:30`);
+
+                // Preencher resultados
+                const resultsBody = $('#reportResults');
+                resultsBody.empty();
+
+                exam.results.forEach(r => {
+                    const statusIcon = r.status === 'normal' ? '✅' :
+                                     r.status === 'attention' ? '⚠️' : '🔴';
+                    const statusClass = r.status === 'normal' ? 'normal' :
+                                      r.status === 'attention' ? 'attention' : 'critical';
+
+                    resultsBody.append(`
+                        <tr>
+                            <td><strong>${r.param}</strong></td>
+                            <td class="${statusClass}">${r.result}</td>
+                            <td>${r.reference}</td>
+                            <td>${statusIcon}</td>
+                        </tr>
+                    `);
+                });
+
+                // Preencher interpretação
+                $('#reportInterpretation').text(exam.interpretation);
+
+                // Atualizar também a visualização
+                $('#viewPatientName').text(exam.patient);
+                $('#viewProcess').text(exam.process);
+                $('#viewSampleCode').text(exam.code);
+                $('#viewDate').text(exam.date);
+                $('#viewSex').text(exam.sex);
+                $('#viewAge').text(exam.age);
+                $('#viewMother').text(exam.mother);
+                $('#viewService').text(exam.service);
+                $('#viewTechnician').text(exam.technician);
+                $('#viewPathologist').text(exam.pathologist);
+                $('#viewValidationDate').text(`${exam.date} 10:30`);
+
+                const viewResultsBody = $('#viewResults');
+                viewResultsBody.empty();
+
+                exam.results.forEach(r => {
+                    const statusIcon = r.status === 'normal' ? '✅' :
+                                     r.status === 'attention' ? '⚠️' : '🔴';
+                    const statusClass = r.status === 'normal' ? 'normal' :
+                                      r.status === 'attention' ? 'attention' : 'critical';
+
+                    viewResultsBody.append(`
+                        <tr>
+                            <td><strong>${r.param}</strong></td>
+                            <td class="${statusClass}">${r.result}</td>
+                            <td>${r.reference}</td>
+                            <td>${statusIcon}</td>
+                        </tr>
+                    `);
+                });
+
+                $('#viewInterpretation').text(exam.interpretation);
+
+                // Atualizar a visualização
+                $('#noReportSelectedView').hide();
+                $('#viewReportContent').show();
+
+                // Scroll para o relatório
+                $('html, body').animate({ scrollTop: $('#reportViewer').offset().top - 100 }, 300);
+            }
+
+            // Emitir relatório
+            $('#btnEmitirRelatorio').click(function() {
+                const patientName = $('#reportPatientName').text();
+                const code = $('#reportSampleCode').text();
+                $('#confirmReportCode').text(`REL-${code}`);
+                $('#confirmReportPatient').text(patientName);
+                $('#confirmModal').modal('show');
+
+                // Atualizar indicadores
+                updateIndicators();
+
+                // Adicionar ao histórico
+                addHistoryReport(patientName, 'Hemograma', 'Emitido');
+            });
+
+            // Adicionar ao histórico
+            function addHistoryReport(patient, exam, status) {
+                const process = `P-2026-${String(historyReports.length + 1).padStart(4, '0')}`;
+                const date = new Date().toLocaleDateString('pt-BR');
+                historyReports.push({ process, patient, exam, date, status });
+                renderHistoryTable();
+            }
+
+            // Renderizar histórico
+            function renderHistoryTable() {
+                const body = $('#historyTableBody');
+                body.empty();
+
+                historyReports.forEach(h => {
+                    const statusClass = h.status === 'Emitido' ? 'issued' :
+                                      h.status === 'Pendente' ? 'pending' :
+                                      h.status === 'Urgente' ? 'urgent' : 'archived';
+
+                    body.append(`
+                        <tr class="clickable-row" data-process="${h.process}">
+                            <td>${h.process}</td>
+                            <td>${h.patient}</td>
+                            <td>${h.exam}</td>
+                            <td>${h.date}</td>
+                            <td><span class="status-badge ${statusClass}">${h.status}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary view-history" data-process="${h.process}"><i class="bi bi-eye"></i></button>
+                                <button class="btn btn-sm btn-outline-success print-history" data-process="${h.process}"><i class="bi bi-printer"></i></button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+            renderHistoryTable();
+
+            // Ver histórico
+            $(document).on('click', '.view-history', function() {
+                const process = $(this).data('process');
+                const report = historyReports.find(h => h.process === process);
+                if (report) {
+                    alert(`📋 Relatório\n\nProcesso: ${report.process}\nPaciente: ${report.patient}\nExame: ${report.exam}\nData: ${report.date}\nEstado: ${report.status}`);
+                }
+            });
+
+            // Imprimir histórico
+            $(document).on('click', '.print-history', function() {
+                const process = $(this).data('process');
+                alert(`🖨️ Imprimindo relatório: ${process}`);
+            });
+
+            // Filtros de pesquisa
+            function searchReports() {
+                const process = $('#searchProcess').val().toLowerCase();
+                const patient = $('#searchPatient').val().toLowerCase();
+                const sample = $('#searchSample').val().toLowerCase();
+                const exam = $('#searchExam').val();
+
+                const filtered = exams.filter(e => {
+                    const matchProcess = process === '' || e.process.toLowerCase().includes(process);
+                    const matchPatient = patient === '' || e.patient.toLowerCase().includes(patient);
+                    const matchSample = sample === '' || e.code.toLowerCase().includes(sample);
+                    const matchExam = exam === '' || e.exam === exam;
+                    return matchProcess && matchPatient && matchSample && matchExam;
+                });
+
+                renderExamList(filtered);
+            }
+
+            $('#searchProcess, #searchPatient, #searchSample, #searchExam').on('input change', searchReports);
+            $('#btnSearchReports').click(searchReports);
+
+            $('#btnClearSearch').click(function() {
+                $('#searchProcess, #searchPatient, #searchSample').val('');
+                $('#searchExam, #searchPeriod').val('');
+                $('#searchStartDate, #searchEndDate').val('');
+                renderExamList(exams);
+            });
+
+            // Pesquisa rápida
+            $('#quickSearch').on('input', function() {
+                const term = $(this).val().toLowerCase();
+                if (term === '') {
+                    renderExamList(exams);
+                } else {
+                    const filtered = exams.filter(e => 
+                        e.patient.toLowerCase().includes(term) || 
+                        e.code.toLowerCase().includes(term) ||
+                        e.exam.toLowerCase().includes(term) ||
+                        e.process.toLowerCase().includes(term)
+                    );
+                    renderExamList(filtered);
+                }
+            });
+
+            // Exportar
+            $('#btnExportAll, #btnExportReports').click(function() {
+                alert('📊 Exportando todos os relatórios...\n\n(Em produção, isso geraria o arquivo para download)');
+            });
+
+            $('#btnExportPDF').click(function() {
+                alert('📄 Exportando relatório em PDF...');
+            });
+
+            $('#btnExportExcel').click(function() {
+                alert('📊 Exportando relatório em Excel...');
+            });
+
+            // Imprimir
+            $('#btnPrintReport, #btnPrintConfirmReport, #btnPrintAll').click(function() {
+                alert('🖨️ Imprimindo relatório...');
+                $('#confirmModal').modal('hide');
+            });
+
+            // Enviar por email
+            $('#btnSendEmail').click(function() {
+                alert('📧 Enviando relatório por email...\n\n(Em produção, isso abriria o cliente de email)');
+            });
+
+            // Arquivar
+            $('#btnArchiveReport').click(function() {
+                alert('📁 Relatório arquivado com sucesso!');
+            });
+
+            // Novo Relatório
+            $('#btnNewReport').click(function() {
+                $('#emitir-tab').tab('show');
+                $('html, body').animate({ scrollTop: 0 }, 300);
+            });
+
+            // Ver Estatísticas
+            $('#btnViewStats').click(function() {
+                $('#visualizar-tab').tab('show');
+            });
+
+            // Atualizar
+            $('#btnRefresh').click(function() {
+                alert('🔄 Dados atualizados com sucesso!');
+            });
+
+            // Inicializar
+            renderExamList(exams);
+
+            console.log('✅ Tela de Emitir Relatórios Laboratoriais - SICAMMI carregada com sucesso!');
+        });
+    </script>
+</body>
+</html>

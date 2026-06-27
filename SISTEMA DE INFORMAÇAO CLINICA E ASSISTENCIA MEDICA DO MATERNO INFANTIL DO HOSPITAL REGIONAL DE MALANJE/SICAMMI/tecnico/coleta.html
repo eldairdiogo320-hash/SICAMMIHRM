@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registar Amostras - SICAMMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Estilo geral - mantido do original */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-image: url('../images/dash-rec.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Tema Claro - mantido do original */
+        body.light-theme::before {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        body.light-theme .page-title,
+        body.light-theme .indicator-card .number,
+        body.light-theme .indicator-card .label,
+        body.light-theme .info-card .card-title,
+        body.light-theme .info-card .info-label,
+        body.light-theme .info-card .info-value,
+        body.light-theme .timeline-item .timeline-content h6,
+        body.light-theme .timeline-item .timeline-content p,
+        body.light-theme .filter-section h6,
+        body.light-theme .filter-section .text-muted,
+        body.light-theme .nav-tabs .nav-link,
+        body.light-theme .report-card .card-body,
+        body.light-theme .report-card .card-title,
+        body.light-theme .report-card .card-text,
+        body.light-theme .chart-container h6,
+        body.light-theme .assistant-card h5,
+        body.light-theme .assistant-card p,
+        body.light-theme .activity-table th,
+        body.light-theme .activity-table td,
+        body.light-theme .patient-detail h5,
+        body.light-theme .patient-detail p,
+        body.light-theme .modal-content,
+        body.light-theme .modal .form-label,
+        body.light-theme .form-label,
+        body.light-theme .sample-info {
+            color: #1a1a2e !important;
+        }
+
+        body.light-theme .nav-tabs .nav-link {
+            color: #1a1a2e !important;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-theme .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .tab-content,
+        body.light-theme .indicator-card,
+        body.light-theme .info-card,
+        body.light-theme .filter-section,
+        body.light-theme .chart-container,
+        body.light-theme .report-card,
+        body.light-theme .activity-table,
+        body.light-theme .timeline-item .timeline-content,
+        body.light-theme .patient-detail,
+        body.light-theme .sample-form-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .filter-section .form-control,
+        body.light-theme .filter-section .form-select,
+        body.light-theme .sample-form-card .form-control,
+        body.light-theme .sample-form-card .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .filter-section .form-control::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-theme #currentDateTime {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .modal .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .timeline-item .timeline-badge {
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark {
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .page-title .badge {
+            background: rgba(13, 110, 253, 0.2) !important;
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .assistant-card {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.85) 0%, rgba(245, 87, 108, 0.85) 100%);
+        }
+
+        body.light-theme .flow-step {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .flow-arrow {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .sample-tag {
+            background: rgba(0, 0, 0, 0.08);
+            color: #1a1a2e;
+        }
+
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Estilo tabs - Glassmorphism - mantido */
+        .nav-tabs .nav-link {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 18px;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            margin-right: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: #fff;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: bold;
+            box-shadow: 0 -2px 20px rgba(13, 110, 253, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 0 8px 8px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Cards de indicadores - Glassmorphism - mantido */
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid rgba(13, 110, 253, 0.6);
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .indicator-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .indicator-card .label {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .indicator-card .label i {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .indicator-card.total { border-left-color: rgba(13, 110, 253, 0.6); }
+        .indicator-card.analysis { border-left-color: rgba(255, 193, 7, 0.6); }
+        .indicator-card.completed { border-left-color: rgba(25, 135, 84, 0.6); }
+        .indicator-card.urgent { border-left-color: rgba(220, 53, 69, 0.6); }
+        .indicator-card.rejected { border-left-color: rgba(108, 117, 125, 0.6); }
+
+        .indicator-card.total .number { color: #6ee7ff; }
+        .indicator-card.analysis .number { color: #ffd75a; }
+        .indicator-card.completed .number { color: #75f0a0; }
+        .indicator-card.urgent .number { color: #ff7a8a; }
+        .indicator-card.rejected .number { color: #adb5bd; }
+
+        /* Filtros - Glassmorphism - mantido */
+        .filter-section {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .filter-section h6 {
+            color: #fff;
+        }
+
+        .filter-section .form-control,
+        .filter-section .form-select {
+            font-family: 'Times New Roman', Times, serif;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .filter-section .form-control:focus,
+        .filter-section .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        .filter-section .btn-outline-primary {
+            color: #fff;
+            border-color: rgba(13, 110, 253, 0.4);
+        }
+
+        .filter-section .btn-outline-primary:hover {
+            background: rgba(13, 110, 253, 0.2);
+        }
+
+        /* Form Card - Glassmorphism */
+        .sample-form-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .sample-form-card .card-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .sample-form-card .form-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+        }
+
+        .sample-form-card .form-control,
+        .sample-form-card .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border-radius: 8px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .sample-form-card .form-control:focus,
+        .sample-form-card .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            color: #fff;
+        }
+
+        .sample-form-card .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        .sample-form-card .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .sample-info {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Priority Buttons */
+        .priority-group .btn {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 3px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+        }
+
+        .priority-group .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .priority-group .btn-outline-primary {
+            color: #fff;
+            border-color: rgba(13, 110, 253, 0.4);
+        }
+
+        .priority-group .btn-outline-primary.active {
+            background: rgba(13, 110, 253, 0.4);
+            border-color: #0d6efd;
+        }
+
+        .priority-group .btn-outline-warning {
+            color: #fff;
+            border-color: rgba(255, 193, 7, 0.4);
+        }
+
+        .priority-group .btn-outline-warning.active {
+            background: rgba(255, 193, 7, 0.3);
+            border-color: #ffc107;
+        }
+
+        .priority-group .btn-outline-danger {
+            color: #fff;
+            border-color: rgba(220, 53, 69, 0.4);
+        }
+
+        .priority-group .btn-outline-danger.active {
+            background: rgba(220, 53, 69, 0.3);
+            border-color: #dc3545;
+        }
+
+        /* Info Card - Glassmorphism - mantido */
+        .info-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .info-card .card-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Sample Tag */
+        .sample-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 0.9rem;
+            margin: 3px;
+        }
+
+        .sample-tag i {
+            margin-right: 5px;
+        }
+
+        /* Flow Chart */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .flow-step {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 12px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .flow-step.active {
+            background: rgba(13, 110, 253, 0.3);
+            border-color: #0d6efd;
+            box-shadow: 0 0 20px rgba(13, 110, 253, 0.2);
+        }
+
+        .flow-step.completed {
+            background: rgba(25, 135, 84, 0.3);
+            border-color: #198754;
+        }
+
+        .flow-step .step-icon {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .flow-step .step-label {
+            font-size: 0.8rem;
+        }
+
+        .flow-arrow {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        /* Activity Table - Glassmorphism - mantido */
+        .activity-table {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .activity-table th {
+            font-family: 'Times New Roman', Times, serif;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .activity-table td {
+            font-family: 'Times New Roman', Times, serif;
+            vertical-align: middle;
+            color: #fff;
+        }
+
+        .activity-table .table-hover tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .status-badge.received {
+            background: rgba(13, 110, 253, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        .status-badge.analysis {
+            background: rgba(255, 193, 7, 0.7);
+            backdrop-filter: blur(5px);
+            color: #000;
+        }
+
+        .status-badge.completed {
+            background: rgba(25, 135, 84, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        .status-badge.urgent {
+            background: rgba(220, 53, 69, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        .status-badge.rejected {
+            background: rgba(108, 117, 125, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+
+        /* Page Title - mantido */
+        .page-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title .bi {
+            animation: bounce 2s infinite;
+        }
+
+        .page-title .badge {
+            background: rgba(13, 110, 253, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Theme Toggle - mantido */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(30deg);
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Dashboard Button - mantido */
+        .dashboard-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        body.light-theme .dashboard-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .dashboard-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        #currentDateTime {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:hover {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal Glassmorphism - mantido */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal .btn-close {
+            filter: invert(1);
+        }
+
+        .modal .form-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .modal .form-control,
+        .modal .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .modal .form-control:focus,
+        .modal .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+        }
+
+        .modal .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        /* Quick Actions - mantido */
+        .quick-actions .btn {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 3px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+        }
+
+        .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.6);
+        }
+
+        .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.6);
+        }
+
+        .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.6);
+        }
+
+        .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.6);
+        }
+
+        .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.3);
+            color: #fff;
+        }
+
+        .quick-actions .btn-outline-dark {
+            background: rgba(33, 37, 41, 0.3);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn-outline-dark:hover {
+            background: rgba(33, 37, 41, 0.5);
+            color: #fff;
+        }
+
+        .quick-actions .btn-dark {
+            background: rgba(33, 37, 41, 0.5);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn-dark:hover {
+            background: rgba(33, 37, 41, 0.7);
+            color: #fff;
+        }
+
+        /* QR Code Display */
+        .qr-code-display {
+            width: 120px;
+            height: 120px;
+            margin: 10px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Assistant Card - mantido */
+        .assistant-card {
+            background: rgba(240, 147, 251, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .assistant-card .bi {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .assistant-card h5 {
+            color: #fff;
+        }
+
+        .assistant-card p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Chart Container - mantido */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container h6 {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        /* Timeline - mantido */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+            padding-left: 20px;
+        }
+
+        .timeline-item .timeline-badge {
+            position: absolute;
+            left: -22px;
+            top: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+        }
+
+        .timeline-item .timeline-badge.primary { background: rgba(13, 110, 253, 0.6); }
+        .timeline-item .timeline-badge.success { background: rgba(25, 135, 84, 0.6); }
+        .timeline-item .timeline-badge.warning { background: rgba(255, 193, 7, 0.6); }
+        .timeline-item .timeline-badge.info { background: rgba(13, 202, 240, 0.6); }
+        .timeline-item .timeline-badge.danger { background: rgba(220, 53, 69, 0.6); }
+
+        .timeline-item .timeline-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-item .timeline-content:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .timeline-item .timeline-content h6 {
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .timeline-item .timeline-content p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        .timeline-item .timeline-content .time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .indicator-card .number {
+                font-size: 1.8rem;
+            }
+            .tab-content {
+                padding: 15px;
+            }
+            .page-title {
+                font-size: 1.5rem;
+            }
+            .header-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .timeline {
+                padding-left: 20px;
+            }
+            .timeline-item {
+                padding-left: 10px;
+            }
+            .timeline-item .timeline-badge {
+                left: -18px;
+                width: 14px;
+                height: 14px;
+                font-size: 0.5rem;
+            }
+            .flow-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+                align-self: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Cabeçalho -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap header-actions">
+                    <h2 class="page-title">
+                        <i class="bi bi-vial text-primary"></i> 
+                        Registar Amostras
+                        <span class="badge bg-primary ms-2 notification-badge">🧪 LAB</span>
+                    </h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- Botão Dashboard -->
+                        <a href="menutec.html" class="dashboard-btn" title="Voltar ao Dashboard Principal">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+                        </a>
+
+                        <!-- Alternador de Tema -->
+                        <button class="theme-toggle-btn" id="themeToggle" title="Alternar Tema">
+                            <i class="bi bi-moon-stars" id="themeIcon"></i>
+                        </button>
+
+                        <span class="badge bg-info text-dark" id="currentDateTime">
+                            <i class="bi bi-clock"></i> 
+                            <span id="dateTimeDisplay">Carregando...</span>
+                        </span>
+                        <button class="btn btn-primary" id="btnExport">
+                            <i class="bi bi-download"></i> Exportar
+                        </button>
+                        <div class="input-group" style="width: 250px;">
+                            <input type="text" id="quickSearch" class="form-control" placeholder="🔍 Pesquisar amostra...">
+                            <button class="btn btn-outline-primary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de Indicadores -->
+        <div class="row mb-4">
+            <div class="col-md-2 col-6">
+                <div class="indicator-card total fade-in">
+                    <div class="number" id="totalSamples">0</div>
+                    <div class="label"><i class="bi bi-box-seam"></i> Amostras Recebidas</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card analysis fade-in">
+                    <div class="number" id="totalAnalysis">0</div>
+                    <div class="label"><i class="bi bi-arrow-repeat"></i> Em Análise</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card completed fade-in">
+                    <div class="number" id="totalCompleted">0</div>
+                    <div class="label"><i class="bi bi-check2-circle"></i> Concluídas</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card urgent fade-in">
+                    <div class="number" id="totalUrgent">0</div>
+                    <div class="label"><i class="bi bi-exclamation-triangle"></i> Urgentes</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card rejected fade-in">
+                    <div class="number" id="totalRejected">0</div>
+                    <div class="label"><i class="bi bi-x-circle"></i> Rejeitadas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="registro-tab" data-bs-toggle="tab" data-bs-target="#registro" type="button" role="tab">
+                    <i class="bi bi-clipboard-plus"></i> Registo
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="amostras-tab" data-bs-toggle="tab" data-bs-target="#amostras" type="button" role="tab">
+                    <i class="bi bi-table"></i> Amostras
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="fluxo-tab" data-bs-toggle="tab" data-bs-target="#fluxo" type="button" role="tab">
+                    <i class="bi bi-diagram-3"></i> Fluxo
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab">
+                    <i class="bi bi-clock-history"></i> Histórico
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Aba Registo -->
+            <div class="tab-pane fade show active" id="registro" role="tabpanel">
+                <div class="row">
+                    <!-- Formulário -->
+                    <div class="col-md-7">
+                        <div class="sample-form-card">
+                            <h6 class="card-title"><i class="bi bi-pencil-square"></i> Registo de Nova Amostra</h6>
+                            
+                            <form id="sampleForm">
+                                <!-- Dados do Paciente -->
+                                <h6 class="mt-3" style="color: rgba(255,255,255,0.6);"><i class="bi bi-person"></i> Dados do Paciente</h6>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Número do Processo Clínico</label>
+                                        <input type="text" class="form-control" id="processNumber" placeholder="Ex: P-2026-0158" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Nome do Paciente</label>
+                                        <input type="text" class="form-control" id="patientName" placeholder="Digite o nome completo" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Sexo</label>
+                                        <select class="form-select" id="patientSex">
+                                            <option value="">Selecione</option>
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Feminino">Feminino</option>
+                                            <option value="Outro">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Idade</label>
+                                        <input type="number" class="form-control" id="patientAge" placeholder="Em anos" min="0">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Data de Nascimento</label>
+                                        <input type="date" class="form-control" id="patientBirth">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Nome da Mãe</label>
+                                        <input type="text" class="form-control" id="motherName" placeholder="Nome da mãe">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Serviço de Origem</label>
+                                        <select class="form-select" id="originService">
+                                            <option value="">Selecione</option>
+                                            <option value="Pediatria">Pediatria</option>
+                                            <option value="Neonatologia">Neonatologia</option>
+                                            <option value="Obstetrícia">Obstetrícia</option>
+                                            <option value="Maternidade">Maternidade</option>
+                                            <option value="Urgência">Urgência</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Dados da Amostra -->
+                                <h6 class="mt-3" style="color: rgba(255,255,255,0.6);"><i class="bi bi-vial"></i> Dados da Amostra</h6>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Código da Amostra</label>
+                                        <input type="text" class="form-control" id="sampleCode" readonly style="background: rgba(13,110,253,0.15);">
+                                        <div class="sample-info"><i class="bi bi-info-circle"></i> Gerado automaticamente</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Tipo de Amostra</label>
+                                        <select class="form-select" id="sampleType" required>
+                                            <option value="">Selecione</option>
+                                            <option value="Sangue">🩸 Sangue</option>
+                                            <option value="Urina">🧪 Urina</option>
+                                            <option value="Fezes">💩 Fezes</option>
+                                            <option value="Escarro">💨 Escarro</option>
+                                            <option value="Secreção Vaginal">🔬 Secreção Vaginal</option>
+                                            <option value="Líquido Cefalorraquidiano">🧠 Líquido Cefalorraquidiano</option>
+                                            <option value="Plasma">💉 Plasma</option>
+                                            <option value="Soro">🧪 Soro</option>
+                                            <option value="Outros">Outros</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Tipo de Exame Solicitado</label>
+                                        <select class="form-select" id="examType" required>
+                                            <option value="">Selecione</option>
+                                            <option value="Hemograma">Hemograma</option>
+                                            <option value="Glicemia">Glicemia</option>
+                                            <option value="HIV">HIV</option>
+                                            <option value="Malária">Malária</option>
+                                            <option value="Urina Tipo II">Urina Tipo II</option>
+                                            <option value="Bioquímica">Bioquímica</option>
+                                            <option value="Parasitologia">Parasitologia</option>
+                                            <option value="Serologia">Serologia</option>
+                                            <option value="Bacteriologia">Bacteriologia</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Quantidade Coletada</label>
+                                        <input type="text" class="form-control" id="sampleQuantity" placeholder="Ex: 5 ml">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Data da Coleta</label>
+                                        <input type="date" class="form-control" id="collectDate">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Hora da Coleta</label>
+                                        <input type="time" class="form-control" id="collectTime">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Responsável pela Coleta</label>
+                                        <select class="form-select" id="collector">
+                                            <option value="">Selecione</option>
+                                            <option value="Enfermeiro">Enfermeiro</option>
+                                            <option value="Médico">Médico</option>
+                                            <option value="Técnico">Técnico</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Prioridade</label>
+                                        <div class="priority-group d-flex flex-wrap">
+                                            <button type="button" class="btn btn-outline-primary priority-btn active" data-priority="Normal">
+                                                <i class="bi bi-circle-fill" style="color: #0d6efd;"></i> Normal
+                                            </button>
+                                            <button type="button" class="btn btn-outline-warning priority-btn" data-priority="Média">
+                                                <i class="bi bi-circle-fill" style="color: #ffc107;"></i> Média
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger priority-btn" data-priority="Urgente">
+                                                <i class="bi bi-circle-fill" style="color: #dc3545;"></i> Urgente
+                                            </button>
+                                        </div>
+                                        <input type="hidden" id="selectedPriority" value="Normal">
+                                    </div>
+                                </div>
+
+                                <!-- Botões de Ação -->
+                                <div class="d-flex gap-2 mt-3 flex-wrap">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-save"></i> Registar Amostra
+                                    </button>
+                                    <button type="button" class="btn btn-success" id="btnPrintLabel">
+                                        <i class="bi bi-printer"></i> Imprimir Etiqueta
+                                    </button>
+                                    <button type="button" class="btn btn-info" id="btnGenerateQR">
+                                        <i class="bi bi-qr-code"></i> Gerar QR Code
+                                    </button>
+                                    <button type="reset" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Limpar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar - Etiqueta e QR Code -->
+                    <div class="col-md-5">
+                        <!-- Etiqueta Inteligente -->
+                        <div class="info-card">
+                            <h6 class="card-title"><i class="bi bi-tags"></i> Etiqueta Inteligente</h6>
+                            <div class="text-center">
+                                <div class="qr-code-display" id="qrCodeDisplay">
+                                    <i class="bi bi-qr-code"></i>
+                                </div>
+                                <div class="sample-tag mt-2">
+                                    <i class="bi bi-upc-scan"></i> <span id="labelCode">SICAMMI-2026-0001</span>
+                                </div>
+                                <div class="sample-tag">
+                                    <i class="bi bi-person"></i> <span id="labelPatient">João Silva</span>
+                                </div>
+                                <div class="sample-tag">
+                                    <i class="bi bi-vial"></i> <span id="labelExam">Hemograma</span>
+                                </div>
+                                <div class="sample-tag">
+                                    <i class="bi bi-calendar"></i> <span id="labelDate">15/08/2026</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary mt-2" id="btnRefreshLabel">
+                                    <i class="bi bi-arrow-repeat"></i> Atualizar Etiqueta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Assistente Inteligente -->
+                        <div class="assistant-card">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-robot me-3"></i>
+                                <div>
+                                    <h5><i class="bi bi-stars"></i> Assistente Laboratorial</h5>
+                                    <p id="assistantMessage">🧪 12 amostras registadas hoje. 5 em análise, 4 concluídas.</p>
+                                    <div class="mt-2">
+                                        <small class="d-block"><i class="bi bi-check-circle"></i> Última amostra: 15/08/2026 09:30</small>
+                                        <small class="d-block"><i class="bi bi-exclamation-triangle"></i> 2 amostras urgentes aguardando</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estatísticas Rápidas -->
+                        <div class="mt-3 chart-container">
+                            <h6><i class="bi bi-bar-chart"></i> Amostras Hoje</h6>
+                            <div class="d-flex justify-content-between">
+                                <div><span class="badge bg-primary">Registadas: 12</span></div>
+                                <div><span class="badge bg-warning">Análise: 5</span></div>
+                                <div><span class="badge bg-success">Concluídas: 4</span></div>
+                            </div>
+                            <div class="progress mt-2" style="height: 8px;">
+                                <div class="progress-bar bg-warning" style="width: 42%">42%</div>
+                            </div>
+                            <div class="mt-2">
+                                <small style="color: rgba(255,255,255,0.7);">Tempo médio de análise: 45min</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Amostras -->
+            <div class="tab-pane fade" id="amostras" role="tabpanel">
+                <!-- Filtros -->
+                <div class="filter-section">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <h6><i class="bi bi-funnel"></i> Filtros de Amostras</h6>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" id="filterCode" class="form-control" placeholder="🔍 Código da amostra">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" id="filterPatient" class="form-control" placeholder="👤 Nome do paciente">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filterExam" class="form-select">
+                                <option value="">Todos os exames</option>
+                                <option value="Hemograma">Hemograma</option>
+                                <option value="Glicemia">Glicemia</option>
+                                <option value="HIV">HIV</option>
+                                <option value="Malária">Malária</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filterStatus" class="form-select">
+                                <option value="">Todos os estados</option>
+                                <option value="Recebida">Recebida</option>
+                                <option value="Em Análise">Em Análise</option>
+                                <option value="Concluída">Concluída</option>
+                                <option value="Urgente">Urgente</option>
+                                <option value="Rejeitada">Rejeitada</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Amostras -->
+                <div class="activity-table table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Paciente</th>
+                                <th>Exame</th>
+                                <th>Estado</th>
+                                <th>Prioridade</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sampleTableBody">
+                            <!-- Amostras serão inseridas via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Aba Fluxo -->
+            <div class="tab-pane fade" id="fluxo" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="info-card">
+                            <h6 class="card-title"><i class="bi bi-diagram-3"></i> Mapa de Fluxo da Amostra</h6>
+                            <div class="flow-container">
+                                <div class="flow-step active" id="step1">
+                                    <span class="step-icon">📦</span>
+                                    <span class="step-label">Recebida</span>
+                                </div>
+                                <span class="flow-arrow">→</span>
+                                <div class="flow-step" id="step2">
+                                    <span class="step-icon">📋</span>
+                                    <span class="step-label">Registada</span>
+                                </div>
+                                <span class="flow-arrow">→</span>
+                                <div class="flow-step" id="step3">
+                                    <span class="step-icon">🔬</span>
+                                    <span class="step-label">Em Análise</span>
+                                </div>
+                                <span class="flow-arrow">→</span>
+                                <div class="flow-step" id="step4">
+                                    <span class="step-icon">📄</span>
+                                    <span class="step-label">Resultado Emitido</span>
+                                </div>
+                                <span class="flow-arrow">→</span>
+                                <div class="flow-step" id="step5">
+                                    <span class="step-icon">📂</span>
+                                    <span class="step-label">Arquivada</span>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-center">
+                                <small style="color: rgba(255,255,255,0.5);">Clique nos passos para ver detalhes</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-pie-chart"></i> Distribuição de Amostras</h6>
+                            <div style="height: 150px; display: flex; justify-content: center; align-items: center;">
+                                <div style="width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(
+                                    rgba(13, 110, 253, 0.8) 0% 30%,
+                                    rgba(255, 193, 7, 0.8) 30% 55%,
+                                    rgba(25, 135, 84, 0.8) 55% 75%,
+                                    rgba(220, 53, 69, 0.8) 75% 90%,
+                                    rgba(108, 117, 125, 0.8) 90% 100%
+                                );"></div>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-around mt-2">
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #0d6efd;">●</span> Recebidas (30%)</span>
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #ffc107;">●</span> Análise (25%)</span>
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #198754;">●</span> Concluídas (20%)</span>
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #dc3545;">●</span> Urgentes (15%)</span>
+                                <span style="color: rgba(255,255,255,0.8);"><span style="color: #6c757d;">●</span> Rejeitadas (10%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Histórico -->
+            <div class="tab-pane fade" id="historico" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="info-card">
+                            <h6 class="card-title"><i class="bi bi-clock-history"></i> Histórico de Movimentação</h6>
+                            <div class="timeline" id="historyTimeline">
+                                <!-- Eventos serão inseridos via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="quick-actions mt-4 d-flex flex-wrap gap-2">
+            <button class="btn btn-primary" id="btnNewSample">
+                <i class="bi bi-plus-circle"></i> Nova Amostra
+            </button>
+            <button class="btn btn-success" id="btnPrintAllLabels">
+                <i class="bi bi-printer"></i> Imprimir Etiquetas
+            </button>
+            <button class="btn btn-info" id="btnScanBarcode">
+                <i class="bi bi-upc-scan"></i> Scanner de Código
+            </button>
+            <button class="btn btn-warning" id="btnViewStats">
+                <i class="bi bi-graph-up"></i> Estatísticas
+            </button>
+            <button class="btn btn-outline-primary" id="btnRefresh">
+                <i class="bi bi-arrow-repeat"></i> Atualizar
+            </button>
+            <button class="btn btn-outline-dark">
+                <a href="menu_recepcionista.html" style="color: inherit; text-decoration: none;">
+                    <i class="bi bi-arrow-left"></i> Voltar ao Dashboard
+                </a>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Registo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>A amostra foi registada com sucesso!</p>
+                    <div class="text-center">
+                        <div class="qr-code-display" style="width: 100px; height: 100px; margin: 10px auto;">
+                            <i class="bi bi-qr-code" style="font-size: 3rem;"></i>
+                        </div>
+                        <p><strong>Código:</strong> <span id="confirmCode">SICAMMI-2026-0001</span></p>
+                        <p><strong>Paciente:</strong> <span id="confirmPatient">João Silva</span></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="btnPrintConfirmLabel">
+                        <i class="bi bi-printer"></i> Imprimir Etiqueta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Dados de exemplo
+            let samples = [
+                { id: 1, code: 'SICAMMI-2026-0001', patient: 'Maria Silva', exam: 'Hemograma', status: 'Recebida', priority: 'Normal', date: '15/08/2026', collector: 'Enfermeiro' },
+                { id: 2, code: 'SICAMMI-2026-0002', patient: 'João Pedro', exam: 'Glicemia', status: 'Em Análise', priority: 'Urgente', date: '15/08/2026', collector: 'Médico' },
+                { id: 3, code: 'SICAMMI-2026-0003', patient: 'Ana Oliveira', exam: 'HIV', status: 'Concluída', priority: 'Normal', date: '14/08/2026', collector: 'Técnico' },
+                { id: 4, code: 'SICAMMI-2026-0004', patient: 'Carlos Santos', exam: 'Malária', status: 'Urgente', priority: 'Urgente', date: '14/08/2026', collector: 'Enfermeiro' },
+                { id: 5, code: 'SICAMMI-2026-0005', patient: 'Sofia Costa', exam: 'Urina Tipo II', status: 'Rejeitada', priority: 'Normal', date: '13/08/2026', collector: 'Técnico' }
+            ];
+
+            const historyEvents = [
+                { type: 'primary', icon: 'bi-box-seam', title: 'Amostra recebida', description: 'SICAMMI-2026-0001 - Maria Silva', time: '15/08/2026 08:00' },
+                { type: 'warning', icon: 'bi-clipboard', title: 'Registo efetuado', description: 'Dados da amostra registados no sistema', time: '15/08/2026 08:15' },
+                { type: 'info', icon: 'bi-flask', title: 'Início da análise', description: 'Exame: Hemograma - Laboratório 2', time: '15/08/2026 08:30' },
+                { type: 'success', icon: 'bi-check2-circle', title: 'Resultado emitido', description: 'Resultado disponível para consulta', time: '15/08/2026 09:30' },
+                { type: 'secondary', icon: 'bi-archive', title: 'Amostra arquivada', description: 'Arquivada no sistema de registos', time: '15/08/2026 10:00' }
+            ];
+
+            // Tema
+            let isDarkTheme = true;
+
+            function toggleTheme() {
+                isDarkTheme = !isDarkTheme;
+                if (isDarkTheme) {
+                    $('body').removeClass('light-theme');
+                    $('#themeIcon').removeClass('bi-sun-fill').addClass('bi-moon-stars');
+                } else {
+                    $('body').addClass('light-theme');
+                    $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+                }
+                localStorage.setItem('sicami-theme-samples', isDarkTheme ? 'dark' : 'light');
+            }
+
+            const savedTheme = localStorage.getItem('sicami-theme-samples');
+            if (savedTheme === 'light') {
+                isDarkTheme = false;
+                $('body').addClass('light-theme');
+                $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+            }
+
+            $('#themeToggle').click(toggleTheme);
+
+            // Botão Dashboard
+            $('#btnDashboard').click(function(e) {
+                e.preventDefault();
+                alert('🔙 Redirecionando para o Dashboard Principal...\n\n(Em produção, isso redirecionaria para a página principal do sistema)');
+            });
+
+            // Data e Hora
+            function updateDateTime() {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR');
+                const timeStr = now.toLocaleTimeString('pt-BR');
+                $('#dateTimeDisplay').text(`${dateStr} ${timeStr}`);
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Gerar código da amostra
+            function generateSampleCode() {
+                const year = new Date().getFullYear();
+                const count = samples.length + 1;
+                return `SICAMMI-${year}-${String(count).padStart(4, '0')}`;
+            }
+
+            // Atualizar código da amostra
+            function updateSampleCode() {
+                const code = generateSampleCode();
+                $('#sampleCode').val(code);
+                $('#labelCode').text(code);
+            }
+            updateSampleCode();
+
+            // Atualizar indicadores
+            function updateIndicators() {
+                const total = samples.length;
+                const analysis = samples.filter(s => s.status === 'Em Análise').length;
+                const completed = samples.filter(s => s.status === 'Concluída').length;
+                const urgent = samples.filter(s => s.priority === 'Urgente').length;
+                const rejected = samples.filter(s => s.status === 'Rejeitada').length;
+
+                $('#totalSamples').text(total);
+                $('#totalAnalysis').text(analysis);
+                $('#totalCompleted').text(completed);
+                $('#totalUrgent').text(urgent);
+                $('#totalRejected').text(rejected);
+            }
+            updateIndicators();
+
+            // Prioridade
+            $('.priority-btn').click(function() {
+                $('.priority-btn').removeClass('active');
+                $(this).addClass('active');
+                $('#selectedPriority').val($(this).data('priority'));
+            });
+
+            // Registrar amostra
+            $('#sampleForm').submit(function(e) {
+                e.preventDefault();
+
+                const newSample = {
+                    id: samples.length + 1,
+                    code: $('#sampleCode').val(),
+                    patient: $('#patientName').val() || 'Paciente não informado',
+                    exam: $('#examType').val() || 'Não especificado',
+                    status: 'Recebida',
+                    priority: $('#selectedPriority').val(),
+                    date: new Date().toLocaleDateString('pt-BR'),
+                    collector: $('#collector').val() || 'Não informado'
+                };
+
+                samples.push(newSample);
+
+                // Atualizar UI
+                updateIndicators();
+                renderSamplesTable();
+
+                // Mostrar modal de confirmação
+                $('#confirmCode').text(newSample.code);
+                $('#confirmPatient').text(newSample.patient);
+                $('#confirmModal').modal('show');
+
+                // Limpar formulário parcialmente
+                $('#patientName, #processNumber, #motherName, #sampleQuantity').val('');
+                $('#sampleType, #examType, #collector, #originService, #patientSex').val('');
+                $('#patientAge, #patientBirth, #collectDate, #collectTime').val('');
+                updateSampleCode();
+
+                // Atualizar mensagem do assistente
+                $('#assistantMessage').text(`🧪 ${samples.length} amostras registadas hoje. ${samples.filter(s => s.status === 'Em Análise').length} em análise, ${samples.filter(s => s.status === 'Concluída').length} concluídas.`);
+
+                // Atualizar etiqueta
+                updateLabel();
+
+                // Adicionar ao histórico
+                addHistoryEvent('primary', 'bi-box-seam', 'Nova amostra registada', `${newSample.code} - ${newSample.patient}`, new Date().toLocaleString('pt-BR'));
+
+                // Scroll para o topo
+                $('html, body').animate({ scrollTop: 0 }, 300);
+            });
+
+            // Atualizar etiqueta
+            function updateLabel() {
+                const patient = $('#patientName').val() || 'Paciente não informado';
+                const exam = $('#examType').val() || 'Não especificado';
+                const date = new Date().toLocaleDateString('pt-BR');
+                const code = $('#sampleCode').val();
+
+                $('#labelPatient').text(patient);
+                $('#labelExam').text(exam);
+                $('#labelDate').text(date);
+                $('#labelCode').text(code);
+
+                // Atualizar QR Code (simulado)
+                $('#qrCodeDisplay').html(`<i class="bi bi-qr-code" style="font-size: 3rem; opacity: 0.8;"></i>`);
+            }
+
+            $('#btnRefreshLabel').click(updateLabel);
+
+            // Atualizar campos para etiqueta
+            $('#patientName, #examType, #sampleType').on('change input', updateLabel);
+
+            // Renderizar tabela de amostras
+            function renderSamplesTable() {
+                const body = $('#sampleTableBody');
+                body.empty();
+
+                if (samples.length === 0) {
+                    body.html('<tr><td colspan="7" class="text-center" style="color: rgba(255,255,255,0.5);">Nenhuma amostra registada</td></tr>');
+                    return;
+                }
+
+                samples.forEach(s => {
+                    const statusClass = s.status === 'Recebida' ? 'received' :
+                                      s.status === 'Em Análise' ? 'analysis' :
+                                      s.status === 'Concluída' ? 'completed' :
+                                      s.status === 'Urgente' ? 'urgent' : 'rejected';
+
+                    const priorityIcon = s.priority === 'Normal' ? '🔵' :
+                                       s.priority === 'Média' ? '🟡' : '🔴';
+
+                    body.append(`
+                        <tr>
+                            <td><span class="sample-tag" style="font-size: 0.8rem;">${s.code}</span></td>
+                            <td>${s.patient}</td>
+                            <td>${s.exam}</td>
+                            <td><span class="status-badge ${statusClass}">${s.status}</span></td>
+                            <td>${priorityIcon} ${s.priority}</td>
+                            <td>${s.date}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary view-sample" data-id="${s.id}"><i class="bi bi-eye"></i></button>
+                                <button class="btn btn-sm btn-outline-success print-sample" data-id="${s.id}"><i class="bi bi-printer"></i></button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+            renderSamplesTable();
+
+            // Ver amostra
+            $(document).on('click', '.view-sample', function() {
+                const id = parseInt($(this).data('id'));
+                const sample = samples.find(s => s.id === id);
+                if (sample) {
+                    alert(`📋 Detalhes da Amostra\n\nCódigo: ${sample.code}\nPaciente: ${sample.patient}\nExame: ${sample.exam}\nEstado: ${sample.status}\nPrioridade: ${sample.priority}\nData: ${sample.date}\nColetor: ${sample.collector}`);
+                }
+            });
+
+            // Imprimir amostra
+            $(document).on('click', '.print-sample', function() {
+                const id = parseInt($(this).data('id'));
+                const sample = samples.find(s => s.id === id);
+                if (sample) {
+                    alert(`🖨️ Imprimindo etiqueta para: ${sample.code}\nPaciente: ${sample.patient}\nExame: ${sample.exam}`);
+                }
+            });
+
+            // Adicionar evento ao histórico
+            function addHistoryEvent(type, icon, title, description, time) {
+                const container = $('#historyTimeline');
+                container.prepend(`
+                    <div class="timeline-item fade-in">
+                        <div class="timeline-badge ${type}">
+                            <i class="bi ${icon}" style="font-size: 0.6rem;"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>${title}</h6>
+                            <p>${description}</p>
+                            <div class="time"><i class="bi bi-clock"></i> ${time}</div>
+                        </div>
+                    </div>
+                `);
+            }
+
+            // Inicializar histórico
+            function renderHistory() {
+                const container = $('#historyTimeline');
+                container.empty();
+
+                historyEvents.forEach(event => {
+                    container.append(`
+                        <div class="timeline-item fade-in">
+                            <div class="timeline-badge ${event.type}">
+                                <i class="bi ${event.icon}" style="font-size: 0.6rem;"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>${event.title}</h6>
+                                <p>${event.description}</p>
+                                <div class="time"><i class="bi bi-clock"></i> ${event.time}</div>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+            renderHistory();
+
+            // Filtrar amostras
+            function filterSamples() {
+                const code = $('#filterCode').val().toLowerCase();
+                const patient = $('#filterPatient').val().toLowerCase();
+                const exam = $('#filterExam').val();
+                const status = $('#filterStatus').val();
+
+                const filtered = samples.filter(s => {
+                    const matchCode = code === '' || s.code.toLowerCase().includes(code);
+                    const matchPatient = patient === '' || s.patient.toLowerCase().includes(patient);
+                    const matchExam = exam === '' || s.exam === exam;
+                    const matchStatus = status === '' || s.status === status;
+                    return matchCode && matchPatient && matchExam && matchStatus;
+                });
+
+                const body = $('#sampleTableBody');
+                body.empty();
+
+                if (filtered.length === 0) {
+                    body.html('<tr><td colspan="7" class="text-center" style="color: rgba(255,255,255,0.5);">Nenhuma amostra encontrada</td></tr>');
+                    return;
+                }
+
+                filtered.forEach(s => {
+                    const statusClass = s.status === 'Recebida' ? 'received' :
+                                      s.status === 'Em Análise' ? 'analysis' :
+                                      s.status === 'Concluída' ? 'completed' :
+                                      s.status === 'Urgente' ? 'urgent' : 'rejected';
+
+                    const priorityIcon = s.priority === 'Normal' ? '🔵' :
+                                       s.priority === 'Média' ? '🟡' : '🔴';
+
+                    body.append(`
+                        <tr>
+                            <td><span class="sample-tag" style="font-size: 0.8rem;">${s.code}</span></td>
+                            <td>${s.patient}</td>
+                            <td>${s.exam}</td>
+                            <td><span class="status-badge ${statusClass}">${s.status}</span></td>
+                            <td>${priorityIcon} ${s.priority}</td>
+                            <td>${s.date}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary view-sample" data-id="${s.id}"><i class="bi bi-eye"></i></button>
+                                <button class="btn btn-sm btn-outline-success print-sample" data-id="${s.id}"><i class="bi bi-printer"></i></button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+
+            $('#filterCode, #filterPatient, #filterExam, #filterStatus').on('input change', filterSamples);
+
+            // Pesquisa rápida
+            $('#quickSearch').on('input', function() {
+                const term = $(this).val().toLowerCase();
+                if (term === '') {
+                    filterSamples();
+                } else {
+                    const filtered = samples.filter(s => 
+                        s.code.toLowerCase().includes(term) || 
+                        s.patient.toLowerCase().includes(term) ||
+                        s.exam.toLowerCase().includes(term)
+                    );
+                    const body = $('#sampleTableBody');
+                    body.empty();
+
+                    if (filtered.length === 0) {
+                        body.html('<tr><td colspan="7" class="text-center" style="color: rgba(255,255,255,0.5);">Nenhuma amostra encontrada</td></tr>');
+                        return;
+                    }
+
+                    filtered.forEach(s => {
+                        const statusClass = s.status === 'Recebida' ? 'received' :
+                                          s.status === 'Em Análise' ? 'analysis' :
+                                          s.status === 'Concluída' ? 'completed' :
+                                          s.status === 'Urgente' ? 'urgent' : 'rejected';
+                        const priorityIcon = s.priority === 'Normal' ? '🔵' : s.priority === 'Média' ? '🟡' : '🔴';
+                        body.append(`
+                            <tr>
+                                <td><span class="sample-tag" style="font-size: 0.8rem;">${s.code}</span></td>
+                                <td>${s.patient}</td>
+                                <td>${s.exam}</td>
+                                <td><span class="status-badge ${statusClass}">${s.status}</span></td>
+                                <td>${priorityIcon} ${s.priority}</td>
+                                <td>${s.date}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary view-sample" data-id="${s.id}"><i class="bi bi-eye"></i></button>
+                                    <button class="btn btn-sm btn-outline-success print-sample" data-id="${s.id}"><i class="bi bi-printer"></i></button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+            });
+
+            // Exportar
+            $('#btnExport').click(function() {
+                alert('📊 Exportando dados das amostras...\n\n(Em produção, isso geraria o arquivo para download)');
+            });
+
+            // Nova Amostra
+            $('#btnNewSample').click(function() {
+                $('#registro-tab').tab('show');
+                $('html, body').animate({ scrollTop: 0 }, 300);
+            });
+
+            // Imprimir Etiquetas
+            $('#btnPrintAllLabels, #btnPrintLabel').click(function() {
+                alert('🖨️ Imprimindo etiquetas...\n\n(Em produção, isso enviaria para a impressora)');
+            });
+
+            // Gerar QR Code
+            $('#btnGenerateQR').click(function() {
+                const code = $('#sampleCode').val();
+                const patient = $('#patientName').val() || 'Paciente';
+                $('#qrCodeDisplay').html(`<i class="bi bi-qr-code" style="font-size: 3rem; color: #0d6efd;"></i>`);
+                alert(`📱 QR Code gerado para: ${code}\nPaciente: ${patient}\n\n(Em produção, o QR Code seria exibido para rastreamento)`);
+            });
+
+            // Scanner de Código
+            $('#btnScanBarcode').click(function() {
+                alert('📷 Scanner de código de barras ativado...\n\n(Em produção, isso abriria a câmera para escanear)');
+            });
+
+            // Ver Estatísticas
+            $('#btnViewStats').click(function() {
+                $('#fluxo-tab').tab('show');
+            });
+
+            // Atualizar
+            $('#btnRefresh').click(function() {
+                alert('🔄 Dados atualizados com sucesso!');
+            });
+
+            // Imprimir etiqueta da confirmação
+            $('#btnPrintConfirmLabel').click(function() {
+                alert('🖨️ Imprimindo etiqueta...');
+                $('#confirmModal').modal('hide');
+            });
+
+            // Fluxo - clicar nos passos
+            $('.flow-step').click(function() {
+                $('.flow-step').removeClass('active');
+                $(this).addClass('active');
+                const label = $(this).find('.step-label').text();
+                alert(`📌 Passo selecionado: ${label}\n\n(Em produção, mostraria detalhes deste estágio)`);
+            });
+
+            console.log('✅ Tela de Registo de Amostras - SICAMMI carregada com sucesso!');
+        });
+    </script>
+</body>
+</html>

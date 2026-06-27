@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico Clínico - SICAMMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* ===== ESTILO GERAL ===== */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-image: url('../images/dash-rec.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* ===== TEMA CLARO ===== */
+        body.light-theme::before {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        body.light-theme .page-title,
+        body.light-theme .indicator-card .number,
+        body.light-theme .indicator-card .label,
+        body.light-theme .info-card .card-title,
+        body.light-theme .info-card .info-label,
+        body.light-theme .info-card .info-value,
+        body.light-theme .timeline-item .timeline-content h6,
+        body.light-theme .timeline-item .timeline-content p,
+        body.light-theme .filter-section h6,
+        body.light-theme .nav-tabs .nav-link,
+        body.light-theme .report-card .card-body,
+        body.light-theme .report-card .card-title,
+        body.light-theme .report-card .card-text,
+        body.light-theme .chart-container h6,
+        body.light-theme .assistant-card h5,
+        body.light-theme .assistant-card p,
+        body.light-theme .activity-table th,
+        body.light-theme .activity-table td,
+        body.light-theme .patient-detail h5,
+        body.light-theme .patient-detail p,
+        body.light-theme .modal-content,
+        body.light-theme .modal .form-label,
+        body.light-theme .clinical-history .card-title,
+        body.light-theme .clinical-history .card-text,
+        body.light-theme .clinical-history .badge,
+        body.light-theme .risk-indicator,
+        body.light-theme .private-note-label {
+            color: #1a1a2e !important;
+        }
+
+        body.light-theme .nav-tabs .nav-link {
+            color: #1a1a2e !important;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-theme .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .tab-content,
+        body.light-theme .indicator-card,
+        body.light-theme .info-card,
+        body.light-theme .filter-section,
+        body.light-theme .chart-container,
+        body.light-theme .report-card,
+        body.light-theme .activity-table,
+        body.light-theme .timeline-item .timeline-content,
+        body.light-theme .patient-detail,
+        body.light-theme .clinical-history .card,
+        body.light-theme .private-note-area {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .filter-section .form-control,
+        body.light-theme .filter-section .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .filter-section .form-control::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-theme #currentDateTime {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .modal .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .timeline-item .timeline-badge {
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark {
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .page-title .badge {
+            background: rgba(13, 110, 253, 0.2) !important;
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .assistant-card {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.85) 0%, rgba(245, 87, 108, 0.85) 100%);
+        }
+
+        body.light-theme .patient-avatar {
+            background: rgba(13, 110, 253, 0.15);
+            border-color: rgba(13, 110, 253, 0.3);
+            color: #0d6efd;
+        }
+
+        body.light-theme .activity-table th {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .activity-table td {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .risk-indicator {
+            background: rgba(220, 53, 69, 0.15) !important;
+            border-color: rgba(220, 53, 69, 0.3) !important;
+        }
+
+        body.light-theme .private-note-area {
+            background: rgba(255, 255, 255, 0.85) !important;
+        }
+
+        body.light-theme .private-note-area textarea {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== GLASSMORPHISM TABS ===== */
+        .nav-tabs .nav-link {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-right: 4px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(255, 255, 255, 0.22);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            color: #fff;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: bold;
+            box-shadow: 0 -2px 20px rgba(13, 110, 253, 0.3);
+        }
+
+        .tab-content {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(15px);
+            border-radius: 0 8px 8px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* ===== CARDS INDICADORES ===== */
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 18px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            margin-bottom: 18px;
+            text-align: center;
+            border-left: 4px solid rgba(13, 110, 253, 0.6);
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .indicator-card .number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .indicator-card .label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .indicator-card.patients { border-left-color: #0d6efd; }
+        .indicator-card.consultations { border-left-color: #198754; }
+        .indicator-card.exams { border-left-color: #ffc107; }
+        .indicator-card.internments { border-left-color: #0dcaf0; }
+        .indicator-card.prescriptions { border-left-color: #dc3545; }
+
+        .indicator-card.patients .number { color: #6ee7ff; }
+        .indicator-card.consultations .number { color: #75f0a0; }
+        .indicator-card.exams .number { color: #ffd75a; }
+        .indicator-card.internments .number { color: #6ee7ff; }
+        .indicator-card.prescriptions .number { color: #ff7a8a; }
+
+        /* ===== FILTROS ===== */
+        .filter-section {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s ease;
+        }
+
+        .filter-section h6 {
+            color: #fff;
+        }
+
+        .filter-section .form-control,
+        .filter-section .form-select {
+            font-family: 'Times New Roman', Times, serif;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .filter-section .form-control:focus,
+        .filter-section .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            color: #fff;
+        }
+
+        .filter-section .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        /* ===== INFO CARD ===== */
+        .info-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s ease;
+        }
+
+        .info-card .card-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .info-card .info-label {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 0.85rem;
+        }
+
+        .info-card .info-value {
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        /* ===== AVATAR ===== */
+        .patient-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #fff;
+            font-weight: bold;
+            margin: 0 auto 10px auto;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+
+        .timeline-item .timeline-badge {
+            position: absolute;
+            left: -22px;
+            top: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+        }
+
+        .timeline-item .timeline-badge.primary { background: rgba(13, 110, 253, 0.6); }
+        .timeline-item .timeline-badge.success { background: rgba(25, 135, 84, 0.6); }
+        .timeline-item .timeline-badge.warning { background: rgba(255, 193, 7, 0.6); }
+        .timeline-item .timeline-badge.info { background: rgba(13, 202, 240, 0.6); }
+        .timeline-item .timeline-badge.danger { background: rgba(220, 53, 69, 0.6); }
+
+        .timeline-item .timeline-content {
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(8px);
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-item .timeline-content:hover {
+            background: rgba(255, 255, 255, 0.16);
+            transform: translateX(5px);
+        }
+
+        .timeline-item .timeline-content h6 {
+            color: #fff;
+            margin-bottom: 3px;
+            font-size: 0.95rem;
+        }
+
+        .timeline-item .timeline-content p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0;
+            font-size: 0.85rem;
+        }
+
+        .timeline-item .timeline-content .time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+        }
+
+        /* ===== HISTÓRICO CLÍNICO ===== */
+        .clinical-history .card {
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+
+        .clinical-history .card:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateX(5px);
+        }
+
+        .clinical-history .card-title {
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .clinical-history .card-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+        }
+
+        .clinical-history .badge {
+            font-size: 0.75rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        /* ===== INDICADOR DE RISCO ===== */
+        .risk-indicator {
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .risk-indicator i {
+            font-size: 1.5rem;
+            color: #dc3545;
+        }
+
+        .risk-indicator .risk-text {
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .risk-indicator .risk-text strong {
+            color: #dc3545;
+        }
+
+        /* ===== NOTAS PRIVADAS ===== */
+        .private-note-area {
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s ease;
+        }
+
+        .private-note-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .private-note-area textarea {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: #fff;
+            width: 100%;
+            padding: 10px;
+            font-family: 'Times New Roman', Times, serif;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .private-note-area textarea:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(13, 110, 253, 0.4);
+            outline: none;
+        }
+
+        .private-note-area textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* ===== CHART CONTAINER ===== */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            margin-bottom: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container h6 {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions .btn {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 3px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+            padding: 6px 16px;
+        }
+
+        .quick-actions .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+        }
+        .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.6);
+        }
+        .quick-actions .btn-info {
+            background: rgba(13, 202, 240, 0.6);
+        }
+        .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.6);
+        }
+        .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.6);
+        }
+        .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.3);
+            color: #fff;
+        }
+        .quick-actions .btn-outline-dark {
+            background: rgba(33, 37, 41, 0.3);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .quick-actions .btn-outline-dark:hover {
+            background: rgba(33, 37, 41, 0.5);
+        }
+
+        /* ===== ASSISTANT CARD ===== */
+        .assistant-card {
+            background: rgba(240, 147, 251, 0.25);
+            backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 18px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s ease;
+        }
+
+        .assistant-card .bi {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .assistant-card h5 {
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .assistant-card p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+        }
+
+        /* ===== STATUS BADGE ===== */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .status-badge.confirmed {
+            background: rgba(25, 135, 84, 0.7);
+            backdrop-filter: blur(5px);
+            color: #fff;
+        }
+        .status-badge.pending {
+            background: rgba(255, 193, 7, 0.7);
+            color: #000;
+        }
+        .status-badge.canceled {
+            background: rgba(220, 53, 69, 0.7);
+            color: #fff;
+        }
+        .status-badge.completed {
+            background: rgba(13, 202, 240, 0.7);
+            color: #000;
+        }
+
+        .status-badge.active {
+            background: rgba(25, 135, 84, 0.7);
+            color: #fff;
+        }
+        .status-badge.discharged {
+            background: rgba(108, 117, 125, 0.7);
+            color: #fff;
+        }
+        .status-badge.followup {
+            background: rgba(255, 193, 7, 0.7);
+            color: #000;
+        }
+
+        /* ===== PAGE TITLE ===== */
+        .page-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            font-size: 1.8rem;
+        }
+
+        .page-title .badge {
+            background: rgba(13, 110, 253, 0.5);
+            backdrop-filter: blur(5px);
+            font-size: 0.7rem;
+        }
+
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(30deg);
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+        body.light-theme .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== DASHBOARD BUTTON ===== */
+        .dashboard-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 0.9rem;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        body.light-theme .dashboard-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+        body.light-theme .dashboard-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        #currentDateTime {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+            padding: 6px 12px;
+        }
+
+        .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .btn-primary:hover {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        .bg-primary { background: rgba(13, 110, 253, 0.4) !important; backdrop-filter: blur(5px); }
+        .bg-info { background: rgba(13, 202, 240, 0.3) !important; }
+        .bg-success { background: rgba(25, 135, 84, 0.3) !important; }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== MODAL ===== */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal .btn-close {
+            filter: invert(1);
+        }
+
+        .modal .form-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .modal .form-control,
+        .modal .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .modal .form-control:focus,
+        .modal .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+        }
+
+        .modal .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        /* ===== PATIENT DETAIL ===== */
+        .patient-detail {
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            margin-bottom: 18px;
+        }
+
+        .patient-detail h5 {
+            color: #fff;
+        }
+
+        .patient-detail p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* ===== ACTIVITY TABLE ===== */
+        .activity-table {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .activity-table th {
+            font-family: 'Times New Roman', Times, serif;
+            background: rgba(255, 255, 255, 0.08);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            font-weight: bold;
+            color: #fff;
+            font-size: 0.85rem;
+            padding: 10px 12px;
+        }
+
+        .activity-table td {
+            font-family: 'Times New Roman', Times, serif;
+            vertical-align: middle;
+            color: #fff;
+            padding: 10px 12px;
+            font-size: 0.85rem;
+        }
+
+        .activity-table .table-hover tbody tr:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ===== REPORT CARDS ===== */
+        .report-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.20);
+        }
+
+        .report-card .card-body {
+            padding: 20px 12px;
+            color: #fff;
+        }
+
+        .report-card .card-title {
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .report-card .card-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        .report-card .bi {
+            opacity: 0.8;
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 768px) {
+            .indicator-card .number {
+                font-size: 1.6rem;
+            }
+            .tab-content {
+                padding: 12px;
+            }
+            .page-title {
+                font-size: 1.3rem;
+            }
+            .header-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .timeline {
+                padding-left: 18px;
+            }
+            .timeline-item {
+                padding-left: 8px;
+            }
+            .timeline-item .timeline-badge {
+                left: -16px;
+                width: 14px;
+                height: 14px;
+                font-size: 0.5rem;
+            }
+            .quick-actions .btn {
+                font-size: 0.8rem;
+                padding: 4px 12px;
+            }
+            .nav-tabs .nav-link {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+            .patient-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-3">
+        <!-- ===== CABEÇALHO ===== -->
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap header-actions">
+                    <h2 class="page-title">
+                        <i class="bi bi-clipboard2-pulse text-primary"></i> 
+                        Histórico Clínico
+                        <span class="badge bg-primary ms-2">MÉDICO</span>
+                    </h2>
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="menumedico.html" class="dashboard-btn">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+                        </a>
+                        <button class="theme-toggle-btn" id="themeToggle">
+                            <i class="bi bi-moon-stars" id="themeIcon"></i>
+                        </button>
+                        <span class="badge bg-info text-dark" id="currentDateTime">
+                            <i class="bi bi-clock"></i> 
+                            <span id="dateTimeDisplay">Carregando...</span>
+                        </span>
+                        <button class="btn btn-primary" id="btnExport">
+                            <i class="bi bi-download"></i> Exportar
+                        </button>
+                        <div class="input-group" style="width: 220px;">
+                            <input type="text" id="quickSearch" class="form-control" placeholder="🔍 Pesquisar paciente...">
+                            <button class="btn btn-outline-primary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== INDICADORES ===== -->
+        <div class="row mb-3">
+            <div class="col-md-2 col-6">
+                <div class="indicator-card patients fade-in">
+                    <div class="number" id="totalPatients">0</div>
+                    <div class="label"><i class="bi bi-people"></i> Pacientes</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card consultations fade-in">
+                    <div class="number" id="totalConsultations">0</div>
+                    <div class="label"><i class="bi bi-calendar-check"></i> Consultas</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card exams fade-in">
+                    <div class="number" id="totalExams">0</div>
+                    <div class="label"><i class="bi bi-microscope"></i> Exames</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card internments fade-in">
+                    <div class="number" id="totalInternments">0</div>
+                    <div class="label"><i class="bi bi-hospital"></i> Internamentos</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="indicator-card prescriptions fade-in">
+                    <div class="number" id="totalPrescriptions">0</div>
+                    <div class="label"><i class="bi bi-prescription"></i> Prescrições</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FILTROS ===== -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-12 mb-2">
+                    <h6><i class="bi bi-funnel"></i> Filtros de Pesquisa</h6>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" id="filterName" class="form-control" placeholder="👤 Nome do paciente">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="filterProcess" class="form-control" placeholder="# Processo">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="filterBI" class="form-control" placeholder="🆔 BI / Cartão">
+                </div>
+                <div class="col-md-3">
+                    <select id="filterStatus" class="form-select">
+                        <option value="">Estado clínico</option>
+                        <option value="active">Ativo</option>
+                        <option value="discharged">Alta</option>
+                        <option value="followup">Em acompanhamento</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-primary w-100" id="btnResetFilters">
+                        <i class="bi bi-arrow-counterclockwise"></i> Limpar
+                    </button>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-2">
+                    <input type="date" id="filterStartDate" class="form-control" placeholder="Data Inicial">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" id="filterEndDate" class="form-control" placeholder="Data Final">
+                </div>
+                <div class="col-md-3">
+                    <select id="filterSpecialty" class="form-select">
+                        <option value="">Todas as especialidades</option>
+                        <option value="Pediatria">Pediatria</option>
+                        <option value="Cardiologia">Cardiologia</option>
+                        <option value="Ginecologia">Ginecologia</option>
+                        <option value="Ortopedia">Ortopedia</option>
+                        <option value="Neurologia">Neurologia</option>
+                        <option value="Dermatologia">Dermatologia</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <select id="filterPeriod" class="form-select">
+                        <option value="today">Hoje</option>
+                        <option value="week">Esta semana</option>
+                        <option value="month">Este mês</option>
+                        <option value="year">Este ano</option>
+                        <option value="custom">Período personalizado</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TABS ===== -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="pacientes-tab" data-bs-toggle="tab" data-bs-target="#pacientes" type="button">
+                    <i class="bi bi-people"></i> Pacientes
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="timeline-tab" data-bs-toggle="tab" data-bs-target="#timeline" type="button">
+                    <i class="bi bi-clock-history"></i> Linha do Tempo
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="clinico-tab" data-bs-toggle="tab" data-bs-target="#clinico" type="button">
+                    <i class="bi bi-clipboard2-pulse"></i> Histórico Clínico
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="analitico-tab" data-bs-toggle="tab" data-bs-target="#analitico" type="button">
+                    <i class="bi bi-graph-up"></i> Analítico
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="atividades-tab" data-bs-toggle="tab" data-bs-target="#atividades" type="button">
+                    <i class="bi bi-activity"></i> Atividades
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+
+            <!-- ===== ABA PACIENTES ===== -->
+            <div class="tab-pane fade show active" id="pacientes" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="info-card">
+                            <h6 class="card-title"><i class="bi bi-search"></i> Pacientes Recentes</h6>
+                            <div class="list-group" id="patientList">
+                                <!-- Inserido via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="patient-detail" id="patientDetail" style="display: none;">
+                            <div class="text-center">
+                                <div class="patient-avatar" id="patientAvatar">MS</div>
+                                <h5 id="detailName">Maria Silva</h5>
+                                <p><i class="bi bi-folder"></i> Processo: <span id="detailProcess">P-2026-0158</span></p>
+                                <p><i class="bi bi-person-badge"></i> BI: <span id="detailBI">00123456LA</span></p>
+                            </div>
+                            <hr style="border-color: rgba(255,255,255,0.1);">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="info-label">Idade</div>
+                                    <div class="info-value" id="detailAge">32 anos</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="info-label">Contacto</div>
+                                    <div class="info-value" id="detailPhone">+244 923 456 789</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="info-label">Estado</div>
+                                    <div class="info-value"><span class="status-badge active" id="detailStatus">Ativo</span></div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <h6><i class="bi bi-exclamation-triangle text-warning"></i> Indicadores de Risco</h6>
+                                <div class="risk-indicator">
+                                    <i class="bi bi-heart-pulse"></i>
+                                    <div class="risk-text">
+                                        <strong>Hipertensão</strong> - em acompanhamento desde 2024
+                                    </div>
+                                </div>
+                                <div class="risk-indicator" style="border-color: rgba(255, 193, 7, 0.3); background: rgba(255, 193, 7, 0.1);">
+                                    <i class="bi bi-exclamation-triangle" style="color: #ffc107;"></i>
+                                    <div class="risk-text">
+                                        <strong>Diabetes Tipo 2</strong> - controle glicêmico regular
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3" id="noPatientSelected">
+                            <i class="bi bi-person-circle" style="font-size: 3.5rem; color: rgba(255,255,255,0.25);"></i>
+                            <p style="color: rgba(255,255,255,0.4);">Selecione um paciente para visualizar o histórico</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ABA LINHA DO TEMPO ===== -->
+            <div class="tab-pane fade" id="timeline" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="info-card">
+                            <h6 class="card-title"><i class="bi bi-clock-history"></i> Linha do Tempo Clínica</h6>
+                            <div class="timeline" id="timelineContainer">
+                                <!-- Inserido via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="assistant-card">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-robot me-3"></i>
+                                <div>
+                                    <h5><i class="bi bi-stars"></i> Assistente Clínico</h5>
+                                    <p id="assistantMessage">📊 Paciente com 8 consultas registadas. Última consulta em 15/08/2026.</p>
+                                    <div class="mt-2">
+                                        <small class="d-block"><i class="bi bi-check-circle"></i> Último diagnóstico: Hipertensão</small>
+                                        <small class="d-block"><i class="bi bi-prescription"></i> 3 prescrições ativas</small>
+                                        <small class="d-block"><i class="bi bi-clock"></i> Próxima consulta: 10/09/2026</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 chart-container">
+                            <h6><i class="bi bi-bar-chart"></i> Resumo Clínico</h6>
+                            <div><span class="badge bg-primary">Consultas: 8</span></div>
+                            <div><span class="badge bg-success">Exames: 5</span></div>
+                            <div><span class="badge bg-warning text-dark">Prescrições: 3</span></div>
+                            <div><span class="badge bg-info">Internamentos: 1</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ABA HISTÓRICO CLÍNICO ===== -->
+            <div class="tab-pane fade" id="clinico" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="nav nav-tabs mb-3" id="clinicoTabs" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link active" id="consultas-tab" data-bs-toggle="tab" data-bs-target="#consultas" type="button">
+                                    <i class="bi bi-calendar-check"></i> Consultas
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="diagnosticos-tab" data-bs-toggle="tab" data-bs-target="#diagnosticos" type="button">
+                                    <i class="bi bi-stethoscope"></i> Diagnósticos
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="prescricoes-tab" data-bs-toggle="tab" data-bs-target="#prescricoes" type="button">
+                                    <i class="bi bi-prescription"></i> Prescrições
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="exames-tab" data-bs-toggle="tab" data-bs-target="#exames" type="button">
+                                    <i class="bi bi-microscope"></i> Exames
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="internamentos-tab" data-bs-toggle="tab" data-bs-target="#internamentos" type="button">
+                                    <i class="bi bi-hospital"></i> Internamentos
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="vacinacao-tab" data-bs-toggle="tab" data-bs-target="#vacinacao" type="button">
+                                    <i class="bi bi-syringe"></i> Vacinação
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="clinicoTabsContent">
+                            <!-- Consultas -->
+                            <div class="tab-pane fade show active" id="consultas" role="tabpanel">
+                                <div class="clinical-history" id="consultationsList">
+                                    <!-- Inserido via JavaScript -->
+                                </div>
+                            </div>
+                            <!-- Diagnósticos -->
+                            <div class="tab-pane fade" id="diagnosticos" role="tabpanel">
+                                <div class="clinical-history" id="diagnosticsList">
+                                    <!-- Inserido via JavaScript -->
+                                </div>
+                            </div>
+                            <!-- Prescrições -->
+                            <div class="tab-pane fade" id="prescricoes" role="tabpanel">
+                                <div class="clinical-history" id="prescriptionsList">
+                                    <!-- Inserido via JavaScript -->
+                                </div>
+                            </div>
+                            <!-- Exames -->
+                            <div class="tab-pane fade" id="exames" role="tabpanel">
+                                <div class="clinical-history" id="examsList">
+                                    <!-- Inserido via JavaScript -->
+                                </div>
+                            </div>
+                            <!-- Internamentos -->
+                            <div class="tab-pane fade" id="internamentos" role="tabpanel">
+                                <div class="clinical-history" id="internmentsList">
+                                    <!-- Inserido via JavaScript -->
+                                </div>
+                            </div>
+                            <!-- Vacinação -->
+                            <div class="tab-pane fade" id="vacinacao" role="tabpanel">
+                                <div class="clinical-history" id="vaccinationList">
+                                    <!-- Inserido via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notas Privadas -->
+                        <div class="private-note-area mt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="private-note-label"><i class="bi bi-lock"></i> Notas Médicas Privadas</span>
+                                <button class="btn btn-sm btn-outline-primary" id="btnSaveNote">
+                                    <i class="bi bi-check-lg"></i> Salvar Nota
+                                </button>
+                            </div>
+                            <textarea id="privateNote" placeholder="Digite suas notas privadas sobre o paciente..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ABA ANALÍTICO ===== -->
+            <div class="tab-pane fade" id="analitico" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-graph-up"></i> Consultas por Período</h6>
+                            <div style="height: 180px; border-radius: 8px; display: flex; align-items: flex-end; padding: 8px;">
+                                <div style="width: 20%; margin: 0 2%; background: rgba(13, 110, 253, 0.7); height: 60%; border-radius: 4px;"></div>
+                                <div style="width: 20%; margin: 0 2%; background: rgba(25, 135, 84, 0.7); height: 80%; border-radius: 4px;"></div>
+                                <div style="width: 20%; margin: 0 2%; background: rgba(255, 193, 7, 0.7); height: 45%; border-radius: 4px;"></div>
+                                <div style="width: 20%; margin: 0 2%; background: rgba(13, 202, 240, 0.7); height: 70%; border-radius: 4px;"></div>
+                                <div style="width: 20%; margin: 0 2%; background: rgba(220, 53, 69, 0.7); height: 30%; border-radius: 4px;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <small style="color: rgba(255,255,255,0.6);">Jan</small>
+                                <small style="color: rgba(255,255,255,0.6);">Fev</small>
+                                <small style="color: rgba(255,255,255,0.6);">Mar</small>
+                                <small style="color: rgba(255,255,255,0.6);">Abr</small>
+                                <small style="color: rgba(255,255,255,0.6);">Mai</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-pie-chart"></i> Distribuição por Especialidade</h6>
+                            <div style="height: 180px; display: flex; justify-content: center; align-items: center;">
+                                <div style="width: 130px; height: 130px; border-radius: 50%; background: conic-gradient(
+                                    rgba(13, 110, 253, 0.8) 0% 35%,
+                                    rgba(25, 135, 84, 0.8) 35% 55%,
+                                    rgba(255, 193, 7, 0.8) 55% 75%,
+                                    rgba(13, 202, 240, 0.8) 75% 90%,
+                                    rgba(220, 53, 69, 0.8) 90% 100%
+                                );"></div>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-around mt-1">
+                                <span style="color: rgba(255,255,255,0.7); font-size: 0.8rem;"><span style="color: #0d6efd;">●</span> Pediatria (35%)</span>
+                                <span style="color: rgba(255,255,255,0.7); font-size: 0.8rem;"><span style="color: #198754;">●</span> Cardiologia (20%)</span>
+                                <span style="color: rgba(255,255,255,0.7); font-size: 0.8rem;"><span style="color: #ffc107;">●</span> Ginecologia (20%)</span>
+                                <span style="color: rgba(255,255,255,0.7); font-size: 0.8rem;"><span style="color: #0dcaf0;">●</span> Ortopedia (15%)</span>
+                                <span style="color: rgba(255,255,255,0.7); font-size: 0.8rem;"><span style="color: #dc3545;">●</span> Outras (10%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-graph-up-arrow"></i> Evolução dos Registos</h6>
+                            <div style="height: 130px; display: flex; align-items: flex-end; padding: 8px;">
+                                <div style="width: 16%; margin: 0 2%; background: rgba(13, 110, 253, 0.7); height: 30%; border-radius: 4px;"></div>
+                                <div style="width: 16%; margin: 0 2%; background: rgba(25, 135, 84, 0.7); height: 50%; border-radius: 4px;"></div>
+                                <div style="width: 16%; margin: 0 2%; background: rgba(255, 193, 7, 0.7); height: 70%; border-radius: 4px;"></div>
+                                <div style="width: 16%; margin: 0 2%; background: rgba(13, 202, 240, 0.7); height: 90%; border-radius: 4px;"></div>
+                                <div style="width: 16%; margin: 0 2%; background: rgba(220, 53, 69, 0.7); height: 60%; border-radius: 4px;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small style="color: rgba(255,255,255,0.6);">2022</small>
+                                <small style="color: rgba(255,255,255,0.6);">2023</small>
+                                <small style="color: rgba(255,255,255,0.6);">2024</small>
+                                <small style="color: rgba(255,255,255,0.6);">2025</small>
+                                <small style="color: rgba(255,255,255,0.6);">2026</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h6><i class="bi bi-clock"></i> Horários de Atendimento</h6>
+                            <div style="height: 130px; display: flex; align-items: flex-end; padding: 8px;">
+                                <div style="width: 14%; margin: 0 1%; background: rgba(13, 110, 253, 0.7); height: 40%; border-radius: 4px;"></div>
+                                <div style="width: 14%; margin: 0 1%; background: rgba(25, 135, 84, 0.7); height: 60%; border-radius: 4px;"></div>
+                                <div style="width: 14%; margin: 0 1%; background: rgba(255, 193, 7, 0.7); height: 90%; border-radius: 4px;"></div>
+                                <div style="width: 14%; margin: 0 1%; background: rgba(13, 202, 240, 0.7); height: 70%; border-radius: 4px;"></div>
+                                <div style="width: 14%; margin: 0 1%; background: rgba(220, 53, 69, 0.7); height: 50%; border-radius: 4px;"></div>
+                                <div style="width: 14%; margin: 0 1%; background: rgba(108, 117, 125, 0.7); height: 30%; border-radius: 4px;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small style="color: rgba(255,255,255,0.6);">08h</small>
+                                <small style="color: rgba(255,255,255,0.6);">10h</small>
+                                <small style="color: rgba(255,255,255,0.6);">12h</small>
+                                <small style="color: rgba(255,255,255,0.6);">14h</small>
+                                <small style="color: rgba(255,255,255,0.6);">16h</small>
+                                <small style="color: rgba(255,255,255,0.6);">18h</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ABA ATIVIDADES ===== -->
+            <div class="tab-pane fade" id="atividades" role="tabpanel">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="activity-table table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Médico</th>
+                                        <th>Ação</th>
+                                        <th>Data/Hora</th>
+                                        <th>Detalhes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activityBody">
+                                    <!-- Inserido via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== AÇÕES RÁPIDAS ===== -->
+        <div class="quick-actions mt-3 d-flex flex-wrap gap-2">
+            <button class="btn btn-success" id="btnNewConsultation">
+                <i class="bi bi-plus-circle"></i> Nova Consulta
+            </button>
+            <button class="btn btn-primary" id="btnPrescribe">
+                <i class="bi bi-prescription"></i> Prescrever
+            </button>
+            <button class="btn btn-warning" id="btnRequestExams">
+                <i class="bi bi-microscope"></i> Solicitar Exames
+            </button>
+            <button class="btn btn-info" id="btnUpdateDiagnosis">
+                <i class="bi bi-stethoscope"></i> Actualizar Diagnóstico
+            </button>
+            <button class="btn btn-secondary" id="btnExportPDF">
+                <i class="bi bi-file-pdf"></i> Exportar PDF
+            </button>
+            <button class="btn btn-outline-dark">
+                <a href="diagnosticos.html" style="color: inherit; text-decoration: none;">
+                 Ver Diagnosticos <i class="bi bi-arrow-right"></i>
+                </a>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== MODAL EXPORTAÇÃO ===== -->
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Exportar Histórico Clínico</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportForm">
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Relatório</label>
+                            <select class="form-select" id="exportType">
+                                <option value="completo">Histórico Completo</option>
+                                <option value="consultas">Consultas</option>
+                                <option value="diagnosticos">Diagnósticos</option>
+                                <option value="prescricoes">Prescrições</option>
+                                <option value="exames">Exames</option>
+                                <option value="internamentos">Internamentos</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Formato</label>
+                            <select class="form-select" id="exportFormat">
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
+                                <option value="csv">CSV</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Período</label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <input type="date" class="form-control" id="exportStartDate" placeholder="Data Inicial">
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" class="form-control" id="exportEndDate" placeholder="Data Final">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnExportConfirm">Exportar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            // ===== DADOS DE EXEMPLO =====
+            const patients = [
+                { id: 1, nome: 'Maria Silva', processo: 'P-2026-0158', bi: '00123456LA', telefone: '+244 923 456 789', idade: '32 anos', status: 'active', especialidade: 'Pediatria', dataCadastro: '15/01/2026' },
+                { id: 2, nome: 'João Pedro', processo: 'P-2026-0159', bi: '00123457LB', telefone: '+244 923 456 790', idade: '45 anos', status: 'followup', especialidade: 'Cardiologia', dataCadastro: '20/01/2026' },
+                { id: 3, nome: 'Ana Oliveira', processo: 'P-2026-0160', bi: '00123458LC', telefone: '+244 923 456 791', idade: '28 anos', status: 'discharged', especialidade: 'Ginecologia', dataCadastro: '25/01/2026' },
+                { id: 4, nome: 'Carlos Santos', processo: 'P-2026-0161', bi: '00123459LD', telefone: '+244 923 456 792', idade: '58 anos', status: 'active', especialidade: 'Ortopedia', dataCadastro: '01/02/2026' },
+                { id: 5, nome: 'Sofia Costa', processo: 'P-2026-0162', bi: '00123460LE', telefone: '+244 923 456 793', idade: '3 anos', status: 'followup', especialidade: 'Pediatria', dataCadastro: '05/02/2026' }
+            ];
+
+            // Histórico Clínico
+            const clinicalHistory = {
+                consultations: [
+                    { date: '15/08/2026', specialty: 'Pediatria', doctor: 'Dr. João Manuel', status: 'Confirmada', details: 'Consulta de rotina, desenvolvimento normal' },
+                    { date: '10/07/2026', specialty: 'Pediatria', doctor: 'Dr. João Manuel', status: 'Finalizada', details: 'Acompanhamento de desenvolvimento infantil' },
+                    { date: '05/06/2026', specialty: 'Pediatria', doctor: 'Dr. João Manuel', status: 'Cancelada', details: 'Paciente não compareceu' },
+                    { date: '20/05/2026', specialty: 'Pediatria', doctor: 'Dr. João Manuel', status: 'Finalizada', details: 'Consulta de rotina, vacinação em dia' }
+                ],
+                diagnostics: [
+                    { date: '15/08/2026', code: 'I10', name: 'Hipertensão Essencial', status: 'Ativo', details: 'Paciente em acompanhamento, medicação regular' },
+                    { date: '10/07/2026', code: 'E11', name: 'Diabetes Tipo 2', status: 'Em controle', details: 'Controle glicêmico, dieta e exercícios' },
+                    { date: '05/06/2026', code: 'J06', name: 'Infecção Respiratória', status: 'Resolvido', details: 'Tratamento com antibióticos, sem complicações' }
+                ],
+                prescriptions: [
+                    { date: '15/08/2026', medication: 'Losartana 50mg', posology: '1 comprimido ao dia', duration: '30 dias', status: 'Ativa' },
+                    { date: '15/08/2026', medication: 'Metformina 500mg', posology: '1 comprimido 2x ao dia', duration: '60 dias', status: 'Ativa' },
+                    { date: '10/07/2026', medication: 'Amoxicilina 500mg', posology: '1 comprimido 3x ao dia', duration: '7 dias', status: 'Concluída' },
+                    { date: '05/06/2026', medication: 'Paracetamol 500mg', posology: '1 comprimido a cada 6h', duration: '5 dias', status: 'Concluída' }
+                ],
+                exams: [
+                    { date: '15/08/2026', type: 'Hemograma Completo', status: 'Concluído', results: 'Normal' },
+                    { date: '10/07/2026', type: 'Glicemia em Jejum', status: 'Concluído', results: 'Alterado - 145 mg/dL' },
+                    { date: '05/06/2026', type: 'Raio-X Tórax', status: 'Concluído', results: 'Normal' },
+                    { date: '20/05/2026', type: 'Eletrocardiograma', status: 'Pendente', results: 'Aguardando resultado' }
+                ],
+                internments: [
+                    { date: '01/03/2026', discharge: '07/03/2026', reason: 'Pneumonia', doctor: 'Dr. Carlos Lima', status: 'Alta' }
+                ],
+                vaccination: [
+                    { date: '15/01/2026', vaccine: 'Tríplice Viral', dose: '1ª dose', status: 'Aplicada' },
+                    { date: '10/06/2025', vaccine: 'Hepatite B', dose: '3ª dose', status: 'Aplicada' },
+                    { date: '05/12/2024', vaccine: 'DTP', dose: 'Reforço', status: 'Aplicada' }
+                ]
+            };
+
+            const timelineEvents = [
+                { type: 'primary', icon: 'bi-person-plus', title: 'Paciente cadastrado', description: 'Maria Silva registada no sistema', time: '15/01/2026 09:00' },
+                { type: 'success', icon: 'bi-calendar-check', title: '1ª Consulta realizada', description: 'Pediatria - Dr. João Manuel', time: '20/01/2026 09:30' },
+                { type: 'info', icon: 'bi-syringe', title: 'Vacinação aplicada', description: 'Tríplice Viral - 1ª dose', time: '15/01/2026 09:15' },
+                { type: 'warning', icon: 'bi-clipboard2-pulse', title: 'Diagnóstico de Hipertensão', description: 'I10 - Hipertensão Essencial', time: '15/08/2026 09:30' },
+                { type: 'success', icon: 'bi-prescription', title: 'Prescrição médica', description: 'Losartana 50mg - 1x ao dia', time: '15/08/2026 09:45' },
+                { type: 'danger', icon: 'bi-exclamation-triangle', title: 'Alerta de risco', description: 'Glicemia alterada - 145 mg/dL', time: '10/07/2026 08:00' },
+                { type: 'info', icon: 'bi-microscope', title: 'Exame solicitado', description: 'Hemograma Completo', time: '15/08/2026 10:00' }
+            ];
+
+            const activities = [
+                { user: 'Dr. João Manuel', action: 'Consulta realizada', time: '08:00', details: 'Pediatria - Maria Silva' },
+                { user: 'Dr. João Manuel', action: 'Diagnóstico atualizado', time: '08:15', details: 'Hipertensão Essencial' },
+                { user: 'Dr. João Manuel', action: 'Prescrição emitida', time: '08:20', details: 'Losartana 50mg' },
+                { user: 'Dr. João Manuel', action: 'Exame solicitado', time: '09:30', details: 'Hemograma Completo' },
+                { user: 'Dr. João Manuel', action: 'Nota privada adicionada', time: '10:30', details: 'Histórico de hipertensão na família' }
+            ];
+
+            // ===== VARIÁVEL PACIENTE SELECIONADO =====
+            let selectedPatientId = null;
+
+            // ===== TEMA =====
+            let isDarkTheme = true;
+
+            function toggleTheme() {
+                isDarkTheme = !isDarkTheme;
+                if (isDarkTheme) {
+                    $('body').removeClass('light-theme');
+                    $('#themeIcon').removeClass('bi-sun-fill').addClass('bi-moon-stars');
+                } else {
+                    $('body').addClass('light-theme');
+                    $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+                }
+                localStorage.setItem('sicami-theme-history', isDarkTheme ? 'dark' : 'light');
+            }
+
+            const savedTheme = localStorage.getItem('sicami-theme-history');
+            if (savedTheme === 'light') {
+                isDarkTheme = false;
+                $('body').addClass('light-theme');
+                $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+            }
+
+            $('#themeToggle').click(toggleTheme);
+
+            // ===== BOTÃO DASHBOARD =====
+            $('#btnDashboard').click(function(e) {
+                e.preventDefault();
+                alert('🔙 Redirecionando para o Dashboard Principal...\n\n(Em produção, isso redirecionaria para a página principal do sistema)');
+            });
+
+            // ===== DATA/HORA =====
+            function updateDateTime() {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR');
+                const timeStr = now.toLocaleTimeString('pt-BR');
+                $('#dateTimeDisplay').text(`${dateStr} ${timeStr}`);
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // ===== ATUALIZAR INDICADORES =====
+            function updateIndicators() {
+                $('#totalPatients').text(patients.length);
+                $('#totalConsultations').text(clinicalHistory.consultations.length);
+                $('#totalExams').text(clinicalHistory.exams.length);
+                $('#totalInternments').text(clinicalHistory.internments.length);
+                $('#totalPrescriptions').text(clinicalHistory.prescriptions.length);
+            }
+            updateIndicators();
+
+            // ===== RENDERIZAR LISTA DE PACIENTES =====
+            function renderPatients(data) {
+                const list = $('#patientList');
+                list.empty();
+
+                if (data.length === 0) {
+                    list.html('<div class="list-group-item" style="color: rgba(255,255,255,0.6);">Nenhum paciente encontrado</div>');
+                    return;
+                }
+
+                data.forEach(p => {
+                    const statusMap = {
+                        'active': 'Ativo',
+                        'discharged': 'Alta',
+                        'followup': 'Em acompanhamento'
+                    };
+                    list.append(`
+                        <div class="list-group-item list-group-item-action patient-item" data-id="${p.id}" style="background: rgba(255,255,255,0.04); color: #fff; border-color: rgba(255,255,255,0.08); cursor: pointer;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${p.nome}</strong>
+                                    <br><small style="color: rgba(255,255,255,0.5);">${p.processo} | ${p.especialidade}</small>
+                                </div>
+                                <span class="status-badge ${p.status}">${statusMap[p.status] || p.status}</span>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            // ===== SELECIONAR PACIENTE =====
+            $(document).on('click', '.patient-item', function() {
+                const id = parseInt($(this).data('id'));
+                const patient = patients.find(p => p.id === id);
+                if (patient) {
+                    selectedPatientId = id;
+                    $('#patientDetail').show();
+                    $('#noPatientSelected').hide();
+                    $('#patientAvatar').text(patient.nome.split(' ').map(n => n[0]).join(''));
+                    $('#detailName').text(patient.nome);
+                    $('#detailProcess').text(patient.processo);
+                    $('#detailBI').text(patient.bi);
+                    $('#detailPhone').text(patient.telefone);
+                    $('#detailAge').text(patient.idade);
+                    
+                    const statusMap = {
+                        'active': 'Ativo',
+                        'discharged': 'Alta',
+                        'followup': 'Em acompanhamento'
+                    };
+                    $('#detailStatus').text(statusMap[patient.status] || patient.status);
+                    $('#detailStatus').attr('class', 'status-badge ' + patient.status);
+
+                    // Atualizar assistente
+                    $('#assistantMessage').html(`📊 Paciente com ${clinicalHistory.consultations.length} consultas registadas. Última consulta em ${clinicalHistory.consultations[0].date}.`);
+
+                    // Recarregar histórico clínico
+                    renderClinicalHistory();
+                    renderTimeline();
+                    renderActivities();
+                }
+            });
+
+            // ===== RENDERIZAR TIMELINE =====
+            function renderTimeline() {
+                const container = $('#timelineContainer');
+                container.empty();
+
+                const events = timelineEvents.slice(0, 6);
+                events.forEach((event, index) => {
+                    container.append(`
+                        <div class="timeline-item">
+                            <div class="timeline-badge ${event.type}">
+                                <i class="bi ${event.icon}" style="font-size: 0.5rem;"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>${event.title}</h6>
+                                <p>${event.description}</p>
+                                <div class="time"><i class="bi bi-clock"></i> ${event.time}</div>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            // ===== RENDERIZAR HISTÓRICO CLÍNICO =====
+            function renderClinicalHistory() {
+                // Consultas
+                const consultContainer = $('#consultationsList');
+                consultContainer.empty();
+                clinicalHistory.consultations.forEach(c => {
+                    consultContainer.append(`
+                        <div class="card" onclick="alert('📋 Detalhes: ${c.details}')">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">${c.specialty} - ${c.date}</h6>
+                                    <p class="card-text">${c.doctor}</p>
+                                </div>
+                                <span class="status-badge ${c.status === 'Cancelada' ? 'canceled' : c.status === 'Confirmada' ? 'confirmed' : 'completed'}">${c.status}</span>
+                            </div>
+                        </div>
+                    `);
+                });
+
+                // Diagnósticos
+                const diagContainer = $('#diagnosticsList');
+                diagContainer.empty();
+                clinicalHistory.diagnostics.forEach(d => {
+                    const statusMap = {
+                        'Ativo': 'active',
+                        'Em controle': 'followup',
+                        'Resolvido': 'discharged'
+                    };
+                    diagContainer.append(`
+                        <div class="card" onclick="alert('📋 Detalhes: ${d.details}')">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">${d.name} (${d.code})</h6>
+                                    <p class="card-text">${d.date}</p>
+                                </div>
+                                <span class="status-badge ${statusMap[d.status] || 'discharged'}">${d.status}</span>
+                            </div>
+                        </div>
+                    `);
+                });
+
+                // Prescrições
+                const prescContainer = $('#prescriptionsList');
+                prescContainer.empty();
+                clinicalHistory.prescriptions.forEach(p => {
+                    prescContainer.append(`
+                        <div class="card" onclick="alert('📋 ${p.medication} - ${p.posology}')">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">${p.medication}</h6>
+                                    <p class="card-text">${p.posology} | ${p.duration}</p>
+                                </div>
+                                <span class="status-badge ${p.status === 'Ativa' ? 'confirmed' : 'discharged'}">${p.status}</span>
+                            </div>
+                        </div>
+                    `);
+                });
+
+                // Exames
+                const examsContainer = $('#examsList');
+                examsContainer.empty();
+                clinicalHistory.exams.forEach(e => {
+                    examsContainer.append(`
+                        <div class="card" onclick="alert('📋 Resultado: ${e.results}')">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">${e.type}</h6>
+                                    <p class="card-text">${e.date}</p>
+                                </div>
+                                <span class="status-badge ${e.status === 'Concluído' ? 'completed' : 'pending'}">${e.status}</span>
+                            </div>
+                        </div>
+                    `);
+                });
+
+                // Internamentos
+                const internContainer = $('#internmentsList');
+                internContainer.empty();
+                clinicalHistory.internments.forEach(i => {
+                    internContainer.append(`
+                        <div class="card" onclick="alert('📋 Internamento: ${i.reason}')">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">${i.reason}</h6>
+                                    <p class="card-text">${i.date} - ${i.discharge} | ${i.doctor}</p>
+                                </div>
+                                <span class="status-badge discharged">${i.status}</span>
+                            </div>
+                        </div>
+                    `);
+                });
+
+                // Vacinação
+                const vaccContainer = $('#vaccinationList');
+                vaccContainer.empty();
+                clinicalHistory.vaccination.forEach(v => {
+                    vaccContainer.append(`
+                        <div class="card" onclick="alert('📋 Vacina: ${v.vaccine} - ${v.dose}')">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">${v.vaccine}</h6>
+                                    <p class="card-text">${v.dose} | ${v.date}</p>
+                                </div>
+                                <span class="status-badge confirmed">${v.status}</span>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            // ===== RENDERIZAR ATIVIDADES =====
+            function renderActivities() {
+                const body = $('#activityBody');
+                body.empty();
+
+                activities.forEach(a => {
+                    body.append(`
+                        <tr>
+                            <td><i class="bi bi-person-circle"></i> ${a.user}</td>
+                            <td>${a.action}</td>
+                            <td>${a.time}</td>
+                            <td>${a.details}</td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // ===== FILTROS =====
+            function filterPatients() {
+                const name = $('#filterName').val().toLowerCase();
+                const process = $('#filterProcess').val().toLowerCase();
+                const bi = $('#filterBI').val().toLowerCase();
+                const status = $('#filterStatus').val();
+
+                let filtered = patients.filter(p => {
+                    const matchName = name === '' || p.nome.toLowerCase().includes(name);
+                    const matchProcess = process === '' || p.processo.toLowerCase().includes(process);
+                    const matchBI = bi === '' || p.bi.toLowerCase().includes(bi);
+                    const matchStatus = status === '' || p.status === status;
+                    return matchName && matchProcess && matchBI && matchStatus;
+                });
+
+                renderPatients(filtered);
+            }
+
+            $('#filterName, #filterProcess, #filterBI, #filterStatus').on('input change', filterPatients);
+
+            $('#btnResetFilters').click(function() {
+                $('#filterName, #filterProcess, #filterBI').val('');
+                $('#filterStatus, #filterSpecialty, #filterPeriod').val('');
+                $('#filterStartDate, #filterEndDate').val('');
+                renderPatients(patients);
+            });
+
+            // ===== PESQUISA RÁPIDA =====
+            $('#quickSearch').on('input', function() {
+                const term = $(this).val().toLowerCase();
+                if (term === '') {
+                    renderPatients(patients);
+                } else {
+                    const filtered = patients.filter(p => 
+                        p.nome.toLowerCase().includes(term) || 
+                        p.processo.toLowerCase().includes(term) ||
+                        p.bi.toLowerCase().includes(term) ||
+                        p.telefone.includes(term)
+                    );
+                    renderPatients(filtered);
+                }
+            });
+
+            // ===== EXPORTAR =====
+            $('#btnExport, #btnExportPDF').click(function() {
+                if (!selectedPatientId) {
+                    alert('⚠️ Selecione um paciente primeiro!');
+                    return;
+                }
+                $('#exportModal').modal('show');
+            });
+
+            $('#btnExportConfirm').click(function() {
+                const type = $('#exportType').val();
+                const format = $('#exportFormat').val();
+                const startDate = $('#exportStartDate').val();
+                const endDate = $('#exportEndDate').val();
+
+                $('#exportModal').modal('hide');
+                alert(`📊 Exportando ${type} em formato ${format.toUpperCase()}\n\nPeríodo: ${startDate || 'início'} a ${endDate || 'atual'}\n(Em produção, isso geraria o arquivo para download)`);
+            });
+
+            // ===== AÇÕES MÉDICAS =====
+            $('#btnNewConsultation').click(function() {
+                if (!selectedPatientId) {
+                    alert('⚠️ Selecione um paciente primeiro!');
+                    return;
+                }
+                alert('📋 Nova consulta para ' + $('#detailName').text() + '\n\n(Em produção, abriria o formulário de consulta)');
+            });
+
+            $('#btnPrescribe').click(function() {
+                if (!selectedPatientId) {
+                    alert('⚠️ Selecione um paciente primeiro!');
+                    return;
+                }
+                alert('💊 Prescrever tratamento para ' + $('#detailName').text() + '\n\n(Em produção, abriria o formulário de prescrição)');
+            });
+
+            $('#btnRequestExams').click(function() {
+                if (!selectedPatientId) {
+                    alert('⚠️ Selecione um paciente primeiro!');
+                    return;
+                }
+                alert('🔬 Solicitar exames para ' + $('#detailName').text() + '\n\n(Em produção, abriria o formulário de solicitação)');
+            });
+
+            $('#btnUpdateDiagnosis').click(function() {
+                if (!selectedPatientId) {
+                    alert('⚠️ Selecione um paciente primeiro!');
+                    return;
+                }
+                alert('🏥 Atualizar diagnóstico de ' + $('#detailName').text() + '\n\n(Em produção, abriria o formulário de diagnóstico)');
+            });
+
+            // ===== NOTAS PRIVADAS =====
+            $('#btnSaveNote').click(function() {
+                const note = $('#privateNote').val();
+                if (!note.trim()) {
+                    alert('⚠️ Digite uma nota antes de salvar.');
+                    return;
+                }
+                alert('📝 Nota privada salva com sucesso!');
+                // Em produção, salvaria no banco de dados
+            });
+
+            // ===== INICIALIZAR =====
+            renderPatients(patients);
+            renderTimeline();
+            renderActivities();
+            renderClinicalHistory();
+
+            console.log('✅ Tela de Histórico Clínico - SICAMMI carregada com sucesso!');
+        });
+    </script>
+</body>
+</html>

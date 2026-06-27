@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitorar Gestantes e RN - SICAMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Estilo geral - herdado do histórico */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-image: url('../images/dash-rec.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Tema Claro */
+        body.light-theme::before {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        body.light-theme .page-title,
+        body.light-theme .glass-card .card-title,
+        body.light-theme .glass-card .card-text,
+        body.light-theme .glass-card .info-label,
+        body.light-theme .glass-card .info-value,
+        body.light-theme .glass-card .text-muted,
+        body.light-theme .modal-content,
+        body.light-theme .modal .form-label,
+        body.light-theme .patient-card .patient-name,
+        body.light-theme .patient-card .patient-info,
+        body.light-theme .indicator-card .number,
+        body.light-theme .indicator-card .label,
+        body.light-theme .monitoring-card .card-title,
+        body.light-theme .monitoring-card .card-text,
+        body.light-theme .monitoring-card .info-label,
+        body.light-theme .monitoring-card .info-value,
+        body.light-theme .alert-box {
+            color: #1a1a2e !important;
+        }
+
+        body.light-theme .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .patient-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .indicator-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .monitoring-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .monitoring-card:hover {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        body.light-theme .form-control,
+        body.light-theme .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .form-control:focus,
+        body.light-theme .form-select:focus {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+        body.light-theme .form-control::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-theme #currentDateTime {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .dashboard-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .dashboard-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .status-badge {
+            color: #1a1a2e;
+        }
+
+        body.light-theme .status-badge.normal {
+            background: rgba(25, 135, 84, 0.3);
+            color: #198754;
+        }
+
+        body.light-theme .status-badge.risk {
+            background: rgba(255, 193, 7, 0.3);
+            color: #856404;
+        }
+
+        body.light-theme .status-badge.critical {
+            background: rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+
+        body.light-theme .status-badge.stable {
+            background: rgba(25, 135, 84, 0.3);
+            color: #198754;
+        }
+
+        body.light-theme .status-badge.observation {
+            background: rgba(255, 193, 7, 0.3);
+            color: #856404;
+        }
+
+        body.light-theme .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .quick-actions .btn-primary {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-success {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-warning {
+            background: rgba(255, 193, 7, 0.8);
+            color: #000;
+        }
+
+        body.light-theme .quick-actions .btn-danger {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark {
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .quick-actions .btn-outline-dark:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+        }
+
+        body.light-theme .modal .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .trend-chart .bar {
+            background: rgba(13, 110, 253, 0.3);
+        }
+
+        body.light-theme .trend-chart .bar.current {
+            background: rgba(13, 110, 253, 0.7);
+        }
+
+        body.light-theme .nav-tabs .nav-link {
+            color: #1a1a2e !important;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-theme .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0d6efd !important;
+        }
+
+        body.light-theme .tab-content {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .glass-card .card-title {
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .glass-card .card-title i {
+            margin-right: 8px;
+        }
+
+        /* Indicadores */
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .indicator-card .number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .indicator-card .label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .indicator-card.pregnant { border-left: 4px solid rgba(13, 110, 253, 0.6); }
+        .indicator-card.newborn { border-left: 4px solid rgba(25, 135, 84, 0.6); }
+        .indicator-card.high-risk { border-left: 4px solid rgba(220, 53, 69, 0.6); }
+        .indicator-card.stability { border-left: 4px solid rgba(13, 202, 240, 0.6); }
+
+        .indicator-card.pregnant .number { color: #6ee7ff; }
+        .indicator-card.newborn .number { color: #75f0a0; }
+        .indicator-card.high-risk .number { color: #ff7a8a; }
+        .indicator-card.stability .number { color: #6ee7ff; }
+
+        /* Tabs - Glassmorphism */
+        .nav-tabs .nav-link {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 18px;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            margin-right: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            color: #fff;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: bold;
+            box-shadow: 0 -2px 20px rgba(13, 110, 253, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            border-radius: 0 8px 8px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Monitoring Cards */
+        .monitoring-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .monitoring-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+            border-color: rgba(13, 110, 253, 0.3);
+        }
+
+        .monitoring-card .card-title {
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .monitoring-card .card-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+        }
+
+        .monitoring-card .info-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+        }
+
+        .monitoring-card .info-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .monitoring-card.selected {
+            border-color: rgba(13, 110, 253, 0.5);
+            background: rgba(13, 110, 253, 0.15);
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-badge.normal {
+            background: rgba(25, 135, 84, 0.3);
+            color: #75f0a0;
+        }
+
+        .status-badge.risk {
+            background: rgba(255, 193, 7, 0.3);
+            color: #ffd75a;
+        }
+
+        .status-badge.critical {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff7a8a;
+        }
+
+        .status-badge.stable {
+            background: rgba(25, 135, 84, 0.3);
+            color: #75f0a0;
+        }
+
+        .status-badge.observation {
+            background: rgba(255, 193, 7, 0.3);
+            color: #ffd75a;
+        }
+
+        /* Patient Detail Card */
+        .detail-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .detail-card .detail-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        .detail-card .detail-value {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .detail-card .detail-value.danger {
+            color: #ff7a8a;
+        }
+
+        .detail-card .detail-value.success {
+            color: #75f0a0;
+        }
+
+        /* Trend Chart */
+        .trend-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 80px;
+            gap: 4px;
+            padding: 10px 0;
+        }
+
+        .trend-chart .bar {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            background: rgba(13, 110, 253, 0.3);
+            transition: all 0.3s ease;
+            min-height: 10px;
+            position: relative;
+        }
+
+        .trend-chart .bar.current {
+            background: rgba(13, 110, 253, 0.7);
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.2);
+        }
+
+        .trend-chart .bar .bar-value {
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.6);
+            white-space: nowrap;
+        }
+
+        .trend-labels {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.65rem;
+            margin-top: 5px;
+        }
+
+        /* Alert Box */
+        .alert-box {
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: #ff7a8a;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert-box.warning {
+            background: rgba(255, 193, 7, 0.15);
+            border-color: rgba(255, 193, 7, 0.3);
+            color: #ffd75a;
+        }
+
+        .alert-box.show {
+            display: block;
+        }
+
+        .alert-box i {
+            margin-right: 8px;
+        }
+
+        /* Page Title */
+        .page-title {
+            font-family: 'Times New Roman', Times, serif;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title .bi {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Theme Toggle */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(30deg);
+        }
+
+        /* Dashboard Button */
+        .dashboard-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        #currentDateTime {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .btn-primary {
+            background: rgba(13, 110, 253, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:hover {
+            background: rgba(13, 110, 253, 0.8);
+        }
+
+        .btn-success {
+            background: rgba(25, 135, 84, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-success:hover {
+            background: rgba(25, 135, 84, 0.8);
+        }
+
+        .btn-warning {
+            background: rgba(255, 193, 7, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #000;
+        }
+
+        .btn-warning:hover {
+            background: rgba(255, 193, 7, 0.8);
+        }
+
+        .btn-danger {
+            background: rgba(220, 53, 69, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-danger:hover {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        /* Quick Actions */
+        .quick-actions .btn {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 3px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-actions .btn-outline-secondary {
+            background: rgba(108, 117, 125, 0.3);
+            color: #fff;
+        }
+
+        .quick-actions .btn-outline-dark {
+            background: rgba(33, 37, 41, 0.3);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions .btn-outline-dark:hover {
+            background: rgba(33, 37, 41, 0.5);
+            color: #fff;
+        }
+
+        /* Modal */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal .btn-close {
+            filter: invert(1);
+        }
+
+        .modal .form-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .modal .form-control,
+        .modal .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .modal .form-control:focus,
+        .modal .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(13, 110, 253, 0.5);
+        }
+
+        .modal .form-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
+        /* Scroll */
+        .scroll-area {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .scroll-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scroll-area::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .scroll-area::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .scroll-area::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.3rem;
+            }
+            .header-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .indicator-card .number {
+                font-size: 1.6rem;
+            }
+            .glass-card {
+                padding: 15px;
+            }
+            .tab-content {
+                padding: 15px;
+            }
+            .monitoring-card {
+                padding: 12px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Cabeçalho -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap header-actions">
+                    <h2 class="page-title">
+                        <i class="bi bi-heart-pulse text-danger"></i> 
+                        Monitorar Gestantes e RN
+                        <span class="badge bg-danger ms-2">MATERNO-INFANTIL</span>
+                    </h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="menuenfermeiro.html" class="dashboard-btn" 
+                            title="Voltar ao Dashboard Principal">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Dashboard
+                        </a>
+                        <button class="theme-toggle-btn" id="themeToggle" title="Alternar Tema">
+                            <i class="bi bi-moon-stars" id="themeIcon"></i>
+                        </button>
+                        <span class="badge" id="currentDateTime">
+                            <i class="bi bi-clock"></i> 
+                            <span id="dateTimeDisplay">Carregando...</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de Indicadores -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-6">
+                <div class="indicator-card pregnant fade-in">
+                    <div class="number" id="totalPregnant">8</div>
+                    <div class="label"><i class="bi bi-person-arms-up"></i> Gestantes Internadas</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="indicator-card newborn fade-in">
+                    <div class="number" id="totalNewborns">5</div>
+                    <div class="label"><i class="bi bi-baby"></i> RN em Acompanhamento</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="indicator-card high-risk fade-in">
+                    <div class="number" id="highRisk">2</div>
+                    <div class="label"><i class="bi bi-exclamation-triangle"></i> Casos de Alto Risco</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="indicator-card stability fade-in">
+                    <div class="number" id="stabilityRate">87%</div>
+                    <div class="label"><i class="bi bi-graph-up"></i> Taxa de Estabilidade</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="gestantes-tab" data-bs-toggle="tab" data-bs-target="#gestantes" type="button" role="tab">
+                    <i class="bi bi-person-arms-up text-primary"></i> Gestantes
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rn-tab" data-bs-toggle="tab" data-bs-target="#rn" type="button" role="tab">
+                    <i class="bi bi-baby text-success"></i> Recém-Nascidos
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Aba Gestantes -->
+            <div class="tab-pane fade show active" id="gestantes" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="glass-card">
+                            <h6 class="card-title"><i class="bi bi-list"></i> Gestantes em Acompanhamento</h6>
+                            <div class="scroll-area" id="pregnantList">
+                                <!-- Gestantes serão inseridas via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <!-- Detalhes da Gestante -->
+                        <div id="pregnantDetail" style="display: none;">
+                            <div class="glass-card">
+                                <h6 class="card-title"><i class="bi bi-clipboard2-pulse"></i> Detalhes da Gestante</h6>
+                                <div id="pregnantDetailContent">
+                                    <!-- Conteúdo dinâmico -->
+                                </div>
+                            </div>
+                            <div class="glass-card">
+                                <h6 class="card-title"><i class="bi bi-graph-up"></i> Tendência de Sinais Vitais</h6>
+                                <div class="trend-chart" id="pregnantTrend">
+                                    <div class="bar" style="height: 40%;"><span class="bar-value">110</span></div>
+                                    <div class="bar" style="height: 55%;"><span class="bar-value">115</span></div>
+                                    <div class="bar" style="height: 65%;"><span class="bar-value">120</span></div>
+                                    <div class="bar" style="height: 50%;"><span class="bar-value">112</span></div>
+                                    <div class="bar" style="height: 60%;"><span class="bar-value">118</span></div>
+                                    <div class="bar current" style="height: 75%;"><span class="bar-value">125</span></div>
+                                </div>
+                                <div class="trend-labels">
+                                    <span>08:00</span>
+                                    <span>10:00</span>
+                                    <span>12:00</span>
+                                    <span>14:00</span>
+                                    <span>16:00</span>
+                                    <span>Agora</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3" id="noPregnantSelected">
+                            <i class="bi bi-person-arms-up" style="font-size: 4rem; color: rgba(255,255,255,0.3);"></i>
+                            <p style="color: rgba(255,255,255,0.5);">Selecione uma gestante para ver os detalhes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Recém-Nascidos -->
+            <div class="tab-pane fade" id="rn" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="glass-card">
+                            <h6 class="card-title"><i class="bi bi-list"></i> Recém-Nascidos em Acompanhamento</h6>
+                            <div class="scroll-area" id="newbornList">
+                                <!-- RN serão inseridos via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <!-- Detalhes do RN -->
+                        <div id="newbornDetail" style="display: none;">
+                            <div class="glass-card">
+                                <h6 class="card-title"><i class="bi bi-clipboard2-pulse"></i> Detalhes do Recém-Nascido</h6>
+                                <div id="newbornDetailContent">
+                                    <!-- Conteúdo dinâmico -->
+                                </div>
+                            </div>
+                            <div class="glass-card">
+                                <h6 class="card-title"><i class="bi bi-graph-up"></i> Evolução de Peso</h6>
+                                <div class="trend-chart" id="newbornTrend">
+                                    <div class="bar" style="height: 45%;"><span class="bar-value">2.8</span></div>
+                                    <div class="bar" style="height: 50%;"><span class="bar-value">2.9</span></div>
+                                    <div class="bar" style="height: 55%;"><span class="bar-value">3.0</span></div>
+                                    <div class="bar" style="height: 60%;"><span class="bar-value">3.1</span></div>
+                                    <div class="bar" style="height: 65%;"><span class="bar-value">3.2</span></div>
+                                    <div class="bar current" style="height: 70%;"><span class="bar-value">3.3</span></div>
+                                </div>
+                                <div class="trend-labels">
+                                    <span>D1</span>
+                                    <span>D2</span>
+                                    <span>D3</span>
+                                    <span>D4</span>
+                                    <span>D5</span>
+                                    <span>Hoje</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3" id="noNewbornSelected">
+                            <i class="bi bi-baby" style="font-size: 4rem; color: rgba(255,255,255,0.3);"></i>
+                            <p style="color: rgba(255,255,255,0.5);">Selecione um recém-nascido para ver os detalhes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="quick-actions mt-4 d-flex flex-wrap gap-2">
+            <button class="btn btn-primary" id="btnUpdateMonitoring">
+                <i class="bi bi-arrow-repeat"></i> Actualizar Dados
+            </button>
+            <button class="btn btn-success" id="btnRegisterObservation">
+                <i class="bi bi-clipboard2"></i> Registrar Ocorrência
+            </button>
+            <button class="btn btn-danger" id="btnRequestMedical">
+                <i class="bi bi-exclamation-triangle"></i> Solicitar Avaliação Médica
+            </button>
+            <button class="btn btn-warning" id="btnExportReport">
+                <i class="bi bi-file-earmark-text"></i> Exportar Relatório
+            </button>
+            <button class="btn btn-outline-secondary" id="btnViewHistory">
+                <i class="bi bi-clock-history"></i> Ver Histórico
+            </button>
+            <button class="btn btn-outline-dark">
+                <a href="menuenfermeiro.html" style="color: inherit; text-decoration: none;">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Observação -->
+    <div class="modal fade" id="observationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-clipboard2 text-success"></i> 
+                        Registrar Ocorrência
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Paciente</label>
+                        <select class="form-select" id="obsPatient">
+                            <option value="">Selecione um paciente...</option>
+                            <option value="gestante1">Ana Souza - Gestante</option>
+                            <option value="gestante2">Maria Oliveira - Gestante</option>
+                            <option value="rn1">RN - Silva (Berçário)</option>
+                            <option value="rn2">RN - Santos (UTI Neonatal)</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Tipo de Ocorrência</label>
+                        <select class="form-select" id="obsType">
+                            <option value="">Selecione...</option>
+                            <option value="clinica">Alteração Clínica</option>
+                            <option value="intervencao">Intervenção Realizada</option>
+                            <option value="evolucao">Evolução Clínica</option>
+                            <option value="alerta">Alerta de Risco</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Descrição Detalhada</label>
+                        <textarea class="form-control" id="obsDescription" rows="4" placeholder="Descreva a ocorrência em detalhes..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Encaminhamento</label>
+                        <select class="form-select" id="obsReferral">
+                            <option value="">Nenhum</option>
+                            <option value="medico">Médico Obstetra</option>
+                            <option value="pediatra">Pediatra</option>
+                            <option value="uti">UTI Neonatal</option>
+                            <option value="emergencia">Emergência</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btnConfirmObservation">
+                        <i class="bi bi-check2"></i> Registrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Avaliação Médica -->
+    <div class="modal fade" id="medicalModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle text-danger"></i> 
+                        Solicitar Avaliação Médica Urgente
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger" style="background: rgba(220, 53, 69, 0.2); border-color: rgba(220, 53, 69, 0.3); color: #ff7a8a;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Prioridade:</strong> Esta solicitação será enviada com prioridade máxima.
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Paciente</label>
+                        <select class="form-select" id="medPatient">
+                            <option value="">Selecione um paciente...</option>
+                            <option value="gestante1">Ana Souza - Gestante (Risco)</option>
+                            <option value="gestante2">Maria Oliveira - Gestante (Crítico)</option>
+                            <option value="rn1">RN - Silva (Berçário)</option>
+                            <option value="rn2">RN - Santos (UTI Neonatal - Crítico)</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Motivo da Solicitação</label>
+                        <select class="form-select" id="medReason">
+                            <option value="">Selecione...</option>
+                            <option value="hipertensao">Hipertensão Gestacional</option>
+                            <option value="sofrimento-fetal">Sofrimento Fetal</option>
+                            <option value="hemorragia">Hemorragia</option>
+                            <option value="desconforto-respiratorio">Desconforto Respiratório Neonatal</option>
+                            <option value="ictericia">Icterícia Grave</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Descrição da Urgência</label>
+                        <textarea class="form-control" id="medDescription" rows="3" placeholder="Descreva a situação de urgência em detalhes..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmMedical">
+                        <i class="bi bi-exclamation-triangle"></i> Solicitar Agora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Dados de exemplo - Gestantes
+            const pregnantWomen = [
+                { 
+                    id: 1, 
+                    name: 'Ana Souza', 
+                    age: 28, 
+                    gestationalWeeks: 34, 
+                    status: 'normal',
+                    lastVitals: 'PA: 110/70 | FC: 78 | Temp: 36.5°C',
+                    fetalHR: '145 bpm',
+                    fetalMovements: 'Ativo',
+                    contractions: 'Não',
+                    alerts: [],
+                    riskLevel: 'Baixo'
+                },
+                { 
+                    id: 2, 
+                    name: 'Maria Oliveira', 
+                    age: 32, 
+                    gestationalWeeks: 38, 
+                    status: 'risk',
+                    lastVitals: 'PA: 145/95 | FC: 92 | Temp: 37.0°C',
+                    fetalHR: '165 bpm',
+                    fetalMovements: 'Reduzido',
+                    contractions: 'Leves',
+                    alerts: ['Hipertensão Gestacional'],
+                    riskLevel: 'Médio'
+                },
+                { 
+                    id: 3, 
+                    name: 'Carla Santos', 
+                    age: 25, 
+                    gestationalWeeks: 30, 
+                    status: 'critical',
+                    lastVitals: 'PA: 160/110 | FC: 105 | Temp: 38.0°C',
+                    fetalHR: '175 bpm',
+                    fetalMovements: 'Muito reduzido',
+                    contractions: 'Intensas',
+                    alerts: ['Pré-eclâmpsia', 'Sofrimento Fetal'],
+                    riskLevel: 'Alto'
+                },
+                { 
+                    id: 4, 
+                    name: 'Patrícia Lima', 
+                    age: 35, 
+                    gestationalWeeks: 36, 
+                    status: 'normal',
+                    lastVitals: 'PA: 115/75 | FC: 72 | Temp: 36.7°C',
+                    fetalHR: '138 bpm',
+                    fetalMovements: 'Ativo',
+                    contractions: 'Não',
+                    alerts: [],
+                    riskLevel: 'Baixo'
+                }
+            ];
+
+            // Dados de exemplo - Recém-Nascidos
+            const newborns = [
+                {
+                    id: 1,
+                    name: 'RN - Silva',
+                    age: '2 dias',
+                    weight: '3.2 kg',
+                    status: 'stable',
+                    unit: 'Berçário',
+                    temp: '36.8°C',
+                    spo2: '98%',
+                    heartRate: '135 bpm',
+                    respiratoryRate: '42 irpm',
+                    feeding: 'Aleitamento Materno',
+                    weightChange: '+0.2 kg',
+                    complications: 'Nenhuma'
+                },
+                {
+                    id: 2,
+                    name: 'RN - Santos',
+                    age: '12 horas',
+                    weight: '2.5 kg',
+                    status: 'observation',
+                    unit: 'UTI Neonatal',
+                    temp: '36.2°C',
+                    spo2: '92%',
+                    heartRate: '155 bpm',
+                    respiratoryRate: '55 irpm',
+                    feeding: 'Fórmula (SNG)',
+                    weightChange: '-0.1 kg',
+                    complications: 'Desconforto Respiratório'
+                },
+                {
+                    id: 3,
+                    name: 'RN - Oliveira',
+                    age: '5 dias',
+                    weight: '3.5 kg',
+                    status: 'critical',
+                    unit: 'UTI Neonatal',
+                    temp: '37.5°C',
+                    spo2: '88%',
+                    heartRate: '165 bpm',
+                    respiratoryRate: '60 irpm',
+                    feeding: 'Fórmula (SNG)',
+                    weightChange: '-0.3 kg',
+                    complications: 'Icterícia Grave, Sepse'
+                },
+                {
+                    id: 4,
+                    name: 'RN - Costa',
+                    age: '1 dia',
+                    weight: '3.0 kg',
+                    status: 'stable',
+                    unit: 'Berçário',
+                    temp: '36.9°C',
+                    spo2: '97%',
+                    heartRate: '140 bpm',
+                    respiratoryRate: '40 irpm',
+                    feeding: 'Aleitamento Materno',
+                    weightChange: '+0.1 kg',
+                    complications: 'Nenhuma'
+                }
+            ];
+
+            // Tema
+            let isDarkTheme = true;
+
+            function toggleTheme() {
+                isDarkTheme = !isDarkTheme;
+                if (isDarkTheme) {
+                    $('body').removeClass('light-theme');
+                    $('#themeIcon').removeClass('bi-sun-fill').addClass('bi-moon-stars');
+                } else {
+                    $('body').addClass('light-theme');
+                    $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+                }
+                localStorage.setItem('sicami-theme-monitor', isDarkTheme ? 'dark' : 'light');
+            }
+
+            const savedTheme = localStorage.getItem('sicami-theme-monitor');
+            if (savedTheme === 'light') {
+                isDarkTheme = false;
+                $('body').addClass('light-theme');
+                $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun-fill');
+            }
+
+            $('#themeToggle').click(toggleTheme);
+
+            // Data e Hora
+            function updateDateTime() {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR');
+                const timeStr = now.toLocaleTimeString('pt-BR');
+                $('#dateTimeDisplay').text(`${dateStr} ${timeStr}`);
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Renderizar gestantes
+            function renderPregnant() {
+                const list = $('#pregnantList');
+                list.empty();
+
+                pregnantWomen.forEach(p => {
+                    const statusMap = {
+                        'normal': { class: 'normal', icon: 'bi-check-circle', text: 'Normal' },
+                        'risk': { class: 'risk', icon: 'bi-exclamation-circle', text: 'Risco' },
+                        'critical': { class: 'critical', icon: 'bi-exclamation-triangle', text: 'Crítico' }
+                    };
+                    const status = statusMap[p.status] || statusMap.normal;
+
+                    list.append(`
+                        <div class="monitoring-card pregnant-item" data-id="${p.id}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="card-title">${p.name}</div>
+                                    <div class="card-text">
+                                        <i class="bi bi-calendar"></i> ${p.age} anos &nbsp;|&nbsp;
+                                        <i class="bi bi-clock"></i> ${p.gestationalWeeks} semanas
+                                    </div>
+                                    <div class="card-text mt-1">
+                                        <span class="info-label">FCF:</span> 
+                                        <span class="info-value">${p.fetalHR}</span>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="status-badge ${status.class}">
+                                        <i class="bi ${status.icon}"></i> ${status.text}
+                                    </span>
+                                    ${p.riskLevel === 'Alto' ? '<span class="badge bg-danger ms-1" style="font-size: 0.6rem;">RISCO</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            // Renderizar RN
+            function renderNewborns() {
+                const list = $('#newbornList');
+                list.empty();
+
+                newborns.forEach(n => {
+                    const statusMap = {
+                        'stable': { class: 'stable', icon: 'bi-check-circle', text: 'Estável' },
+                        'observation': { class: 'observation', icon: 'bi-exclamation-circle', text: 'Observação' },
+                        'critical': { class: 'critical', icon: 'bi-exclamation-triangle', text: 'Crítico' }
+                    };
+                    const status = statusMap[n.status] || statusMap.stable;
+
+                    list.append(`
+                        <div class="monitoring-card newborn-item" data-id="${n.id}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="card-title">${n.name}</div>
+                                    <div class="card-text">
+                                        <i class="bi bi-clock"></i> ${n.age} &nbsp;|&nbsp;
+                                        <i class="bi bi-weight-scale"></i> ${n.weight}
+                                    </div>
+                                    <div class="card-text mt-1">
+                                        <span class="info-label">SpO₂:</span> 
+                                        <span class="info-value">${n.spo2}</span>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="status-badge ${status.class}">
+                                        <i class="bi ${status.icon}"></i> ${status.text}
+                                    </span>
+                                    <span class="badge bg-info ms-1" style="font-size: 0.6rem;">${n.unit}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            // Selecionar gestante
+            $(document).on('click', '.pregnant-item', function() {
+                const id = parseInt($(this).data('id'));
+                const p = pregnantWomen.find(w => w.id === id);
+                if (p) {
+                    $('#pregnantDetail').show();
+                    $('#noPregnantSelected').hide();
+
+                    const statusMap = {
+                        'normal': { class: 'normal', text: 'Normal' },
+                        'risk': { class: 'risk', text: 'Risco' },
+                        'critical': { class: 'critical', text: 'Crítico' }
+                    };
+                    const status = statusMap[p.status] || statusMap.normal;
+
+                    let alertsHtml = p.alerts.map(a => 
+                        `<span class="badge bg-danger me-1">${a}</span>`
+                    ).join('');
+
+                    $('#pregnantDetailContent').html(`
+                        <div class="detail-card">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Nome</div>
+                                    <div class="detail-value">${p.name}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Idade</div>
+                                    <div class="detail-value">${p.age} anos</div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Idade Gestacional</div>
+                                    <div class="detail-value">${p.gestationalWeeks} semanas</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Estado</div>
+                                    <div class="detail-value">
+                                        <span class="status-badge ${status.class}">
+                                            <i class="bi ${status.icon}"></i> ${status.text}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <h6 style="color: #fff; font-weight: bold;">Sinais Vitais Recentes</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Última Avaliação</div>
+                                    <div class="detail-value">${p.lastVitals}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Frequência Cardíaca Fetal</div>
+                                    <div class="detail-value">${p.fetalHR}</div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Movimentos Fetais</div>
+                                    <div class="detail-value">${p.fetalMovements}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Contrações Uterinas</div>
+                                    <div class="detail-value">${p.contractions}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${p.alerts.length > 0 ? `
+                            <div class="alert-box show">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <strong>Alertas Obstétricos:</strong> ${p.alerts.join(', ')}
+                            </div>
+                        ` : ''}
+
+                        <div class="d-flex gap-2 flex-wrap mt-3">
+                            <button class="btn btn-primary btn-sm" onclick="alert('📊 Atualizando monitorização de ${p.name}...')">
+                                <i class="bi bi-arrow-repeat"></i> Atualizar Monitorização
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="alert('📝 Registrando observação para ${p.name}...')">
+                                <i class="bi bi-clipboard2"></i> Registrar Observação
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="alert('🚨 Solicitação de avaliação médica enviada para ${p.name}!')">
+                                <i class="bi bi-exclamation-triangle"></i> Solicitar Avaliação Médica
+                            </button>
+                        </div>
+                    `);
+                }
+            });
+
+            // Selecionar RN
+            $(document).on('click', '.newborn-item', function() {
+                const id = parseInt($(this).data('id'));
+                const n = newborns.find(w => w.id === id);
+                if (n) {
+                    $('#newbornDetail').show();
+                    $('#noNewbornSelected').hide();
+
+                    const statusMap = {
+                        'stable': { class: 'stable', text: 'Estável' },
+                        'observation': { class: 'observation', text: 'Observação' },
+                        'critical': { class: 'critical', text: 'Crítico' }
+                    };
+                    const status = statusMap[n.status] || statusMap.stable;
+
+                    let complicationsHtml = n.complications !== 'Nenhuma' ? 
+                        `<span class="badge bg-danger">${n.complications}</span>` : 
+                        `<span class="badge bg-success">Nenhuma complicação</span>`;
+
+                    $('#newbornDetailContent').html(`
+                        <div class="detail-card">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Nome/Código</div>
+                                    <div class="detail-value">${n.name}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Idade</div>
+                                    <div class="detail-value">${n.age}</div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Peso Atual</div>
+                                    <div class="detail-value">${n.weight}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Estado Clínico</div>
+                                    <div class="detail-value">
+                                        <span class="status-badge ${status.class}">
+                                            <i class="bi ${status.icon}"></i> ${status.text}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Unidade</div>
+                                    <div class="detail-value">${n.unit}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Complicações</div>
+                                    <div class="detail-value">${complicationsHtml}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <h6 style="color: #fff; font-weight: bold;">Sinais Vitais</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="detail-label">Temperatura</div>
+                                    <div class="detail-value">${n.temp}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-label">SpO₂</div>
+                                    <div class="detail-value ${parseInt(n.spo2) < 95 ? 'danger' : 'success'}">${n.spo2}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-label">Frequência Cardíaca</div>
+                                    <div class="detail-value">${n.heartRate}</div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Frequência Respiratória</div>
+                                    <div class="detail-value">${n.respiratoryRate}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Alimentação</div>
+                                    <div class="detail-value">${n.feeding}</div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Variação de Peso</div>
+                                    <div class="detail-value ${n.weightChange.includes('-') ? 'danger' : 'success'}">${n.weightChange}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${n.complications !== 'Nenhuma' ? `
+                            <div class="alert-box show">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <strong>Complicação Neonatal:</strong> ${n.complications}
+                            </div>
+                        ` : ''}
+
+                        <div class="d-flex gap-2 flex-wrap mt-3">
+                            <button class="btn btn-primary btn-sm" onclick="alert('📊 Atualizando monitorização de ${n.name}...')">
+                                <i class="bi bi-arrow-repeat"></i> Atualizar Monitorização
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="alert('📝 Registrando observação para ${n.name}...')">
+                                <i class="bi bi-clipboard2"></i> Registrar Observação
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="alert('🚨 Solicitação de avaliação médica enviada para ${n.name}!')">
+                                <i class="bi bi-exclamation-triangle"></i> Solicitar Avaliação Médica
+                            </button>
+                        </div>
+                    `);
+                }
+            });
+
+            // Atualizar dados
+            $('#btnUpdateMonitoring').click(function() {
+                alert('🔄 Dados atualizados com sucesso!\n\nÚltima atualização: ' + new Date().toLocaleString('pt-BR'));
+            });
+
+            // Registrar ocorrência
+            $('#btnRegisterObservation').click(function() {
+                $('#observationModal').modal('show');
+            });
+
+            $('#btnConfirmObservation').click(function() {
+                const patient = $('#obsPatient').val();
+                const type = $('#obsType').val();
+                const description = $('#obsDescription').val().trim();
+
+                if (!patient) {
+                    alert('⚠️ Por favor, selecione um paciente.');
+                    return;
+                }
+                if (!type) {
+                    alert('⚠️ Por favor, selecione o tipo de ocorrência.');
+                    return;
+                }
+                if (!description) {
+                    alert('⚠️ Por favor, preencha a descrição detalhada.');
+                    return;
+                }
+
+                $('#observationModal').modal('hide');
+                alert('✅ Ocorrência registrada com sucesso!\n\nPaciente: ' + $('#obsPatient option:selected').text() + 
+                      '\nTipo: ' + $('#obsType option:selected').text() +
+                      '\nDescrição: ' + description);
+
+                $('#obsPatient').val('');
+                $('#obsType').val('');
+                $('#obsDescription').val('');
+                $('#obsReferral').val('');
+            });
+
+            // Solicitar avaliação médica
+            $('#btnRequestMedical').click(function() {
+                $('#medicalModal').modal('show');
+            });
+
+            $('#btnConfirmMedical').click(function() {
+                const patient = $('#medPatient').val();
+                const reason = $('#medReason').val();
+                const description = $('#medDescription').val().trim();
+
+                if (!patient) {
+                    alert('⚠️ Por favor, selecione um paciente.');
+                    return;
+                }
+                if (!reason) {
+                    alert('⚠️ Por favor, selecione o motivo da solicitação.');
+                    return;
+                }
+                if (!description) {
+                    alert('⚠️ Por favor, preencha a descrição da urgência.');
+                    return;
+                }
+
+                $('#medicalModal').modal('hide');
+                alert('🚨 Solicitação de avaliação médica URGENTE enviada!\n\nPaciente: ' + $('#medPatient option:selected').text() +
+                      '\nMotivo: ' + $('#medReason option:selected').text() +
+                      '\nDescrição: ' + description);
+
+                $('#medPatient').val('');
+                $('#medReason').val('');
+                $('#medDescription').val('');
+            });
+
+            // Exportar relatório
+            $('#btnExportReport').click(function() {
+                alert('📄 Relatório clínico materno-infantil exportado com sucesso!\n\n(Em produção, isso geraria um arquivo PDF)');
+            });
+
+            // Ver histórico
+            $('#btnViewHistory').click(function() {
+                alert('📋 Redirecionando para o histórico completo...\n\n(Em produção, isso abriria o histórico detalhado)');
+            });
+
+            // Botão Dashboard
+            $('#btnDashboard').click(function(e) {
+                e.preventDefault();
+                alert('🔙 Redirecionando para o Dashboard Principal...\n\n(Em produção, isso redirecionaria para a página principal do sistema)');
+            });
+
+            // Inicializar
+            renderPregnant();
+            renderNewborns();
+
+            console.log('✅ Tela de Monitorar Gestantes e Recém-Nascidos - SICAMI carregada com sucesso!');
+        });
+    </script>
+</body>
+</html>

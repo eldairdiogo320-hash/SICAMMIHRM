@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+  <title>Termos de Uso · Sistema Materno Infantil</title>
+  <!-- Font Awesome (versão gratuita) para ícones modernos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    body {
+      background: #f4f7fc;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      color: #1a2639;
+    }
+
+    .terms-card {
+      max-width: 1100px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 32px;
+      box-shadow: 0 20px 40px rgba(0, 20, 40, 0.12), 0 8px 24px rgba(0, 20, 40, 0.06);
+      overflow: hidden;
+      transition: background 0.3s, color 0.3s;
+      position: relative;
+    }
+
+    /* modo escuro (toggle com classe .dark-mode) */
+    .terms-card.dark-mode {
+      background: #1e2a3a;
+      color: #e8edf5;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+    .terms-card.dark-mode .terms-header,
+    .terms-card.dark-mode .terms-footer {
+      background: #16212e;
+      border-color: #2d3d52;
+    }
+    .terms-card.dark-mode .section-divider {
+      border-color: #2d3d52;
+    }
+    .terms-card.dark-mode .badge-perfil {
+      background: #2d4059;
+      color: #cbd5e6;
+    }
+    .terms-card.dark-mode .btn-outline {
+      border-color: #5a7290;
+      color: #d0dcee;
+    }
+    .terms-card.dark-mode .btn-outline:hover {
+      background: #2d4059;
+      border-color: #7a96b8;
+    }
+    .terms-card.dark-mode .btn-primary {
+      background: #2a6f97;
+      color: white;
+    }
+    .terms-card.dark-mode .btn-primary:hover {
+      background: #1e5a7a;
+    }
+
+    /* cabeçalho */
+    .terms-header {
+      padding: 1.8rem 2.5rem;
+      background: #ffffff;
+      border-bottom: 1px solid #e9edf4;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      background: #0b3b5c;
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+    }
+
+    .header-titles h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: #0b2b44;
+    }
+    .terms-card.dark-mode .header-titles h1 {
+      color: #d6e5f5;
+    }
+    .header-titles .sub {
+      font-size: 0.9rem;
+      color: #4d627a;
+      margin-top: 4px;
+      font-style: italic;
+      border-left: 3px solid #2a7faa;
+      padding-left: 12px;
+    }
+    .terms-card.dark-mode .header-titles .sub {
+      color: #b0c8e0;
+      border-left-color: #4a8db5;
+    }
+
+    .lang-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .lang-actions select {
+      padding: 6px 12px;
+      border-radius: 40px;
+      border: 1px solid #d0dae8;
+      background: white;
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+      transition: 0.2s;
+    }
+    .terms-card.dark-mode .lang-actions select {
+      background: #243447;
+      color: #e0ecfa;
+      border-color: #3f5670;
+    }
+
+    .btn-mode {
+      background: transparent;
+      border: none;
+      font-size: 1.3rem;
+      padding: 6px 10px;
+      border-radius: 30px;
+      cursor: pointer;
+      color: #2d4d6e;
+      transition: 0.2s;
+    }
+    .terms-card.dark-mode .btn-mode {
+      color: #d0def0;
+    }
+    .btn-mode:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* barra de progresso de leitura */
+    .progress-wrap {
+      width: 100%;
+      height: 5px;
+      background: #e2e9f3;
+      transition: background 0.3s;
+    }
+    .terms-card.dark-mode .progress-wrap {
+      background: #2d4059;
+    }
+    .progress-bar {
+      height: 5px;
+      width: 0%;
+      background: #1a7aa8;
+      transition: width 0.25s ease;
+    }
+
+    /* corpo dos termos */
+    .terms-body {
+      padding: 2rem 2.5rem 1.8rem;
+      max-height: 72vh;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    .terms-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .terms-body::-webkit-scrollbar-track {
+      background: #eef3f9;
+    }
+    .terms-body::-webkit-scrollbar-thumb {
+      background: #b3c9df;
+      border-radius: 12px;
+    }
+    .terms-card.dark-mode .terms-body::-webkit-scrollbar-track {
+      background: #243447;
+    }
+    .terms-card.dark-mode .terms-body::-webkit-scrollbar-thumb {
+      background: #3f5a78;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+    .section h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      color: #10324b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .terms-card.dark-mode .section h2 {
+      color: #c8def5;
+    }
+    .section h2 i {
+      color: #1d7aa8;
+      width: 1.8rem;
+    }
+    .terms-card.dark-mode .section h2 i {
+      color: #5b9bc9;
+    }
+    .section p, .section li {
+      line-height: 1.6;
+      color: #1f3349;
+    }
+    .terms-card.dark-mode .section p,
+    .terms-card.dark-mode .section li {
+      color: #d4e2f2;
+    }
+    .section ul, .section .grid-perfis {
+      list-style: none;
+      padding-left: 0.5rem;
+    }
+    .section ul li {
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .section ul li i {
+      color: #1d7aa8;
+      width: 1.4rem;
+      margin-top: 0.2rem;
+    }
+    .terms-card.dark-mode .section ul li i {
+      color: #6ba3d0;
+    }
+
+    .grid-perfis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 8px;
+    }
+    .badge-perfil {
+      background: #f0f5fe;
+      padding: 0.8rem 1rem;
+      border-radius: 18px;
+      border-left: 4px solid #1d7aa8;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .badge-perfil span {
+      font-weight: 400;
+      font-size: 0.8rem;
+      color: #2d4f72;
+      display: block;
+      margin-top: 4px;
+    }
+    .terms-card.dark-mode .badge-perfil span {
+      color: #b6cfe7;
+    }
+    .badge-perfil i {
+      margin-right: 6px;
+      color: #1d7aa8;
+    }
+
+    .destaque {
+      background: #e7f1fa;
+      padding: 0.6rem 1rem;
+      border-radius: 20px;
+      font-weight: 500;
+      display: inline-block;
+      margin: 6px 0;
+    }
+    .terms-card.dark-mode .destaque {
+      background: #253a50;
+      color: #cde0f2;
+    }
+
+    .section-divider {
+      border: 0;
+      height: 1px;
+      background: linear-gradient(to right, #d8e3f0, transparent);
+      margin: 1.6rem 0;
+    }
+
+    .restricoes li i {
+      color: #b13e3e !important;
+    }
+
+    /* rodapé com checkbox e botões */
+    .terms-footer {
+      padding: 1.6rem 2.5rem;
+      background: #f9fbfe;
+      border-top: 1px solid #e2e9f3;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: background 0.3s;
+    }
+
+    .agree-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+    .agree-area input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #1a7aa8;
+      cursor: pointer;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      background: white;
+      color: #1f3a57;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: #0b3b5c;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #0a2f4a;
+      transform: scale(1.02);
+    }
+    .btn-outline {
+      border: 1.5px solid #b7ccdf;
+      background: transparent;
+    }
+    .btn-outline:hover {
+      background: #eaf1fa;
+    }
+    .btn-danger {
+      background: #b13e3e;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #8f2f2f;
+    }
+    .btn-success {
+      background: #1f7a5e;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #15634b;
+    }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      .terms-header {
+        flex-direction: column;
+        align-items: start;
+        gap: 12px;
+        padding: 1.4rem 1.5rem;
+      }
+      .header-titles h1 {
+        font-size: 1.5rem;
+      }
+      .terms-body {
+        padding: 1.5rem;
+      }
+      .terms-footer {
+        flex-direction: column;
+        align-items: start;
+        padding: 1.5rem;
+      }
+      .btn-group {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .lang-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+
+    /* simular pesquisa interna */
+    .search-terms {
+      background: #f2f7fe;
+      padding: 8px 16px;
+      border-radius: 60px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #d7e3f0;
+      margin-bottom: 1.2rem;
+    }
+    .terms-card.dark-mode .search-terms {
+      background: #243447;
+      border-color: #3d5670;
+    }
+    .search-terms input {
+      border: none;
+      background: transparent;
+      padding: 8px 0;
+      outline: none;
+      font-size: 0.9rem;
+      width: 180px;
+      color: inherit;
+    }
+    .search-terms input::placeholder {
+      color: #6f88a0;
+    }
+    .terms-card.dark-mode .search-terms input::placeholder {
+      color: #9ab0c9;
+    }
+
+    /* assinatura digital fictícia */
+    .assinatura-area {
+      background: #eef5fc;
+      border-radius: 30px;
+      padding: 4px 16px 4px 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+    .terms-card.dark-mode .assinatura-area {
+      background: #1e3349;
+    }
+  </style>
+</head>
+<body>
+
+<div class="terms-card" id="termsCard">
+  <!-- cabeçalho com logo, título e ações -->
+  <div class="terms-header">
+    <div class="logo-area">
+      <div class="logo-icon"><i class="fas fa-hospital-user"></i></div>
+      <div class="header-titles">
+        <h1>Termos de Uso</h1>
+        <div class="sub"><i class="fas fa-quote-left" style="opacity:0.6;margin-right:4px;"></i> Leia atentamente os termos e condições para utilização do Sistema de Informação Clínica e Assistência Médica do Materno Infantil.</div>
+      </div>
+    </div>
+    <div class="lang-actions">
+      <select id="langSelect" aria-label="Idioma">
+        <option value="pt">🇵🇹 Português</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="fr">🇫🇷 Français</option>
+      </select>
+      <button class="btn-mode" id="darkModeToggle" title="Alternar modo escuro/claro"><i class="fas fa-moon"></i></button>
+    </div>
+  </div>
+
+  <!-- barra de progresso -->
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar" style="width:0%;"></div>
+  </div>
+
+  <!-- corpo do texto (scroll) -->
+  <div class="terms-body" id="termsBody">
+    <!-- pesquisa interna -->
+    <div class="search-terms">
+      <i class="fas fa-search" style="color:#3f6b8f;"></i>
+      <input type="text" id="searchInput" placeholder="Pesquisar nos termos...">
+    </div>
+
+    <!-- 1. Objetivo -->
+    <div class="section" id="sec1">
+      <h2><i class="fas fa-bullseye"></i> 1. Objetivo do Sistema</h2>
+      <p>O sistema tem como finalidade:</p>
+      <ul>
+        <li><i class="fas fa-check-circle"></i> Gerenciar informações clínicas.</li>
+        <li><i class="fas fa-check-circle"></i> Apoiar o atendimento médico materno-infantil.</li>
+        <li><i class="fas fa-check-circle"></i> Controlar consultas e exames.</li>
+        <li><i class="fas fa-check-circle"></i> Registrar vacinas e tratamentos.</li>
+        <li><i class="fas fa-check-circle"></i> Melhorar a qualidade da assistência médica.</li>
+      </ul>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 2. Aceitação -->
+    <div class="section">
+      <h2><i class="fas fa-check-double"></i> 2. Aceitação dos Termos</h2>
+      <p>Ao utilizar o sistema, o utilizador declara que:</p>
+      <ul>
+        <li><i class="fas fa-check" style="color:#1d7aa8;"></i> ✅ Leu os Termos de Uso.</li>
+        <li><i class="fas fa-check" style="color:#1d7aa8;"></i> ✅ Compreendeu as regras do sistema.</li>
+        <li><i class="fas fa-check" style="color:#1d7aa8;"></i> ✅ Concorda com todas as condições estabelecidas.</li>
+      </ul>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 3. Responsabilidades -->
+    <div class="section">
+      <h2><i class="fas fa-user-shield"></i> 3. Responsabilidades do Utilizador</h2>
+      <ul>
+        <li><i class="fas fa-check-circle"></i> Utilizar o sistema de forma ética e legal.</li>
+        <li><i class="fas fa-check-circle"></i> Fornecer informações verdadeiras.</li>
+        <li><i class="fas fa-check-circle"></i> Manter a confidencialidade da sua senha.</li>
+        <li><i class="fas fa-check-circle"></i> Não partilhar credenciais de acesso.</li>
+        <li><i class="fas fa-check-circle"></i> Respeitar a privacidade dos pacientes.</li>
+      </ul>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 4. Proteção de Dados -->
+    <div class="section">
+      <h2><i class="fas fa-lock"></i> 4. Proteção de Dados e Privacidade</h2>
+      <ul>
+        <li><i class="fas fa-shield-alt"></i> Proteção dos dados clínicos.</li>
+        <li><i class="fas fa-shield-alt"></i> Armazenamento seguro das informações.</li>
+        <li><i class="fas fa-shield-alt"></i> Controle de acesso por perfil de utilizador.</li>
+        <li><i class="fas fa-shield-alt"></i> Registo de atividades realizadas no sistema.</li>
+        <li><i class="fas fa-shield-alt"></i> Confidencialidade das informações médicas.</li>
+      </ul>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 5. Perfis -->
+    <div class="section">
+      <h2><i class="fas fa-users"></i> 5. Perfis de Utilizadores</h2>
+      <div class="grid-perfis">
+        <div class="badge-perfil"><i class="fas fa-user-md"></i> Médico <span>Consultar processos, diagnosticar, prescrever, solicitar exames.</span></div>
+        <div class="badge-perfil"><i class="fas fa-user-nurse"></i> Enfermeiro <span>Atualizar sinais vitais, registar vacinas, acompanhar pacientes.</span></div>
+        <div class="badge-perfil"><i class="fas fa-user-cog"></i> Administrador <span>Gerenciar utilizadores, permissões, emitir relatórios.</span></div>
+        <div class="badge-perfil"><i class="fas fa-user-injured"></i> Paciente <span>Consultar histórico, visualizar exames, agendar consultas.</span></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 6. Restrições -->
+    <div class="section">
+      <h2><i class="fas fa-ban" style="color:#b13e3e;"></i> 6. Restrições de Utilização</h2>
+      <ul class="restricoes">
+        <li><i class="fas fa-times-circle"></i> Alterar dados sem autorização.</li>
+        <li><i class="fas fa-times-circle"></i> Aceder a informações de outros utilizadores sem permissão.</li>
+        <li><i class="fas fa-times-circle"></i> Compartilhar dados clínicos confidenciais.</li>
+        <li><i class="fas fa-times-circle"></i> Utilizar o sistema para fins ilícitos.</li>
+        <li><i class="fas fa-times-circle"></i> Tentar comprometer a segurança do sistema.</li>
+      </ul>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 7. Segurança -->
+    <div class="section">
+      <h2><i class="fas fa-server"></i> 7. Segurança</h2>
+      <ul>
+        <li><i class="fas fa-check-circle"></i> Autenticação de utilizadores.</li>
+        <li><i class="fas fa-check-circle"></i> Criptografia de dados.</li>
+        <li><i class="fas fa-check-circle"></i> Registo de acessos.</li>
+        <li><i class="fas fa-check-circle"></i> Controlo de permissões.</li>
+        <li><i class="fas fa-check-circle"></i> Cópias de segurança (backup).</li>
+      </ul>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 8, 9, 10, 11 -->
+    <div class="section">
+      <h2><i class="fas fa-user-slash"></i> 8. Suspensão de Conta</h2>
+      <ul>
+        <li><i class="fas fa-circle-exclamation"></i> Violação dos termos.</li>
+        <li><i class="fas fa-circle-exclamation"></i> Uso indevido do sistema.</li>
+        <li><i class="fas fa-circle-exclamation"></i> Tentativas de acesso não autorizado.</li>
+        <li><i class="fas fa-circle-exclamation"></i> Divulgação indevida de informações médicas.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-scale-balanced"></i> 9. Limitação de Responsabilidade</h2>
+      <p>O sistema atua como ferramenta de apoio à gestão clínica. As decisões médicas continuam sendo de responsabilidade dos profissionais de saúde habilitados.</p>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-rotate"></i> 10. Atualizações dos Termos</h2>
+      <p>Os Termos de Uso poderão ser atualizados sempre que necessário para melhorar a segurança e o funcionamento do sistema.</p>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-headset"></i> 11. Contactos</h2>
+      <p><i class="fas fa-phone" style="width:1.8rem;"></i> Suporte Técnico: +244 934 579 033</p>
+      <p><i class="fas fa-envelope" style="width:1.8rem;"></i> <a href="#" style="color:#1d7aa8;text-decoration:none;">eldaidiogo@gmail.com</a></p>
+    </div>
+
+    <!-- pequena área de assinatura digital (mock) -->
+    <div style="margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+      <div class="assinatura-area"><i class="fas fa-pen-fancy"></i> Assinatura digital: <span style="font-weight:600;">USUÁRIO_1234</span> <span style="font-size:0.7rem; opacity:0.7;">(pendente)</span></div>
+      <div><i class="fas fa-history"></i> Histórico: aceite em 12/01/2026</div>
+    </div>
+  </div>
+
+  <!-- rodapé com checkbox e botões -->
+  <div class="terms-footer">
+    <div class="agree-area">
+      <input type="checkbox" id="agreeCheck">
+      <label for="agreeCheck"><i class="fas fa-check-circle" style="color:#1a7aa8;"></i> Li e concordo com os Termos de Uso</label>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-success" id="acceptBtn"><i class="fas fa-check"></i> Aceitar e Continuar</button>
+      <button class="btn btn-danger" id="cancelBtn"><i class="fas fa-times"></i> Cancelar</button>
+      <button class="btn btn-outline" id="downloadPdfBtn"><i class="fas fa-file-pdf"></i> Baixar PDF</button>
+      <button class="btn btn-outline" id="printBtn"><i class="fas fa-print"></i></button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const termsCard = document.getElementById('termsCard');
+    const bodyScroll = document.getElementById('termsBody');
+    const progressBar = document.getElementById('progressBar');
+    const darkToggle = document.getElementById('darkModeToggle');
+    const agreeCheck = document.getElementById('agreeCheck');
+    const acceptBtn = document.getElementById('acceptBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const searchInput = document.getElementById('searchInput');
+    const langSelect = document.getElementById('langSelect');
+
+    // --- Barra de progresso de leitura ---
+    function updateProgress() {
+      if (!bodyScroll) return;
+      const scrollTop = bodyScroll.scrollTop;
+      const scrollHeight = bodyScroll.scrollHeight - bodyScroll.clientHeight;
+      const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      progressBar.style.width = Math.min(progress, 100) + '%';
+    }
+    bodyScroll.addEventListener('scroll', updateProgress);
+    window.addEventListener('resize', updateProgress);
+    // inicializar
+    setTimeout(updateProgress, 100);
+
+    // --- Modo escuro ---
+    darkToggle.addEventListener('click', function() {
+      termsCard.classList.toggle('dark-mode');
+      const icon = darkToggle.querySelector('i');
+      if (termsCard.classList.contains('dark-mode')) {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+      }
+    });
+
+    // --- Aceitar / Cancelar ---
+    acceptBtn.addEventListener('click', function(e) {
+      if (!agreeCheck.checked) {
+        alert('Por favor, marque a caixa "Li e concordo com os Termos de Uso" antes de continuar.');
+        return;
+      }
+      alert('Termos aceites. Acesso concedido ao sistema.');
+      // simular assinatura digital
+      const assinaturaSpan = document.querySelector('.assinatura-area span');
+      if (assinaturaSpan) assinaturaSpan.textContent = 'USUÁRIO_1234 ✅';
+    });
+
+    cancelBtn.addEventListener('click', function() {
+      if (confirm('Tem certeza que deseja cancelar? O acesso ao sistema será negado.')) {
+        alert('Acesso cancelado. Pode rever os termos mais tarde.');
+      }
+    });
+
+    // --- Download PDF (simulação) ---
+    document.getElementById('downloadPdfBtn').addEventListener('click', function() {
+      alert('Funcionalidade de download PDF: o ficheiro seria gerado com os termos completos.');
+    });
+
+    // --- Impressão ---
+    document.getElementById('printBtn').addEventListener('click', function() {
+      window.print();
+    });
+
+    // --- Pesquisa interna (destacar / filtrar) ---
+    searchInput.addEventListener('input', function(e) {
+      const query = e.target.value.trim().toLowerCase();
+      const sections = document.querySelectorAll('.section');
+      sections.forEach(sec => {
+        const text = sec.textContent.toLowerCase();
+        if (query === '') {
+          sec.style.display = 'block';
+        } else {
+          sec.style.display = text.includes(query) ? 'block' : 'none';
+        }
+      });
+      // se nenhum resultado, mostrar mensagem simples
+    });
+
+    // --- Troca de idioma (mock) ---
+    langSelect.addEventListener('change', function() {
+      const lang = this.value;
+      let msg = 'Idioma alterado para: ';
+      if (lang === 'pt') msg += 'Português';
+      else if (lang === 'en') msg += 'Inglês';
+      else if (lang === 'fr') msg += 'Francês';
+      alert(msg + ' (demonstração de tradução)');
+    });
+
+    // --- Simular "primeiro acesso" (checkbox fica focado) ---
+    agreeCheck.focus();
+
+    // Expor algumas funcionalidades para debug (opcional)
+    console.log('Termos de Uso carregados. (modo escuro, progresso, pesquisa, idioma)');
+  })();
+</script>
+
+<!-- pequeno ajuste para impressão: esconder elementos interativos -->
+<style media="print">
+  .lang-actions, .btn-group, .search-terms, .btn-mode, #darkModeToggle { display: none !important; }
+  .terms-card { box-shadow: none; border: 1px solid #ccc; }
+  .terms-footer { background: #f3f3f3; }
+  .progress-wrap { display: none; }
+</style>
+
+</body>
+</html>

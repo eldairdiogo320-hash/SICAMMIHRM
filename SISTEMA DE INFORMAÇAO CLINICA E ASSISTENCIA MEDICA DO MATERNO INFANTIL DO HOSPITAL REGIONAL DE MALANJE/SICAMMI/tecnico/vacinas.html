@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxílio em Vacinas e Curativos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        .card-header {
+            background-color: #198754;
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        .btn-success {
+            background-color: #198754;
+            border: none;
+            padding: 10px 20px;
+        }
+        .btn-success:hover {
+            background-color: #157347;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #198754;
+        }
+        .nav-pills .nav-link {
+            color: #198754;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background-color: #adb5bd;
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        .step.active .step-number {
+            background-color: #198754;
+        }
+        .step.completed .step-number {
+            background-color: #198754;
+        }
+        .step.completed .step-number:after {
+            content: "✓";
+        }
+        .step-title {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .step.active .step-title {
+            color: #198754;
+            font-weight: bold;
+        }
+        .step:not(:last-child):after {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 60%;
+            width: 80%;
+            height: 2px;
+            background-color: #adb5bd;
+            z-index: -1;
+        }
+        .step.completed:not(:last-child):after {
+            background-color: #198754;
+        }
+        .procedure-video {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .procedure-video i {
+            font-size: 50px;
+            color: #6c757d;
+        }
+        .material-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .material-item:last-child {
+            border-bottom: none;
+        }
+        .material-checkbox {
+            margin-right: 10px;
+        }
+        .material-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        .material-details {
+            flex: 1;
+        }
+        .material-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .material-description {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold">Auxílio em Vacinas e Curativos</h2>
+                <p class="text-muted">Guia passo a passo para procedimentos</p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <ul class="nav nav-pills mb-3 justify-content-center" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-vaccine-tab" data-bs-toggle="pill" data-bs-target="#pills-vaccine" type="button" role="tab">Vacinação</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-dressing-tab" data-bs-toggle="pill" data-bs-target="#pills-dressing" type="button" role="tab">Curativos</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="tab-content" id="pills-tabContent">
+                    <!-- Aba de Vacinação -->
+                    <div class="tab-pane fade show active" id="pills-vaccine" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Procedimento de Vacinação</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="step-indicator">
+                                    <div class="step completed">
+                                        <div class="step-number">1</div>
+                                        <div class="step-title">Paciente</div>
+                                    </div>
+                                    <div class="step active">
+                                        <div class="step-number">2</div>
+                                        <div class="step-title">Preparação</div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">3</div>
+                                        <div class="step-title">Aplicação</div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">4</div>
+                                        <div class="step-title">Registro</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Materiais Necessários</h5>
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <div class="material-item">
+                                                    <input type="checkbox" class="form-check-input material-checkbox" id="material1" checked>
+                                                    <div class="material-icon">
+                                                        <i class="bi bi-droplet"></i>
+                                                    </div>
+                                                    <div class="material-details">
+                                                        <div class="material-name">Vacina</div>
+                                                        <div class="material-description">COVID-19 - Dose de reforço</div>
+                                                    </div>
+                                                </div>
+                                                <div class="material-item">
+                                                    <input type="checkbox" class="form-check-input material-checkbox" id="material2">
+                                                    <div class="material-icon">
+                                                        <i class="bi bi-eyedropper"></i>
+                                                    </div>
+                                                    <div class="material-details">
+                                                        <div class="material-name">Seringa</div>
+                                                        <div class="material-description">3mL com agulha 25x7</div>
+                                                    </div>
+                                                </div>
+                                                <div class="material-item">
+                                                    <input type="checkbox" class="form-check-input material-checkbox" id="material3">
+                                                    <div class="material-icon">
+                                                        <i class="bi bi-bandaid"></i>
+                                                    </div>
+                                                    <div class="material-details">
+                                                        <div class="material-name">Algodão</div>
+                                                        <div class="material-description">Estéril</div>
+                                                    </div>
+                                                </div>
+                                                <div class="material-item">
+                                                    <input type="checkbox" class="form-check-input material-checkbox" id="material4">
+                                                    <div class="material-icon">
+                                                        <i class="bi bi-droplet-half"></i>
+                                                    </div>
+                                                    <div class="material-details">
+                                                        <div class="material-name">Álcool 70%</div>
+                                                        <div class="material-description">Frascos de 50mL</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Orientações</h5>
+                                        <div class="procedure-video">
+                                            <i class="bi bi-play-circle"></i>
+                                        </div>
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <ol>
+                                                    <li>Verificar a vacina correta e data de validade</li>
+                                                    <li>Higienizar as mãos</li>
+                                                    <li>Preparar a seringa com a dose correta</li>
+                                                    <li>Identificar o paciente corretamente</li>
+                                                    <li>Explicar o procedimento ao paciente</li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white d-flex justify-content-between">
+                                <button class="btn btn-outline-secondary">Anterior</button>
+                                <button class="btn btn-success">Próximo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aba de Curativos -->
+                    <div class="tab-pane fade" id="pills-dressing" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Procedimento de Curativos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-bandaid-fill" style="font-size: 2rem; color: #198754;"></i>
+                                                <h5 class="mt-3">Curativo Simples</h5>
+                                                <p class="text-muted">Para pequenos ferimentos</p>
+                                                <button class="btn btn-outline-success">Selecionar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-prescription2" style="font-size: 2rem; color: #198754;"></i>
+                                                <h5 class="mt-3">Curativo com Medicamento</h5>
+                                                <p class="text-muted">Quando há necessidade de pomadas</p>
+                                                <button class="btn btn-outline-success">Selecionar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-activity" style="font-size: 2rem; color: #198754;"></i>
+                                                <h5 class="mt-3">Curativo Especializado</h5>
+                                                <p class="text-muted">Para feridas complexas</p>
+                                                <button class="btn btn-outline-success">Selecionar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <strong>Dica:</strong> Selecione o tipo de curativo para ver as instruções específicas do procedimento.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Registro do Procedimento</h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="procedureDate" class="form-label">Data e Hora</label>
+                                    <input type="datetime-local" class="form-control" id="procedureDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="professionalName" class="form-label">Profissional Responsável</label>
+                                    <input type="text" class="form-control" id="professionalName" value="Enf. João Silva" readonly>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="procedureNotes" class="form-label">Observações</label>
+                                <textarea class="form-control" id="procedureNotes" rows="3"></textarea>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="adverseReaction">
+                                <label class="form-check-label" for="adverseReaction">
+                                    Houve reação adversa
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-end">
+                        <button class="btn btn-success">Registrar Procedimento</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Marcar/desmarcar materiais ao clicar em qualquer lugar do item
+            document.querySelectorAll('.material-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        const checkbox = this.querySelector('.material-checkbox');
+                        checkbox.checked = !checkbox.checked;
+                    }
+                });
+            });
+
+            // Simular carregamento de vídeo
+            const procedureVideo = document.querySelector('.procedure-video');
+            procedureVideo.addEventListener('click', function() {
+                this.innerHTML = '<div class="ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Procedimento de Vacinação" allowfullscreen></iframe></div>';
+            });
+
+            // Validação do formulário
+            const procedureForm = document.querySelector('#pills-vaccine form');
+            const nextButton = document.querySelector('#pills-vaccine .btn-success');
+            
+            nextButton.addEventListener('click', function() {
+                if (procedureForm.checkValidity()) {
+                    // Avançar para o próximo passo
+                    alert('Próximo passo: Aplicação da vacina');
+                } else {
+                    procedureForm.reportValidity();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
