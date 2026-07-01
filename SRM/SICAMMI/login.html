@@ -404,7 +404,7 @@
               <option value="enfermeiro" id="profile-enfermeiro">Enfermeiro</option>
               <option value="tecnico" id="profile-tecnico">Técnico de Enfermagem</option>
               <option value="administrativo" id="profile-administrativo">Administrativo</option>
-              <option value="agente" id="profile-agente">Agentes de Vacinação</option>
+              <option value="agente" id="profile-agente">Gestor Hospitalar</option>
               <option value="recepcionista" id="profile-recepcionista">Recepcionista e Atendimento</option>
               <option value="directores" id="profile-directores">Gestantes</option>
             </select>
@@ -420,9 +420,9 @@
           </button>
           
           <div class="links-section">
-            <a href="esqueci-me-senha.html"><i class="fas fa-key"></i> <span id="forgot-password-text">Esqueci minha senha</span></a>
-            <a href="criar-conta.html"><i class="fas fa-user-plus"></i> <span id="first-access-text">Primeiro acesso?</span></a>
-            <a href="ajuda.html"><i class="fas fa-question-circle"></i> <span id="help-text">Ajuda</span></a>
+            <a href="esqueci-me-senha.html" id="forgotPassword"><i class="fas fa-key"></i> <span id="forgot-password-text">Esqueci minha senha</span></a>
+            <a href="criar-conta.html" id="firstAccess"><i class="fas fa-user-plus"></i> <span id="first-access-text">Primeiro acesso?</span></a>
+            <a href="ajuda.html" id="help"><i class="fas fa-question-circle"></i> <span id="help-text">Ajuda</span></a>
           </div>
         </form>
       </div>
@@ -450,7 +450,7 @@
           'profile-enfermeiro': 'Enfermeiro',
           'profile-tecnico': 'Técnico de Enfermagem',
           'profile-administrativo': 'Administrativo',
-          'profile-agente': 'Agentes de Vacinação',
+          'profile-agente': 'Gestor Hospitalar',
           'profile-recepcionista': 'Recepcionista e Atendimento',
           'profile-directores': 'Gestante',
           captcha: 'Não sou um robô',
@@ -470,7 +470,7 @@
           'profile-enfermeiro': 'Enfermero',
           'profile-tecnico': 'Técnico de Enfermería',
           'profile-administrativo': 'Administrativo',
-          'profile-agente': 'Agentes de Vacunación',
+          'profile-agente': 'Gestor Hospitalario',
           'profile-recepcionista': 'Recepcionista y Atención',
           'profile-directores': 'Mujer Embarazada',
           captcha: 'No soy un robot',
@@ -490,7 +490,7 @@
           'profile-enfermeiro': 'Nurse',
           'profile-tecnico': 'Nursing Technician',
           'profile-administrativo': 'Administrative',
-          'profile-agente': 'Vaccination Agents',
+          'profile-agente': 'Hospital Manager',
           'profile-recepcionista': 'Receptionist and Service',
           'profile-directores': 'Pregnant Woman',
           captcha: 'I am not a robot',
@@ -549,9 +549,9 @@
         enfermeiro: 'enfermeiro/menuenfermeiro.html',
         tecnico: 'tecnico/menutec.html',
         administrativo: 'administrativo/menuadmin.html',
-        agente: 'agente/menu_agente.html',
+        agente: 'gestor/menu_gestor.html',
         recepcionista: 'recepcionista/menu_recepcionista.html',
-        directores: 'gestante/menu_director.html'
+        directores: 'gestante/menu_gestante.html'
       };
 
       // Mapeamento de permissões por perfil
@@ -559,7 +559,6 @@
         medico: ['visualizar_pacientes', 'prescrever_medicamentos', 'solicitar_exames'],
         enfermeiro: ['visualizar_pacientes', 'registrar_procedimentos', 'aplicar_medicamentos'],
         tecnico: ['auxiliar_procedimentos', 'registrar_sinais_vitais'],
-        gestor: ['gerar_relatorios', 'visualizar_indicadores'],
         administrativo: ['gerenciar_documentos', 'agendar_consultas'],
         agente: ['registrar_vacinacoes', 'gerar_certificados'],
         recepcionista: ['agendar_consultas', 'cadastrar_pacientes'],
